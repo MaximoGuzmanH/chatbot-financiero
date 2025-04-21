@@ -3,3 +3,6 @@ requests==2.32.3
 python-dotenv==1.0.1
 aiohttp==3.9.5
 aiofiles==24.1.0
+rasa==3.6.10
+transformers==4.39.3
+tensorflow==2.12.0
