@@ -1,16 +1,20 @@
-# Imagen base con Python 3.10 y pip
+# Imagen base con Python 3.10
 FROM python:3.10
 
-# Instala Rasa y demás dependencias
+# Copiar archivo de dependencias
 COPY requirements.txt ./
-RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copia todo el proyecto
+# Instalar dependencias y limpiar caché
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    rm -rf ~/.cache/pip
+
+# Copiar el contenido del proyecto al contenedor
 COPY . /app
 WORKDIR /app
 
-# Exponer puerto de la API
+# Exponer el puerto en el que se ejecuta Rasa por defecto
 EXPOSE 5005
 
-# Comando para correr Rasa en modo servidor API
+# Comando por defecto: iniciar el servidor de Rasa con API y CORS habilitado
 CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug"]
