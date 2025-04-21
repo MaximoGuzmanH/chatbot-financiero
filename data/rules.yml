@@ -1,0 +1,143 @@
+version: "3.1"
+
+rules:
+
+# ════════════════════════════════════════════════════════════════════
+# 🔧 FUNCIONALES: Reglas principales por intención
+# ════════════════════════════════════════════════════════════════════
+
+- rule: Analizar o Clasificar Gastos
+  steps:
+    - intent: analizar_gastos
+    - action: action_analizar_gastos
+
+- rule: Comparar Meses
+  steps:
+    - intent: comparar_meses
+    - action: action_comparar_meses
+
+- rule: Consultar Configuración
+  steps:
+    - intent: consultar_configuracion
+    - action: action_consultar_configuracion
+
+- rule: Consultar Saldo
+  steps:
+    - intent: consultar_informacion_financiera
+    - action: action_consultar_informacion_financiera
+
+- rule: Crear Configuración de Presupuesto o Alerta
+  steps:
+    - intent: crear_configuracion
+    - action: action_crear_configuracion
+
+- rule: Modificar Configuración de Presupuesto o Alerta
+  steps:
+    - intent: modificar_configuracion
+    - action: action_modificar_configuracion
+
+- rule: Eliminar Configuración de Presupuesto o Alerta
+  steps:
+    - intent: eliminar_configuracion
+    - action: action_eliminar_configuracion
+
+- rule: Registrar Gasto
+  steps:
+    - intent: registrar_gasto
+    - action: action_registrar_gasto
+
+- rule: Registrar Ingreso
+  steps:
+    - intent: registrar_ingreso
+    - action: action_registrar_ingreso
+
+- rule: Resetear Categoría de Gastos
+  steps:
+    - intent: resetear_categoria_gastos
+    - action: action_resetear_categoria_gastos
+
+- rule: Ver Historial Completo
+  steps:
+    - intent: ver_historial_completo
+    - action: action_ver_historial_completo
+
+- rule: Entrada No Entendida
+  steps:
+    - intent: entrada_no_entendida
+    - action: action_entrada_no_entendida
+
+- rule: Exportar Información
+  steps:
+    - intent: ver_historial_completo
+    - action: action_ver_historial_completo
+
+# ════════════════════════════════════════════════════════════════════
+# 💬 CONVERSACIONALES: saludos, ayuda, despedida
+# ════════════════════════════════════════════════════════════════════
+
+- rule: Saludo con bienvenida
+  steps:
+    - intent: saludo
+    - action: action_bienvenida
+
+- rule: Proveer ayuda general
+  steps:
+    - intent: ayuda_general
+    - action: utter_ayuda_general
+
+- rule: Responder a una despedida
+  steps:
+    - intent: despedida
+    - action: utter_despedida
+
+# ════════════════════════════════════════════════════════════════════
+# 🧠 CONTROL DE SLOTS / SUGERENCIAS
+# ════════════════════════════════════════════════════════════════════
+
+- rule: Reintentar ingreso con tipo=ingreso
+  condition:
+    - slot_was_set:
+        - tipo: ingreso
+  steps:
+    - intent: registrar_ingreso
+    - action: action_registrar_ingreso
+
+- rule: Reintentar gasto con tipo=gasto
+  condition:
+    - slot_was_set:
+        - tipo: gasto
+  steps:
+    - intent: registrar_gasto
+    - action: action_registrar_gasto
+
+- rule: Después de seguir la sugerencia
+  steps:
+    - action: action_follow_suggestion
+    - action: action_listen
+
+- rule: Ejecutar sugerencia si está pendiente
+  condition:
+    - slot_was_set:
+        - sugerencia_pendiente: true
+  steps:
+    - intent: affirm
+    - action: action_follow_suggestion
+    - slot_was_set:
+        - sugerencia_pendiente: null
+
+- rule: Ejecutar sugerencia pendiente
+  steps:
+    - slot_was_set:
+        - sugerencia_pendiente
+    - intent: affirm
+    - action: action_follow_suggestion
+
+- rule: Cancelar sugerencia pendiente
+  condition:
+    - slot_was_set:
+        - sugerencia_pendiente: true
+  steps:
+    - intent: deny
+    - action: action_negacion
+    - slot_was_set:
+        - sugerencia_pendiente: null

@@ -1,0 +1,135 @@
+version: "3.1"
+
+intents:
+  - analizar_gastos
+  - comparar_meses
+  - consultar_configuracion
+  - consultar_informacion_financiera
+  - crear_configuracion
+  - modificar_configuracion
+  - eliminar_configuracion
+  - entrada_no_entendida
+  - registrar_gasto
+  - registrar_ingreso
+  - resetear_categoria_gastos
+  - ver_historial_completo
+  - saludo
+  - despedida
+  - ayuda_general
+  - affirm
+  - deny
+
+entities:
+  - monto
+  - categoria
+  - fecha
+  - periodo
+  - medio
+  - tipo
+
+slots:
+  monto:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: monto
+
+  categoria:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: categoria
+
+  fecha:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: fecha
+
+  periodo:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: periodo
+
+  medio:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: medio
+
+  tipo:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: tipo
+
+  sugerencia_pendiente:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+responses:
+  utter_despedida:
+    - text: "¡Hasta luego! Cuida tus finanzas"
+    - text: "Nos vemos pronto. ¡Éxitos!"
+    - text: "Gracias por usar el asistente financiero. ¡Adiós!"
+    - text: "¡Hasta la próxima! Sigue controlando tus gastos."
+    - text: "Fue un gusto ayudarte. ¡Cuida tu bolsillo!"
+    - text: "¡Adiós! Que tengas un buen día financiero."
+    - text: "Nos vemos. ¡Que tus finanzas estén siempre en orden!"
+    - text: "¡Listo! Me despido por ahora, vuelve cuando necesites ayuda."
+    - text: "Gracias por confiar en tu asistente financiero. ¡Hasta luego!"
+    - text: "¡Hasta pronto! Recuerda revisar tus ingresos y egresos."
+
+  utter_ayuda_general:
+    - text: |
+        🙋‍♂️ ¡Estoy aquí para ayudarte a gestionar tus finanzas personales!
+
+        💰 *Ingresos y Gastos*  
+        - Registrar un ingreso o gasto  
+        - Consultar cuánto has gastado o recibido en cierto periodo  
+        - Analizar tus hábitos de consumo  
+
+        🧾 *Historial y Exportación*  
+        - Mostrar tu historial completo de transacciones  
+        - Exportar tus registros de ingresos y gastos  
+
+        📊 *Presupuestos y Alertas*  
+        - Configurar un presupuesto o alerta por categoría y mes  
+        - Consultar o eliminar alertas activas  
+        - Reiniciar los límites de una categoría para un mes específico  
+
+        🔄 *Comparaciones y análisis*  
+        - Comparar tus ingresos o gastos entre dos meses  
+        - Ver tu saldo actual disponible por medio (tarjeta, efectivo, etc.)  
+
+        🆘 *¿No sabes por dónde empezar?*  
+        Puedes decir cosas como:  
+        - "Quiero registrar un gasto"  
+        - "Muéstrame mis ingresos de marzo"  
+        - "Configura una alerta de 200 soles para transporte este mes"  
+
+        ¿Con cuál deseas comenzar?
+
+actions:
+  - action_analizar_gastos
+  - action_comparar_meses
+  - action_consultar_configuracion
+  - action_consultar_informacion_financiera
+  - action_crear_configuracion
+  - action_modificar_configuracion
+  - action_eliminar_configuracion
+  - action_entrada_no_entendida
+  - action_registrar_gasto
+  - action_registrar_ingreso
+  - action_resetear_categoria_gastos
+  - action_ver_historial_completo
+  - action_follow_suggestion
+  - action_negacion
+  - action_bienvenida
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
