@@ -1,10 +1,23 @@
+# /actions/Dockerfile
+
 FROM python:3.10
 
+# Establece el directorio de trabajo
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copia solo los archivos necesarios de la carpeta actions
+COPY requirements-actions.txt ./
+COPY actions.py ./
+COPY alertas_io.py ./
+COPY transacciones_io.py ./
 
-COPY . .
+# Instala las dependencias necesarias
+RUN pip install --upgrade pip && \
+    pip install rasa==3.6.10 && \
+    pip install -r requirements-actions.txt
 
-CMD ["rasa", "run", "actions", "--port", "5055", "--debug"]
+# Puerto de Rasa Actions
+EXPOSE 5055
+
+# Comando para ejecutar el servidor de acciones
+CMD ["rasa", "run", "actions"]
