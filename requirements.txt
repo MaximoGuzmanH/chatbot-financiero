@@ -1,5 +1,2 @@
-rasa==3.6.21
-rasa-sdk==3.6.2
 streamlit==1.32.2
 requests==2.32.3
-python-dotenv==1.0.1
