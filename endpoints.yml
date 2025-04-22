@@ -11,7 +11,7 @@
 # https://rasa.com/docs/rasa/custom-actions
 
 action_endpoint:
-  url: "https://actions-server-lwwf.onrender.com/webhook"
+  url: "https://actions-server-1wwf.onrender.com/webhook"
 
 # Tracker store which is used to store the conversations.
 # By default the conversations are stored in memory.
