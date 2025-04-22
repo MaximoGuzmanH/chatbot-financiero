@@ -6,7 +6,6 @@ language: es
 pipeline:
   - name: WhitespaceTokenizer
   - name: RegexFeaturizer
-  - name: LexicalSyntacticFeaturizer
   - name: CountVectorsFeaturizer
   - name: CountVectorsFeaturizer
     analyzer: char_wb
