@@ -8,5 +8,5 @@ WORKDIR /app
 # Exponer el puerto por defecto
 EXPOSE 5005
 
-# Comando de arranque
-CMD ["python", "-m", "rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "/app/models/model.tar.gz"]
+# Comando por defecto: iniciar el servidor de Rasa con API y CORS habilitado
+CMD ["python3", "-m", "rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "/app/models/model.tar.gz"]
