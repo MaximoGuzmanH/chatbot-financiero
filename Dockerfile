@@ -5,7 +5,7 @@ FROM python:3.10
 WORKDIR /app
 
 # Copiar primero requirements.txt para aprovechar la caché de Docker
-COPY requirements.txt .
+COPY requirements-render.txt ./requirements.txt
 
 # Instalar dependencias del sistema necesarias para Rasa
 RUN apt-get update && apt-get install -y \
