@@ -4,10 +4,17 @@ WORKDIR /app
 
 COPY . /app
 
-# Instala pip y las dependencias necesarias
-RUN pip install --upgrade pip && \
-    pip install rasa==3.5.11 rasa-sdk==3.5.11 && \
-    pip install -r requirements.txt
+# Actualiza pip y configura entorno base
+RUN apt-get update && apt-get install -y gcc
+
+RUN pip install --upgrade pip
+
+# Instala rasa y rasa-sdk directamente desde PyPI (versión válida y disponible)
+RUN pip install rasa==3.5.11
+RUN pip install rasa-sdk==3.5.11
+
+# Instala otras dependencias
+RUN pip install -r requirements.txt
 
 EXPOSE 5055
 
