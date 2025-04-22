@@ -1,23 +1,19 @@
-# /actions/Dockerfile
+# Usa una imagen base ligera con Python
+FROM python:3.10-slim
 
-FROM python:3.10
-
-# Establece el directorio de trabajo
+# Crea y define el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia solo los archivos necesarios de la carpeta actions
-COPY requirements-actions.txt ./
-COPY actions.py ./
-COPY alertas_io.py ./
-COPY transacciones_io.py ./
+# Copia todos los archivos al contenedor
+COPY . /app
 
-# Instala las dependencias necesarias
+# Instala pip y las dependencias necesarias
 RUN pip install --upgrade pip && \
-    pip install rasa==3.6.10 && \
-    pip install -r requirements-actions.txt
+    pip install rasa && \
+    pip install -r requirements.txt
 
-# Puerto de Rasa Actions
+# Expón el puerto por donde Rasa escuchará peticiones
 EXPOSE 5055
 
-# Comando para ejecutar el servidor de acciones
-CMD ["rasa", "run", "actions"]
+# Comando por defecto al arrancar el contenedor
+CMD ["rasa", "run", "actions", "--port", "5055"]
