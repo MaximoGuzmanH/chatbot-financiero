@@ -1,21 +1,29 @@
-# Imagen base
-FROM python:3.10-slim
+# Base compatible con Rasa
+FROM python:3.10
 
 # Crear carpeta de trabajo
 WORKDIR /app
 
-# Copiar dependencias primero (mejor caché)
+# Copiar primero requirements.txt para aprovechar la caché de Docker
 COPY requirements.txt .
 
-# Instalar dependencias
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Instalar dependencias del sistema necesarias para Rasa
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    graphviz \
+    git \
+    && pip install --upgrade pip \
+    && pip install -r requirements.txt \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar todo el proyecto
+# Copiar el resto del proyecto
 COPY . .
 
-# Exponer puerto 5005 (por defecto en Rasa)
+# Exponer el puerto de Rasa
 EXPOSE 5005
 
-# Comando de inicio
+# Comando de inicio del servicio Rasa
 ENTRYPOINT ["python"]
 CMD ["-m", "rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "models/model.tar.gz"]
