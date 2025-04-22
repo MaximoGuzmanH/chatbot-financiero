@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y \
 # Copiar el resto del proyecto
 COPY . .
 
+# DEBUG: listar contenido del directorio models (verificación)
+RUN ls -lh models/
+
 # Exponer el puerto de Rasa
 EXPOSE 5005
 
