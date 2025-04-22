@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . /app
 
-# Instala pip actualizado y dependencias
+# Instala pip y las dependencias necesarias
 RUN pip install --upgrade pip && \
     pip install rasa==3.5.11 rasa-sdk==3.5.11 && \
     pip install -r requirements.txt
