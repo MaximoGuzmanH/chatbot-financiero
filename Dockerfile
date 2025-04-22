@@ -17,4 +17,4 @@ WORKDIR /app
 EXPOSE 5005
 
 # Comando por defecto: iniciar el servidor de Rasa con API y CORS habilitado
-CMD ["rasa", "run", "--enable-api", "--model", "models/model.tar.gz", "--cors", "*", "--debug"]
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "models/model.tar.gz"]
