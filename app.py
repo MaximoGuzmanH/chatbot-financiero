@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 
-# 🌍 URL del túnel Cloudflare apuntando al servidor Rasa
 RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
 
 # Configuración de la página
@@ -24,8 +23,10 @@ def enviar_a_rasa(mensaje):
         response = requests.post(RASA_ENDPOINT, json=payload, timeout=10)
         response.raise_for_status()
         data = response.json()
+        print("Respuesta de Rasa:", data)  # <--- AÑADE ESTO
         return [r["text"] for r in data if "text" in r]
     except Exception as e:
+        print(f"Error al comunicarse con Rasa: {e}")  # <--- Y ESTO
         return [f"❌ Error al comunicarse con el asistente: {e}"]
 
 # Entrada del usuario
