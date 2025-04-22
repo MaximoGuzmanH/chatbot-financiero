@@ -1,3 +1,4 @@
-rasa==3.6.10
+rasa==3.5.11
+rasa-sdk==3.5.11
 aiohttp==3.8.5
 python-dotenv==1.0.1
