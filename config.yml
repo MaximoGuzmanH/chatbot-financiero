@@ -6,6 +6,7 @@ language: es
 pipeline:
   - name: WhitespaceTokenizer
   - name: RegexFeaturizer
+  - name: LexicalSyntacticFeaturizer
   - name: CountVectorsFeaturizer
   - name: CountVectorsFeaturizer
     analyzer: char_wb
@@ -21,8 +22,8 @@ pipeline:
   - name: FallbackClassifier
     threshold: 0.3
     ambiguity_threshold: 0.1
-  - name: DucklingEntityExtractor
-    url: http://localhost:8000
+  #- name: DucklingEntityExtractor
+  #  url: http://localhost:8000
 
 policies:
   - name: MemoizationPolicy
