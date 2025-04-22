@@ -1,12 +1,21 @@
-# Usa imagen oficial de Rasa, ya trae todo configurado
-FROM rasa/rasa:3.6.10
+# Imagen base
+FROM python:3.10-slim
 
-# Copiar el contenido del proyecto al contenedor
-COPY . /app
+# Crear carpeta de trabajo
 WORKDIR /app
 
-# Exponer el puerto por defecto
+# Copiar dependencias primero (mejor caché)
+COPY requirements.txt .
+
+# Instalar dependencias
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+# Copiar todo el proyecto
+COPY . .
+
+# Exponer puerto 5005 (por defecto en Rasa)
 EXPOSE 5005
 
-# Comando por defecto: iniciar el servidor de Rasa con API y CORS habilitado
-CMD ["python3", "-m", "rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "/app/models/model.tar.gz"]
+# Comando de inicio
+ENTRYPOINT ["python"]
+CMD ["-m", "rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "models/model.tar.gz"]
