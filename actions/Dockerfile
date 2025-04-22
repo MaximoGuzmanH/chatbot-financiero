@@ -1,12 +1,11 @@
-FROM rasa/rasa-sdk:3.5.11
+FROM rasa/rasa-sdk:3.0.0
 
 WORKDIR /app
 
-# Copia tus archivos de acciones personalizados
 COPY . /app
 
-# Instala tus dependencias adicionales
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
 EXPOSE 5055
 
