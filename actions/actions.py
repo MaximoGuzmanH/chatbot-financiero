@@ -2,7 +2,7 @@ from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import EventType
-from actions.transacciones_io import guardar_transaccion, cargar_transacciones
+from transacciones_io import guardar_transaccion, cargar_transacciones
 from rasa_sdk.events import SlotSet
 from collections import defaultdict
 import json
