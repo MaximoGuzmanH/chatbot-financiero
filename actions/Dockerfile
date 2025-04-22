@@ -1,11 +1,17 @@
 FROM rasa/rasa-sdk:3.0.0
 
+USER root
+
 WORKDIR /app
 
 COPY . /app
 
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+# Instalar pip actualizado y requerimientos como root
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Regresar al usuario sin privilegios
+USER 1001
 
 EXPOSE 5055
 
