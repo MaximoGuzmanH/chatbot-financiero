@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # 🌍 URL del túnel Cloudflare apuntando al servidor Rasa
-RASA_ENDPOINT = "https://colorado-decisions-qualifying-laden.trycloudflare.com/webhooks/rest/webhook"
+RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
 
 # Configuración de la página
 st.set_page_config(page_title="Asistente Financiero", page_icon="💰")
