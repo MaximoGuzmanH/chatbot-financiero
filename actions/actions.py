@@ -11,11 +11,9 @@ from datetime import datetime
 from collections import Counter, defaultdict
 from rasa_sdk.types import DomainDict
 from dateparser import parse as parse_fecha_relativa
-from actions.transacciones_io import eliminar_transaccion_logicamente
-from actions.alertas_io import guardar_alerta
-from actions.alertas_io import eliminar_alerta_logicamente
-from actions.alertas_io import cargar_alertas
-from actions.alertas_io import guardar_todas_las_alertas
+from transacciones_io import eliminar_transaccion_logicamente
+from alertas_io import guardar_alerta, eliminar_alerta_logicamente, cargar_alertas, guardar_todas_las_alertas
+import alertas_io
 
 def formatear_fecha(fecha: str) -> str:
     try:
@@ -301,8 +299,7 @@ class ActionVerHistorialCompleto(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
         try:
-            from actions.transacciones_io import cargar_transacciones
-            from actions import formatear_fecha
+            from transacciones_io import cargar_transacciones
 
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo = get_entity(tracker, "periodo")
@@ -750,8 +747,6 @@ class ActionEntradaNoEntendida(Action):
             dispatcher.utter_message(text="Ocurrió un error procesando tu mensaje. Por favor, intenta nuevamente.")
             return []
 
-from actions.alertas_io import guardar_alerta
-
 class ActionResetearCategoriaGastos(Action):
     def name(self) -> Text:
         return "action_resetear_categoria_gastos"
@@ -815,8 +810,6 @@ class ActionResetearCategoriaGastos(Action):
 
         dispatcher.utter_message(text=mensaje)
         return []
-
-import actions.alertas_io as alertas_io
 
 class ActionCrearConfiguracion(Action):
     def name(self) -> Text:
