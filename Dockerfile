@@ -9,4 +9,4 @@ WORKDIR /app
 EXPOSE 5005
 
 # Comando de arranque
-CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "models/model.tar.gz"]
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "/app/models/model.tar.gz"]
