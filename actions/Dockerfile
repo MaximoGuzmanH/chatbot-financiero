@@ -1,19 +1,14 @@
-# Usa una imagen base ligera con Python
-FROM python:3.10-slim
+FROM python:3.8-slim
 
-# Crea y define el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia todos los archivos al contenedor
 COPY . /app
 
-# Instala pip y las dependencias necesarias
+# Instala pip actualizado y dependencias
 RUN pip install --upgrade pip && \
-    pip install rasa && \
+    pip install rasa==3.5.11 rasa-sdk==3.5.11 && \
     pip install -r requirements.txt
 
-# Expón el puerto por donde Rasa escuchará peticiones
 EXPOSE 5055
 
-# Comando por defecto al arrancar el contenedor
 CMD ["rasa", "run", "actions", "--port", "5055"]
