@@ -4,7 +4,7 @@ FROM python:3.10
 # Crear carpeta de trabajo
 WORKDIR /app
 
-# Copiar primero requirements.txt para aprovechar la caché de Docker
+# Copiar primero requirements.txt para aprovechar caché
 COPY requirements-render.txt ./requirements.txt
 
 # Instalar dependencias del sistema necesarias para Rasa
@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     graphviz \
     git \
-    && pip install --upgrade pip \
-    && pip install -r requirements.txt \
+    && pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,6 +24,5 @@ COPY . .
 # Exponer el puerto de Rasa
 EXPOSE 5005
 
-# Comando de inicio del servicio Rasa
-ENTRYPOINT ["python"]
-CMD ["-m", "rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "models/model.tar.gz"]
+# Comando de inicio del servicio Rasa (forma correcta)
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--debug", "--model", "models/model.tar.gz"]
