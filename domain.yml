@@ -129,6 +129,7 @@ actions:
   - action_follow_suggestion
   - action_negacion
   - action_bienvenida
+  - action_session_start
 
 session_config:
   session_expiration_time: 60
