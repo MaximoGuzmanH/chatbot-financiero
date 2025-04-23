@@ -42,20 +42,32 @@ if not df_transacciones.empty:
 alertas = cargar_datos_json(RUTA_ALERTAS)
 df_alertas = pd.DataFrame(alertas)
 
-for campo in campos:
-    if campo not in df_alertas.columns:
-        df_alertas[campo] = None
-
 if not df_alertas.empty:
     df_alertas["tipo"] = "alerta"
     df_alertas["monto"] = pd.to_numeric(df_alertas.get("monto", 0), errors="coerce")
     df_alertas["categoria"] = df_alertas.get("categoria", "").fillna("Sin categoría")
     df_alertas["periodo"] = df_alertas.get("periodo", "").fillna("")
-    df_alertas["status"] = df_alertas.get("status", 1).astype(int)
-    df_alertas["mes"] = df_alertas.get("mes", "").str.lower()
-    df_alertas["año"] = df_alertas.get("año", datetime.now().year).astype(int)
+
+    # Extraer mes y año del campo periodo si no vienen por separado
+    def extraer_mes_y_anio(periodo):
+        try:
+            partes = periodo.lower().strip().split(" de ")
+            if len(partes) == 2:
+                return partes[0], int(partes[1])
+        except:
+            pass
+        return "desconocido", datetime.now().year
+
+    df_alertas[["mes", "año"]] = df_alertas["periodo"].apply(
+        lambda p: pd.Series(extraer_mes_y_anio(p))
+    )
+
+    df_alertas["status"] = df_alertas.get("status", 1).fillna(1).astype(int)
     df_alertas["medio"] = "N/A"
-    df_alertas["fecha"] = df_alertas.get("timestamp", "")
+    df_alertas["fecha"] = df_alertas.get("timestamp", datetime.now().isoformat())
+    df_alertas["timestamp"] = pd.to_datetime(df_alertas.get("timestamp", datetime.now().isoformat()), errors="coerce")
+else:
+    df_alertas = pd.DataFrame(columns=df_transacciones.columns)
 
 # ---------- UNIÓN Y FILTRADO ----------
 df = pd.concat([df_transacciones, df_alertas], ignore_index=True)
