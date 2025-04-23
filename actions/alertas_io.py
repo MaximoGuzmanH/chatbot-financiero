@@ -1,38 +1,35 @@
 import json
 import os
+import base64
 from datetime import datetime
 from typing import Dict, Any
 import requests
 
 RUTA_ALERTAS = "/tmp/alertas.json"
 
-# --- GitHub Sync (producción en Render) ---
+# --- GitHub Sync ---
 GITHUB_REPO = "MaximoGuzmanH/chatbot-financiero"
 ARCHIVO_ALERTAS = "alertas.json"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
-
 def subir_a_github_alertas():
     if not GITHUB_TOKEN:
-        print("[WARN] No se definió GITHUB_TOKEN. No se subirá a GitHub.")
+        print("[WARN] GITHUB_TOKEN no definido. No se subirá a GitHub.")
         return
 
     try:
         with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
             contenido = f.read()
 
+        contenido_base64 = base64.b64encode(contenido.encode("utf-8")).decode("utf-8")
         api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{ARCHIVO_ALERTAS}"
 
-        # Obtener el SHA actual del archivo
         response_get = requests.get(api_url, headers={"Authorization": f"Bearer {GITHUB_TOKEN}"})
-        if response_get.status_code == 200:
-            sha = response_get.json()["sha"]
-        else:
-            sha = None
+        sha = response_get.json().get("sha") if response_get.status_code == 200 else None
 
         payload = {
             "message": "🟢 Actualización de alertas desde el bot",
-            "content": contenido.encode("utf-8").decode("utf-8").encode("base64"),
+            "content": contenido_base64,
             "branch": "main"
         }
         if sha:
@@ -43,13 +40,14 @@ def subir_a_github_alertas():
             "Accept": "application/vnd.github+json"
         }
 
-        res = requests.put(api_url, headers=headers, json=payload)
-        if res.status_code in [200, 201]:
-            print("[SYNC] alertas.json actualizado correctamente en GitHub.")
+        response = requests.put(api_url, headers=headers, json=payload)
+        if response.status_code in [200, 201]:
+            print("[SYNC] alertas.json actualizado en GitHub.")
         else:
-            print(f"[ERROR] No se pudo actualizar alertas en GitHub: {res.status_code}", res.text)
+            print(f"[ERROR] GitHub ({response.status_code}):", response.text)
+
     except Exception as e:
-        print(f"[ERROR] al subir alertas a GitHub: {e}")
+        print(f"[ERROR] al subir alertas: {e}")
 
 
 def cargar_alertas(filtrar_activos=True):
@@ -58,9 +56,7 @@ def cargar_alertas(filtrar_activos=True):
     try:
         with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
             alertas = json.load(f)
-            if filtrar_activos:
-                alertas = [a for a in alertas if a.get("status", 1) == 1]
-            return alertas
+            return [a for a in alertas if a.get("status", 1) == 1] if filtrar_activos else alertas
     except json.JSONDecodeError:
         return []
 
@@ -70,6 +66,9 @@ def guardar_alerta(alerta):
     alerta["timestamp"] = datetime.now().isoformat()
     alerta["status"] = 1
     alertas.append(alerta)
+
+    if not alertas:
+        raise ValueError("⚠️ No se deben guardar alertas si la lista está vacía.")
 
     with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
         json.dump(alertas, f, ensure_ascii=False, indent=2)
@@ -96,13 +95,11 @@ def guardar_todas_las_alertas(nuevas_alertas):
     ahora = datetime.now()
     alertas = cargar_alertas(filtrar_activos=False)
 
-    # Desactivar todas las alertas activas
     for alerta in alertas:
         if alerta.get("status", 1) == 1:
             alerta["status"] = 0
             alerta["timestamp_modificacion"] = ahora.isoformat()
 
-    # Agregar nuevas alertas activas
     for nueva in nuevas_alertas:
         nueva_alerta = {
             "categoria": nueva["categoria"],
@@ -122,12 +119,14 @@ def guardar_todas_las_alertas(nuevas_alertas):
 def actualizar_alerta_existente(condiciones: Dict[str, str], nueva_alerta: Dict[str, Any]) -> bool:
     ahora = datetime.now().isoformat()
     alertas = cargar_alertas(filtrar_activos=False)
-
     modificada = False
+
     for alerta in alertas:
-        if (alerta.get("categoria", "").lower() == condiciones["categoria"].lower()
-                and alerta.get("periodo", "").lower() == condiciones["periodo"].lower()
-                and alerta.get("status", 1) == 1):
+        if (
+            alerta.get("categoria", "").lower() == condiciones["categoria"].lower()
+            and alerta.get("periodo", "").lower() == condiciones["periodo"].lower()
+            and alerta.get("status", 1) == 1
+        ):
             alerta["status"] = 0
             alerta["timestamp_modificacion"] = ahora
             modificada = True
