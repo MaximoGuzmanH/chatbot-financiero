@@ -6,7 +6,6 @@ from datetime import datetime
 
 # ---------- CONFIGURACIÓN INICIAL ----------
 st.set_page_config(page_title="📊 Visor Financiero", layout="wide")
-
 st.title("📋 Historial Financiero Interactivo")
 
 # ---------- CARGA DE ARCHIVOS ----------
@@ -24,6 +23,11 @@ transacciones = cargar_datos_json(RUTA_TRANSACCIONES)
 df_transacciones = pd.DataFrame(transacciones)
 
 # Normalización para evitar errores
+campos = ["tipo", "monto", "categoria", "fecha", "medio", "mes", "año", "status"]
+for campo in campos:
+    if campo not in df_transacciones.columns:
+        df_transacciones[campo] = None
+
 if not df_transacciones.empty:
     df_transacciones["monto"] = pd.to_numeric(df_transacciones.get("monto", 0), errors="coerce")
     df_transacciones["fecha"] = df_transacciones.get("fecha", "")
@@ -38,6 +42,10 @@ if not df_transacciones.empty:
 alertas = cargar_datos_json(RUTA_ALERTAS)
 df_alertas = pd.DataFrame(alertas)
 
+for campo in campos:
+    if campo not in df_alertas.columns:
+        df_alertas[campo] = None
+
 if not df_alertas.empty:
     df_alertas["tipo"] = "alerta"
     df_alertas["monto"] = pd.to_numeric(df_alertas.get("monto", 0), errors="coerce")
@@ -48,11 +56,13 @@ if not df_alertas.empty:
     df_alertas["año"] = df_alertas.get("año", datetime.now().year).astype(int)
     df_alertas["medio"] = "N/A"
     df_alertas["fecha"] = df_alertas.get("timestamp", "")
-else:
-    df_alertas = pd.DataFrame(columns=df_transacciones.columns)
 
 # ---------- UNIÓN Y FILTRADO ----------
 df = pd.concat([df_transacciones, df_alertas], ignore_index=True)
+
+if df.empty:
+    st.warning("⚠️ No se encontraron datos en transacciones.json ni alertas.json.")
+    st.stop()
 
 # ---------- BARRA LATERAL DE FILTROS ----------
 st.sidebar.header("📂 Filtros")
