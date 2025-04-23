@@ -10,6 +10,11 @@ RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
 st.set_page_config(page_title="Asistente Financiero", page_icon="💰")
 st.title("💬 Chat con tu Asistente Financiero")
 
+# 🧹 Botón para limpiar el historial de conversación
+if st.button("🧹 Limpiar conversación"):
+    st.session_state.messages = []
+    st.experimental_rerun()
+
 # ⏰ Función para mostrar la hora al estilo de WhatsApp
 def hora_estilo_chat():
     lima_tz = pytz.timezone("America/Lima")
