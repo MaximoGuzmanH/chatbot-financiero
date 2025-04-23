@@ -20,15 +20,31 @@ def hora_estilo_chat():
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# 🗂️ Mostrar historial previo con hora
+# 🗂️ Mostrar historial con íconos personalizados y alineación
 for msg in st.session_state.messages:
-    alineacion = "left" if msg["role"] == "assistant" else "right"
-    estilo = f"text-align: {alineacion}; background-color: #f0f2f6; padding: 8px 12px; border-radius: 12px; margin: 4px 0;"
-    hora = f"<div style='text-align:{alineacion}; font-size:0.75rem; color:gray'>{msg['hora']}</div>"
+    es_usuario = msg["role"] == "user"
+    hora = f"<div style='text-align: {'right' if es_usuario else 'left'}; font-size: 0.75rem; color: gray;'>{msg['hora']}</div>"
 
-    with st.chat_message(msg["role"]):
-        st.markdown(f"<div style='{estilo}'>{msg['content']}</div>", unsafe_allow_html=True)
-        st.markdown(hora, unsafe_allow_html=True)
+    if es_usuario:
+        st.markdown(f"""
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 2px;">
+            <div style="background-color: #daf0e9; padding: 8px 12px; border-radius: 12px; max-width: 70%; text-align: right;">
+                {msg['content']}
+            </div>
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" width="30" style="margin-left: 8px; border-radius: 50%;">
+        </div>
+        {hora}
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown(f"""
+        <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 2px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712017.png" width="30" style="margin-right: 8px; border-radius: 50%;">
+            <div style="background-color: #ffffff; padding: 8px 12px; border-radius: 12px; max-width: 70%; text-align: left;">
+                {msg['content']}
+            </div>
+        </div>
+        {hora}
+        """, unsafe_allow_html=True)
 
 # 🔁 Función para enviar mensaje a Rasa
 def enviar_a_rasa(mensaje):
@@ -47,16 +63,16 @@ def enviar_a_rasa(mensaje):
 if mensaje_usuario := st.chat_input("Escribe algo..."):
     hora_actual = hora_estilo_chat()
 
-    # Mostrar mensaje del usuario alineado a la derecha
-    with st.chat_message("user"):
-        st.markdown(
-            f"<div style='text-align: right; background-color: #daf0e9; padding: 8px 12px; border-radius: 12px; margin: 4px 0;'>{mensaje_usuario}</div>",
-            unsafe_allow_html=True
-        )
-        st.markdown(
-            f"<div style='text-align:right; font-size:0.75rem; color:gray'>{hora_actual}</div>",
-            unsafe_allow_html=True
-        )
+    # Mostrar mensaje del usuario con ícono a la derecha
+    st.markdown(f"""
+    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 2px;">
+        <div style="background-color: #daf0e9; padding: 8px 12px; border-radius: 12px; max-width: 70%; text-align: right;">
+            {mensaje_usuario}
+        </div>
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" width="30" style="margin-left: 8px; border-radius: 50%;">
+    </div>
+    <div style="text-align: right; font-size: 0.75rem; color: gray;">{hora_actual}</div>
+    """, unsafe_allow_html=True)
 
     st.session_state.messages.append({
         "role": "user",
@@ -69,16 +85,16 @@ if mensaje_usuario := st.chat_input("Escribe algo..."):
     respuesta_completa = "\n\n".join(respuestas)
     hora_respuesta = hora_estilo_chat()
 
-    # Mostrar respuesta del bot alineada a la izquierda
-    with st.chat_message("assistant"):
-        st.markdown(
-            f"<div style='text-align: left; background-color: #ffffff; padding: 8px 12px; border-radius: 12px; margin: 4px 0;'>{respuesta_completa}</div>",
-            unsafe_allow_html=True
-        )
-        st.markdown(
-            f"<div style='text-align:left; font-size:0.75rem; color:gray'>{hora_respuesta}</div>",
-            unsafe_allow_html=True
-        )
+    # Mostrar respuesta del bot con ícono a la izquierda
+    st.markdown(f"""
+    <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 2px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712017.png" width="30" style="margin-right: 8px; border-radius: 50%;">
+        <div style="background-color: #ffffff; padding: 8px 12px; border-radius: 12px; max-width: 70%; text-align: left;">
+            {respuesta_completa}
+        </div>
+    </div>
+    <div style="text-align: left; font-size: 0.75rem; color: gray;">{hora_respuesta}</div>
+    """, unsafe_allow_html=True)
 
     st.session_state.messages.append({
         "role": "assistant",
