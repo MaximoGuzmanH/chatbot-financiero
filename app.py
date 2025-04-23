@@ -19,19 +19,6 @@ def hora_estilo_chat():
     ahora = datetime.now(lima_tz)
     return ahora.strftime("%I:%M %p").lstrip("0").replace("AM", "a. m.").replace("PM", "p. m.")
 
-# Mensaje inicial automático si no hay historial
-if not st.session_state.messages:
-    hora_inicio = hora_estilo_chat()
-    bienvenida = """👋 ¡Hola! Soy tu asistente financiero.  
-Puedo ayudarte a registrar gastos, consultar saldos, configurar alertas y más.  
-👉 Escribe algo como: *"Gaste 50 soles en comida"*"""
-
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": bienvenida,
-        "hora": hora_inicio
-    })
-
 # 📦 Inicializar historial
 if "messages" not in st.session_state:
     st.session_state.messages = []
