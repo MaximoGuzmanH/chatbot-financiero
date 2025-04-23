@@ -92,14 +92,13 @@ def guardar_transaccion(transaccion):
         
     from github_sync import subir_a_github
 
-    subir_a_github(
+    resultado = subir_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
         ruta_destino_repo="transacciones.json",
         mensaje_commit="Actualización automática de transacciones desde Streamlit"
     )
 
-    if TOKEN:
-        subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
+    print(f"[DEBUG] Resultado de subida a GitHub: {resultado}")
 
 def eliminar_transaccion_logicamente(condiciones):
     transacciones = cargar_transacciones(filtrar_activos=False)
