@@ -22,5 +22,17 @@
     "año": 2025,
     "timestamp": "2025-04-23T07:01:33.515303",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 1100.0,
+    "categoria": "freelance",
+    "fecha": "23 de abril de 2025",
+    "medio": "tarjeta débito",
+    "dia": 23,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-23T07:02:58.526774",
+    "status": 1
   }
 ]
