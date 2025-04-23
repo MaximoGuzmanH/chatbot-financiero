@@ -10,5 +10,17 @@
     "año": 2025,
     "timestamp": "2025-04-23T07:00:48.929963",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 50.0,
+    "categoria": "ropa",
+    "fecha": "1 de abril",
+    "medio": "efectivo",
+    "dia": 1,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-23T07:01:33.515303",
+    "status": 1
   }
 ]
