@@ -85,6 +85,18 @@
   },
   {
     "tipo": "gasto",
+    "monto": 500.0,
+    "categoria": "restaurante",
+    "fecha": "dia",
+    "medio": "efectivo",
+    "dia": 23,
+    "mes": "april",
+    "año": 2025,
+    "timestamp": "2025-04-23T16:48:31.126517",
+    "status": 1
+  },
+  {
+    "tipo": "gasto",
     "monto": 1500.0,
     "categoria": "rojo",
     "fecha": "23 de abril de 2025",
@@ -141,6 +153,38 @@
     "mes": "abril",
     "año": 2025,
     "timestamp": "2025-04-23T21:42:51.123996",
+    "status": 1
+  },
+  {
+    "tipo": "entrada_no_entendida",
+    "descripcion": "eres gei?",
+    "timestamp": "2025-04-23T21:43:04.405945",
+    "fecha": "23/04/2025",
+    "dia": 23,
+    "mes": "abril",
+    "año": 2025,
+    "status": 1
+  },
+  {
+    "tipo": "entrada_no_entendida",
+    "descripcion": "ya pero eres o no eres?",
+    "timestamp": "2025-04-23T21:43:38.759144",
+    "fecha": "23/04/2025",
+    "dia": 23,
+    "mes": "abril",
+    "año": 2025,
+    "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 100.0,
+    "categoria": "comida",
+    "fecha": "23 de abril de 2025",
+    "medio": "tarjeta de crédito",
+    "dia": 23,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-23T23:46:16.644144",
     "status": 1
   }
 ]
