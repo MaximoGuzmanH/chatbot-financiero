@@ -60,6 +60,8 @@ if not df_alertas.empty:
 # ---------- UNIÓN Y FILTRADO ----------
 df = pd.concat([df_transacciones, df_alertas], ignore_index=True)
 
+df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+
 if df.empty:
     st.warning("⚠️ No se encontraron datos en transacciones.json ni alertas.json.")
     st.stop()
@@ -100,7 +102,7 @@ elif estado_sel == "Inactivos":
 
 # ---------- TABLA RESULTANTE ----------
 st.markdown(f"### Resultados ({len(df_filtrado)} registros)")
-st.dataframe(df_filtrado.sort_values(by="fecha", ascending=False).reset_index(drop=True), use_container_width=True)
+st.dataframe(df_filtrado.sort_values(by="timestamp", ascending=False).reset_index(drop=True), use_container_width=True)
 
 # ---------- RESÚMENES ----------
 if not df_filtrado.empty:
@@ -113,5 +115,29 @@ if not df_filtrado.empty:
 
     with col2:
         st.subheader("📊 Totales por categoría")
-        total_por_categoria = df_filtrado.groupby("categoria")["monto"].sum().sort_values(ascending=False)
-        st.table(total_por_categoria.apply(lambda x: f"{x:.2f} soles"))
+        
+        # Detectamos tipo por categoría
+        tipo_por_categoria = df_filtrado.groupby("categoria")["tipo"].agg(lambda x: x.mode()[0] if not x.mode().empty else "desconocido")
+
+        # Agrupamos montos
+        total_por_categoria = df_filtrado.groupby("categoria")["monto"].sum().to_frame()
+        total_por_categoria["tipo"] = tipo_por_categoria
+
+        # Aplicamos signo negativo si es gasto
+        total_por_categoria["monto"] = total_por_categoria.apply(
+            lambda row: -row["monto"] if row["tipo"] == "gasto" else row["monto"],
+            axis=1
+        ).round(2)
+
+        # Estilo condicional
+        def estilo_monto(val, tipo):
+            color = "red" if tipo == "gasto" else "black"
+            return f"color: {color}"
+
+        # Visualización
+        st.dataframe(
+            total_por_categoria[["monto", "tipo"]]
+            .style
+            .apply(lambda row: [estilo_monto(row["monto"], row["tipo"]), ""], axis=1)
+            .format({"monto": lambda x: f"{x:,.2f} soles"})
+        )
