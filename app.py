@@ -19,6 +19,19 @@ def hora_estilo_chat():
     ahora = datetime.now(lima_tz)
     return ahora.strftime("%I:%M %p").lstrip("0").replace("AM", "a. m.").replace("PM", "p. m.")
 
+# Mensaje inicial automático si no hay historial
+if not st.session_state.messages:
+    hora_inicio = hora_estilo_chat()
+    bienvenida = """👋 ¡Hola! Soy tu asistente financiero.  
+Puedo ayudarte a registrar gastos, consultar saldos, configurar alertas y más.  
+👉 Escribe algo como: *"Gaste 50 soles en comida"*"""
+
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": bienvenida,
+        "hora": hora_inicio
+    })
+
 # 📦 Inicializar historial
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -105,47 +118,34 @@ if mensaje_usuario := st.chat_input("Escribe algo..."):
         "hora": hora_respuesta
     })
 
-# HTML y CSS del botón
-components.html("""
+# ✅ Botón flotante usando st.button con estilo embebido
+from streamlit.components.v1 import html
+
+# Crear columna flotante en posición absoluta con HTML y aplicar `st.button` ahí dentro
+float_button = st.empty()
+
+with float_button.container():
+    st.markdown("""
     <style>
-    .floating-button {
+    div[data-testid="stHorizontalBlock"] {
         position: fixed;
         bottom: 90px;
         right: 20px;
+        z-index: 9999;
         background-color: #ff4b4b;
-        color: white;
-        border: none;
         border-radius: 20px;
-        padding: 10px 16px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
+        padding: 0px 12px;
         box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-        z-index: 100;
-        transition: background-color 0.3s ease;
     }
-    .floating-button:hover {
-        background-color: #e03e3e;
+    button {
+        color: white !important;
+        background: none !important;
+        border: none !important;
     }
-    </style>
-    <script>
-        const btn = document.createElement("button");
-        btn.innerText = "🧹 Limpiar";
-        btn.className = "floating-button";
-        btn.onclick = () => {
-            window.parent.postMessage({ type: "streamlit:clearChat" }, "*");
-        };
-        document.body.appendChild(btn);
-    </script>
-""", height=0)
 
-# 🔄 Captura el mensaje del botón desde JS
-st.markdown("""
-    <script>
-        window.addEventListener("message", (event) => {
-            if (event.data?.type === "streamlit:clearChat") {
-                window.location.reload();
-            }
-        });
-    </script>
-""", unsafe_allow_html=True)
+    </style>
+    """, unsafe_allow_html=True)
+
+    if st.button("🧹 Limpiar"):
+        st.session_state.messages = []
+        st.experimental_rerun()
