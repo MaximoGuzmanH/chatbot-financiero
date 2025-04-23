@@ -1264,13 +1264,13 @@ class ActionBienvenida(Action):
             "💼 **¡Hola! Bienvenido 👋**",
             f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.",
             "",
-            "🔧 **¿Qué puedo hacer por ti?**",
+            "🛠️ **Puedo ayudarte a:**",
             "- Registrar ingresos y gastos",
             "- Ver tu historial o saldo",
             "- Configurar alertas",
             "- Comparar tus gastos entre meses",
             "",
-            "💡 *Ejemplo*: `Muéstrame mis gastos de abril`",
+            "💡 *Ejemplo:* `Muéstrame mis gastos de abril`",
             "",
             "👉 ¿Qué deseas hacer hoy?"
         ])
