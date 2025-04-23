@@ -1,9 +1,44 @@
 import json
 import os
 from datetime import datetime
+import requests
+import base64
 
 # Ruta absoluta al archivo transacciones.json
 RUTA_TRANSACCIONES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "transacciones.json")
+
+# GitHub API
+REPO = "MaximoGuzmanH/chatbot-financiero"
+ARCHIVO_GITHUB = "transacciones.json"
+TOKEN = os.getenv("GITHUB_TOKEN") 
+
+def subir_a_github(ruta_local, repo, archivo_remoto, token):
+    with open(ruta_local, "r", encoding="utf-8") as f:
+        contenido = f.read()
+
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github+json"
+    }
+
+    url_base = f"https://api.github.com/repos/{repo}/contents/{archivo_remoto}"
+
+    resp = requests.get(url_base, headers=headers)
+    sha = resp.json().get("sha") if resp.status_code == 200 else None
+
+    payload = {
+        "message": f"Actualización automática de {archivo_remoto}",
+        "content": base64.b64encode(contenido.encode()).decode("utf-8"),
+        "branch": "main"
+    }
+    if sha:
+        payload["sha"] = sha
+
+    response = requests.put(url_base, headers=headers, json=payload)
+    if response.status_code not in [200, 201]:
+        print(f"[ERROR] GitHub update failed: {response.status_code} - {response.text}")
+    else:
+        print(f"[OK] Archivo {archivo_remoto} actualizado en GitHub")
 
 def cargar_transacciones(filtrar_activos=True):
     if not os.path.exists(RUTA_TRANSACCIONES):
@@ -19,10 +54,8 @@ def cargar_transacciones(filtrar_activos=True):
 
 def guardar_transaccion(transaccion):
     transacciones = cargar_transacciones(filtrar_activos=False)
-
     ahora = datetime.now()
 
-    # Si no se proporciona fecha, se usa la actual
     fecha_str = transaccion.get("fecha")
     if not fecha_str:
         fecha_str = ahora.strftime("%d/%m/%Y")
@@ -40,42 +73,42 @@ def guardar_transaccion(transaccion):
                      "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
             mes = meses[mes_num - 1]
     except Exception as e:
-        print(f"[WARN] No se pudo procesar fecha '{fecha_str}', usando fecha actual. Error: {e}")
+        print(f"[WARN] Fecha inválida '{fecha_str}': {e}")
         dia = ahora.day
         mes = ahora.strftime("%B").lower()
         año = ahora.year
 
-    # Agregar campos adicionales
-    transaccion["dia"] = dia
-    transaccion["mes"] = mes
-    transaccion["año"] = año
-    transaccion["timestamp"] = ahora.isoformat()
-    transaccion["status"] = transaccion.get("status", 1)  # 👈 importante aquí
+    transaccion.update({
+        "dia": dia,
+        "mes": mes,
+        "año": año,
+        "timestamp": ahora.isoformat(),
+        "status": transaccion.get("status", 1)
+    })
 
     transacciones.append(transaccion)
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
         
-def eliminar_transaccion_logicamente(condiciones):
-    """
-    Marca como inactiva (status = 0) la primera transacción que coincida con las condiciones dadas.
+    from github_sync import subir_a_github
 
-    condiciones: diccionario con los campos clave que deben coincidir. Ejemplo:
-        {
-            "tipo": "alerta",
-            "categoria": "ropa",
-            "periodo": "abril"
-        }
-    """
-    transacciones = cargar_transacciones(filtrar_activos=False)  # Trae todas, incluso inactivas
+    subir_a_github(
+        ruta_archivo_local=RUTA_TRANSACCIONES,
+        ruta_destino_repo="transacciones.json",
+        mensaje_commit="Actualización automática de transacciones desde Streamlit"
+    )
+
+    if TOKEN:
+        subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
+
+def eliminar_transaccion_logicamente(condiciones):
+    transacciones = cargar_transacciones(filtrar_activos=False)
     modificada = False
 
     for transaccion in transacciones:
         if transaccion.get("status", 1) == 0:
-            continue  # Ya está desactivada
-
-        coincide = all(transaccion.get(k) == v for k, v in condiciones.items())
-        if coincide:
+            continue
+        if all(transaccion.get(k) == v for k, v in condiciones.items()):
             transaccion["status"] = 0
             transaccion["timestamp_modificacion"] = datetime.now().isoformat()
             modificada = True
@@ -84,7 +117,8 @@ def eliminar_transaccion_logicamente(condiciones):
     if modificada:
         with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
             json.dump(transacciones, f, ensure_ascii=False, indent=2)
-        print(f"[INFO] Transacción eliminada lógicamente: {condiciones}")
+        print(f"[INFO] Eliminada lógicamente: {condiciones}")
+        if TOKEN:
+            subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
     else:
-        print(f"[WARN] No se encontró ninguna transacción activa que coincida con: {condiciones}")
-
+        print(f"[WARN] No encontrada: {condiciones}")
