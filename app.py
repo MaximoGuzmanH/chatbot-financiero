@@ -3,6 +3,9 @@ import requests
 from datetime import datetime
 import pytz
 
+# 🧹 Botón flotante funcional en Streamlit
+import streamlit.components.v1 as components
+
 # 🔗 Configuración del endpoint
 RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
 
@@ -102,8 +105,8 @@ if mensaje_usuario := st.chat_input("Escribe algo..."):
         "hora": hora_respuesta
     })
 
-# 🧹 Botón flotante para limpiar conversación (siempre visible)
-st.markdown("""
+# HTML y CSS del botón
+components.html("""
     <style>
     .floating-button {
         position: fixed;
@@ -125,11 +128,24 @@ st.markdown("""
         background-color: #e03e3e;
     }
     </style>
-    <form action="" method="post">
-        <button class="floating-button" name="clear" type="submit">🧹 Limpiar</button>
-    </form>
-""", unsafe_allow_html=True)
+    <script>
+        const btn = document.createElement("button");
+        btn.innerText = "🧹 Limpiar";
+        btn.className = "floating-button";
+        btn.onclick = () => {
+            window.parent.postMessage({ type: "streamlit:clearChat" }, "*");
+        };
+        document.body.appendChild(btn);
+    </script>
+""", height=0)
 
-if st.session_state.get("clear"):
-    st.session_state.messages = []
-    st.experimental_rerun()
+# 🔄 Captura el mensaje del botón desde JS
+st.markdown("""
+    <script>
+        window.addEventListener("message", (event) => {
+            if (event.data?.type === "streamlit:clearChat") {
+                window.location.reload();
+            }
+        });
+    </script>
+""", unsafe_allow_html=True)
