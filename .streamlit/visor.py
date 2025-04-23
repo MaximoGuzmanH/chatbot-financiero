@@ -29,14 +29,14 @@ for campo in campos:
         df_transacciones[campo] = None
 
 if not df_transacciones.empty:
-    df_transacciones["monto"] = pd.to_numeric(df_transacciones.get("monto", 0), errors="coerce")
+    df_transacciones["monto"] = (pd.to_numeric(df_transacciones.get("monto", 0).astype(str).str.replace(",", ""), errors="coerce"))
     df_transacciones["fecha"] = df_transacciones.get("fecha", "")
     df_transacciones["categoria"] = df_transacciones.get("categoria", "").fillna("Sin categoría")
     df_transacciones["tipo"] = df_transacciones.get("tipo", "").fillna("Sin tipo")
     df_transacciones["medio"] = df_transacciones.get("medio", "").fillna("Sin medio")
     df_transacciones["status"] = df_transacciones.get("status", 1).fillna(1).astype(int)
     df_transacciones["mes"] = df_transacciones.get("mes", "").fillna("desconocido").str.lower()
-    df_transacciones["año"] = df_transacciones.get("año", datetime.now().year).fillna(datetime.now().year).astype(int)
+    df_transacciones["año"] = pd.to_numeric(df_transacciones.get("año", datetime.now().year), errors="coerce").fillna(datetime.now().year).astype(int)
 
 # ---------- ALERTAS ----------
 alertas = cargar_datos_json(RUTA_ALERTAS)
@@ -64,7 +64,7 @@ if not df_alertas.empty:
 
     df_alertas["status"] = df_alertas.get("status", 1).fillna(1).astype(int)
     df_alertas["medio"] = "N/A"
-    df_alertas["fecha"] = df_alertas.get("timestamp", datetime.now().isoformat())
+    df_alertas["fecha"] = None
     df_alertas["timestamp"] = pd.to_datetime(df_alertas.get("timestamp", datetime.now().isoformat()), errors="coerce")
 else:
     df_alertas = pd.DataFrame(columns=df_transacciones.columns)
@@ -127,29 +127,35 @@ if not df_filtrado.empty:
 
     with col2:
         st.subheader("📊 Totales por categoría")
-        
-        # Detectamos tipo por categoría
-        tipo_por_categoria = df_filtrado.groupby("categoria")["tipo"].agg(lambda x: x.mode()[0] if not x.mode().empty else "desconocido")
 
-        # Agrupamos montos
-        total_por_categoria = df_filtrado.groupby("categoria")["monto"].sum().to_frame()
-        total_por_categoria["tipo"] = tipo_por_categoria
+        # Agrupar por tipo + categoría
+        agrupado = df_filtrado.groupby(["tipo", "categoria"])["monto"].sum().reset_index()
 
-        # Aplicamos signo negativo si es gasto
-        total_por_categoria["monto"] = total_por_categoria.apply(
+        # Aplicar signo negativo si es gasto (solo visual)
+        agrupado["monto"] = agrupado.apply(
             lambda row: -row["monto"] if row["tipo"] == "gasto" else row["monto"],
             axis=1
         ).round(2)
 
-        # Estilo condicional
-        def estilo_monto(val, tipo):
-            color = "red" if tipo == "gasto" else "black"
-            return f"color: {color}"
+        # Ordenar por monto
+        agrupado = agrupado.sort_values(by="monto", ascending=False)
 
-        # Visualización
+        # Estilo condicional por tipo
+        def estilo_condicional(row):
+            tipo = row["tipo"]
+            if tipo == "gasto":
+                return ["color: red", "", ""]
+            elif tipo == "ingreso":
+                return ["color: green", "", ""]
+            elif tipo == "alerta":
+                return ["color: goldenrod", "", ""]
+            else:
+                return ["", "", ""]
+
+        # Visualización estilizada
         st.dataframe(
-            total_por_categoria[["monto", "tipo"]]
+            agrupado[["categoria", "monto", "tipo"]]
             .style
-            .apply(lambda row: [estilo_monto(row["monto"], row["tipo"]), ""], axis=1)
+            .apply(estilo_condicional, axis=1)
             .format({"monto": lambda x: f"{x:,.2f} soles"})
         )
