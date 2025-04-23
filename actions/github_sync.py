@@ -25,7 +25,7 @@ GITHUB_REPO = os.getenv("GITHUB_REPO")
 GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_USERNAME}/{GITHUB_REPO}/contents/"
 
 # ---------- FUNCIÓN DE SUBIDA ----------
-def subir_a_github(ruta_archivo_local: str, ruta_destino_repo: str, mensaje_commit: str):
+def subir_log_a_github(ruta_archivo_local: str, ruta_destino_repo: str, mensaje_commit: str):
     if not all([GITHUB_TOKEN, GITHUB_USERNAME, GITHUB_REPO]):
         msg = "[ERROR] Faltan variables de entorno para autenticación con GitHub."
         print(msg)
