@@ -1,2 +1,11 @@
 [
+  {
+    "categoria": "transporte",
+    "monto": 300.0,
+    "periodo": "abril de 2025",
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-23T15:44:49.148527",
+    "status": 1
+  }
 ]
