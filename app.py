@@ -43,7 +43,7 @@ if mensaje_usuario := st.chat_input("Escribe algo..."):
     respuesta_completa = "\n\n".join(respuestas)
     with st.chat_message("assistant"):
         st.markdown(respuesta_completa, unsafe_allow_html=True)
-        st.session_state.messages.append({"role": "assistant", "content": r})
+    st.session_state.messages.append({"role": "assistant", "content": respuesta_completa})
 
     # Scroll automático al final
     st.markdown("""
