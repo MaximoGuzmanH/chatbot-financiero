@@ -5,7 +5,7 @@ import requests
 import base64
 
 # Ruta absoluta al archivo transacciones.json
-RUTA_TRANSACCIONES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "transacciones.json")
+RUTA_TRANSACCIONES = "/tmp/transacciones.json"
 
 # GitHub API
 REPO = "MaximoGuzmanH/chatbot-financiero"
