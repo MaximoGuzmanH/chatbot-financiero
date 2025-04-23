@@ -117,19 +117,25 @@ with float_button.container():
     div[data-testid="stHorizontalBlock"] {
         position: fixed;
         bottom: 90px;
-        right: 20px;
+        right: 32px;
         z-index: 9999;
-        background-color: #ff4b4b;
-        border-radius: 20px;
         padding: 0px 12px;
         box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
     }
-    button {
+    div[data-testid="stHorizontalBlock"] button {
+        background-color: #ff4b4b;
         color: white !important;
-        background: none !important;
-        border: none !important;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
     }
-
+    div[data-testid="stHorizontalBlock"] button:hover {
+        background-color: #e03e3e;
+    }
     </style>
     """, unsafe_allow_html=True)
 
