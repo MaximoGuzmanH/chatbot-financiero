@@ -1257,16 +1257,17 @@ class ActionBienvenida(Action):
         fecha_formateada = f"{ahora.day} de {nombre_mes_es} de {ahora.year}"
 
         mensaje = (
-            f"<b>¡Hola! Bienvenido 👋</b><br><br>"
-            f"📅 Hoy es <i>{fecha_formateada}</i> y estoy listo para ayudarte con tus finanzas.<br><br>"
-            f"🛠️ Puedo ayudarte a:<br>"
-            f"• Registrar ingresos y gastos<br>"
-            f"• Ver tu historial o saldo<br>"
-            f"• Configurar alertas<br>"
-            f"• Comparar tus gastos entre meses<br><br>"
-            f"💡 Ejemplo: <code>Muéstrame mis gastos de {nombre_mes_es.lower()}</code><br><br>"
-            f"👉 ¿Qué deseas hacer hoy?"
+            "**¡Hola! Bienvenido 👋**\n\n"
+            f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.\n\n"
+            "🛠️ Puedo ayudarte a:\n"
+            "- Registrar ingresos y gastos\n"
+            "- Ver tu historial o saldo\n"
+            "- Configurar alertas\n"
+            "- Comparar tus gastos entre meses\n\n"
+            "💡 Ejemplo: `Muéstrame mis gastos de abril`\n\n"
+            "👉 ¿Qué deseas hacer hoy?"
         )
+
 
         dispatcher.utter_message(text=mensaje)
         return []
