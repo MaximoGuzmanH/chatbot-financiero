@@ -6,7 +6,9 @@ from datetime import datetime
 
 # ---------- CONFIGURACIÓN DE LOG ----------
 fecha_log = datetime.now().strftime("%Y-%m-%d")
-LOG_PATH = os.path.join(os.path.dirname(__file__), f"github_sync_{fecha_log}.log")
+logs_dir = os.path.join(os.path.dirname(__file__), "logs")
+os.makedirs(logs_dir, exist_ok=True)
+LOG_PATH = os.path.join(logs_dir, f"github_sync_{fecha_log}.log")
 RUTA_DESTINO_LOG = f"logs/github_sync_{fecha_log}.log"
 
 logging.basicConfig(
