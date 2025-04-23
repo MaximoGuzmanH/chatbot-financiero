@@ -90,9 +90,9 @@ def guardar_transaccion(transaccion):
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
         
-    from github_sync import subir_a_github
+    from github_sync import subir_log_a_github
 
-    resultado = subir_a_github(
+    resultado = subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
         ruta_destino_repo="transacciones.json",
         mensaje_commit="Actualización automática de transacciones desde Streamlit"
