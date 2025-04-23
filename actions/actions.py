@@ -1260,20 +1260,19 @@ class ActionBienvenida(Action):
         nombre_mes_es = meses_es.get(nombre_mes_en, nombre_mes_en).capitalize()
         fecha_formateada = f"{ahora.day} de {nombre_mes_es} de {ahora.year}"
 
-        mensaje = "\n".join([
-            "💼 **¡Hola! Bienvenido 👋**",
-            f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.",
-            "",
-            "🛠️ **Puedo ayudarte a:**",
-            "- Registrar ingresos y gastos",
-            "- Ver tu historial o saldo",
-            "- Configurar alertas",
-            "- Comparar tus gastos entre meses",
-            "",
-            "💡 *Ejemplo:* `Muéstrame mis gastos de abril`",
-            "",
-            "👉 ¿Qué deseas hacer hoy?"
-        ])
+        mensaje = f"""💼 **¡Hola! Bienvenido 👋**
+
+📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.
+
+🛠️ **Puedo ayudarte a:**
+- Registrar ingresos y gastos
+- Ver tu historial o saldo
+- Configurar alertas
+- Comparar tus gastos entre meses
+
+💡 *Ejemplo:* `Muéstrame mis gastos de abril`
+
+👉 ¿Qué deseas hacer hoy?"""
 
         dispatcher.utter_message(text=mensaje)
         return []
