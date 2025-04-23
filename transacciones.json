@@ -154,25 +154,5 @@
     "año": 2025,
     "timestamp": "2025-04-23T21:42:51.123996",
     "status": 1
-  },
-  {
-    "tipo": "entrada_no_entendida",
-    "descripcion": "eres gei?",
-    "timestamp": "2025-04-23T21:43:04.405945",
-    "fecha": "23/04/2025",
-    "dia": 23,
-    "mes": "abril",
-    "año": 2025,
-    "status": 1
-  },
-  {
-    "tipo": "entrada_no_entendida",
-    "descripcion": "ya pero eres o no eres?",
-    "timestamp": "2025-04-23T21:43:38.759144",
-    "fecha": "23/04/2025",
-    "dia": 23,
-    "mes": "abril",
-    "año": 2025,
-    "status": 1
   }
 ]
