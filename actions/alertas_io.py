@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, Any
 import requests
 
-RUTA_ALERTAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "alertas.json")
+RUTA_ALERTAS = "/tmp/alertas.json"
 
 # --- GitHub Sync (producción en Render) ---
 GITHUB_REPO = "MaximoGuzmanH/chatbot-financiero"
