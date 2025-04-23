@@ -115,12 +115,3 @@ if not df_filtrado.empty:
         st.subheader("📊 Totales por categoría")
         total_por_categoria = df_filtrado.groupby("categoria")["monto"].sum().sort_values(ascending=False)
         st.table(total_por_categoria.apply(lambda x: f"{x:.2f} soles"))
-
-# ---------- DESCARGA ----------
-st.markdown("### 📥 Descargar datos filtrados")
-st.download_button(
-    label="📄 Descargar CSV",
-    data=df_filtrado.to_csv(index=False).encode("utf-8"),
-    file_name="transacciones_filtradas.csv",
-    mime="text/csv"
-)
