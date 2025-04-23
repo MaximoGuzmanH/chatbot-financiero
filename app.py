@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from datetime import datetime
+import pytz
 
 # 🔗 Configuración del endpoint
 RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
@@ -11,7 +12,9 @@ st.title("💬 Chat con tu Asistente Financiero")
 
 # ⏰ Función para mostrar la hora al estilo de WhatsApp
 def hora_estilo_chat():
-    return datetime.now().strftime("%I:%M %p").lstrip("0").replace("AM", "a. m.").replace("PM", "p. m.")
+    lima_tz = pytz.timezone("America/Lima")
+    ahora = datetime.now(lima_tz)
+    return ahora.strftime("%I:%M %p").lstrip("0").replace("AM", "a. m.").replace("PM", "p. m.")
 
 # 📦 Inicializar historial
 if "messages" not in st.session_state:
