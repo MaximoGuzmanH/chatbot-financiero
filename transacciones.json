@@ -1,0 +1,14 @@
+[
+  {
+    "tipo": "ingreso",
+    "monto": 950.0,
+    "categoria": "consultoría",
+    "fecha": "23 de abril",
+    "medio": "efectivo",
+    "dia": 23,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-23T06:22:19.278047",
+    "status": 1
+  }
+]
