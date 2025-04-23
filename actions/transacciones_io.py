@@ -7,6 +7,7 @@ import base64
 # Ruta absoluta al archivo transacciones.json
 RUTA_TRANSACCIONES = "/tmp/transacciones.json"
 
+   
 # GitHub API
 REPO = "MaximoGuzmanH/chatbot-financiero"
 ARCHIVO_GITHUB = "transacciones.json"
@@ -121,3 +122,20 @@ def eliminar_transaccion_logicamente(condiciones):
             subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
     else:
         print(f"[WARN] No encontrada: {condiciones}")
+
+def descargar_de_github():
+    url = f"https://raw.githubusercontent.com/{REPO}/main/{ARCHIVO_GITHUB}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
+                f.write(response.text)
+            print("[INFO] transacciones.json sincronizado desde GitHub")
+        else:
+            print(f"[WARN] No se pudo descargar el archivo desde GitHub ({response.status_code})")
+    except Exception as e:
+        print(f"[ERROR] Al intentar sincronizar desde GitHub: {e}")
+
+# 🔁 Cargar desde GitHub solo si no existe en el contenedor
+if not os.path.exists(RUTA_TRANSACCIONES):
+    descargar_de_github()
