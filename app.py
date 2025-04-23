@@ -10,11 +10,6 @@ RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
 st.set_page_config(page_title="Asistente Financiero", page_icon="💰")
 st.title("💬 Chat con tu Asistente Financiero")
 
-# 🧹 Botón para limpiar el historial de conversación
-if st.button("🧹 Limpiar conversación"):
-    st.session_state.messages = []
-    st.experimental_rerun()
-
 # ⏰ Función para mostrar la hora al estilo de WhatsApp
 def hora_estilo_chat():
     lima_tz = pytz.timezone("America/Lima")
@@ -80,3 +75,10 @@ if mensaje_usuario := st.chat_input("Escribe algo..."):
             window.scrollTo(0, document.body.scrollHeight);
         </script>
     """, unsafe_allow_html=True)
+    
+    # 🧹 Botón para limpiar conversación (al final del chat)
+    col1, col2, col3 = st.columns([4, 1.5, 4])
+    with col2:
+        if st.button("🧹 Limpiar conversación", help="Borrar todo el historial del chat"):
+            st.session_state.messages = []
+            st.experimental_rerun()
