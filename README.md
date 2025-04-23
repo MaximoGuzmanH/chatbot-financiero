@@ -180,6 +180,13 @@ Este chatbot reconoce múltiples intenciones del usuario para ayudarte a gestion
 | `ver_historial_completo`      | Muestra todo el historial de **ingresos y gastos** organizados por categoría para un mes (y año) específico. |
 | `entrada_no_entendida`        | Captura mensajes ambiguos, incompletos o que no permiten identificar una intención válida. |
 
+## 🔄 Sincronización automática con GitHub
+
+Cada vez que se registra una transacción o alerta desde el chatbot o Streamlit, los archivos `transacciones.json` y `alertas.json` se actualizan automáticamente en el repositorio:
+
+- 🔁 Cambios persistentes en tiempo real
+- ☁️ Compatible con Streamlit Community Cloud
+- 🔐 Autenticación segura usando GitHub Token y variables de entorno
 
 ## 👨‍💻 Desarrollado por
 
