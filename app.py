@@ -42,7 +42,7 @@ if mensaje_usuario := st.chat_input("Escribe algo..."):
     respuestas = enviar_a_rasa(mensaje_usuario)
     for r in respuestas:
         with st.chat_message("assistant"):
-            st.markdown(r)
+            st.markdown(r, unsafe_allow_html=True)
         st.session_state.messages.append({"role": "assistant", "content": r})
 
     # Scroll automático al final
