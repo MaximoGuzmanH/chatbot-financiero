@@ -106,5 +106,17 @@
     "año": 2025,
     "timestamp": "2025-04-23T21:34:17.235483",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 500.0,
+    "categoria": "comida",
+    "fecha": "23 de abril de 2025",
+    "medio": "efectivo",
+    "dia": 23,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-23T21:35:07.697000",
+    "status": 1
   }
 ]
