@@ -321,30 +321,35 @@ class ActionVerHistorialCompleto(Action):
                 dispatcher.utter_message(text=mensaje)
                 return []
 
-            mensaje = "📋 Estas son tus transacciones registradas"
-            if periodo:
-                mensaje += f" para el periodo {periodo}"
-            mensaje += ":\n"
+            mensaje = []
 
+            # Encabezado
+            encabezado = "📋 Estas son tus transacciones registradas"
+            if periodo:
+                encabezado += f" para el periodo *{periodo}*"
+            encabezado += ":\n"
+            mensaje.append(encabezado)
+
+            # Detalles de cada transacción
             for t in transacciones_filtradas:
-                tipo = t.get("tipo", "transacción")
-                monto = t.get("monto", 0)
-                categoria = t.get("categoria", "sin categoría")
-                fecha = t.get("fecha", "")
+                tipo = t.get("tipo", "transacción").capitalize()
+                monto = float(t.get("monto", 0))
+                categoria = t.get("categoria", "sin categoría").capitalize()
+                fecha = formatear_fecha(t.get("fecha", "")) if t.get("fecha") else ""
                 medio = t.get("medio", "")
 
-                linea = f"- {tipo}: {monto:.2f} soles en {categoria}"
+                linea = f"- *{tipo}*: {monto:.2f} soles en *{categoria}*"
                 if fecha:
-                    try:
-                        linea += f" el {formatear_fecha(fecha)}"
-                    except Exception:
-                        linea += f" el {fecha}"
-                if medio:
+                    linea += f" el {fecha}"
+                if medio and medio != "N/A":
                     linea += f" con {medio}"
-                mensaje += linea + "\n"
+                mensaje.append(linea)
 
-            mensaje += "\n¿Deseas registrar algo nuevo o consultar tu resumen mensual?"
-            dispatcher.utter_message(text=mensaje)
+            # Cierre
+            mensaje.append("\n¿Deseas registrar algo nuevo o consultar tu resumen mensual?")
+
+            # Enviar todo como una sola burbuja
+            dispatcher.utter_message(text="\n".join(mensaje))
 
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
@@ -1238,13 +1243,12 @@ class ActionFollowSuggestion(Action):
         # Si no hay sugerencia válida
         dispatcher.utter_message(text="No tengo ninguna acción pendiente que ejecutar.")
         return []
-    
+
 class ActionBienvenida(Action):
     def name(self) -> Text:
         return "action_bienvenida"
 
     def run(self, dispatcher, tracker, domain):
-        # Diccionario de traducción de meses
         meses_es = {
             "January": "enero", "February": "febrero", "March": "marzo", "April": "abril",
             "May": "mayo", "June": "junio", "July": "julio", "August": "agosto",
@@ -1256,18 +1260,20 @@ class ActionBienvenida(Action):
         nombre_mes_es = meses_es.get(nombre_mes_en, nombre_mes_en).capitalize()
         fecha_formateada = f"{ahora.day} de {nombre_mes_es} de {ahora.year}"
 
-        mensaje = (
-            "**¡Hola! Bienvenido 👋**\n\n"
-            f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.\n\n"
-            "🛠️ Puedo ayudarte a:\n"
-            "- Registrar ingresos y gastos\n"
-            "- Ver tu historial o saldo\n"
-            "- Configurar alertas\n"
-            "- Comparar tus gastos entre meses\n\n"
-            "💡 Ejemplo: `Muéstrame mis gastos de abril`\n\n"
+        mensaje = "\n".join([
+            "💼 **¡Hola! Bienvenido 👋**",
+            f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.",
+            "",
+            "🔧 **¿Qué puedo hacer por ti?**",
+            "- Registrar ingresos y gastos",
+            "- Ver tu historial o saldo",
+            "- Configurar alertas",
+            "- Comparar tus gastos entre meses",
+            "",
+            "💡 *Ejemplo*: `Muéstrame mis gastos de abril`",
+            "",
             "👉 ¿Qué deseas hacer hoy?"
-        )
-
+        ])
 
         dispatcher.utter_message(text=mensaje)
         return []
