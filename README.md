@@ -37,6 +37,7 @@ chatbot-financiero/
 - Cuenta en Render
 - Cuenta en Streamlit Community Cloud (opcional)
 
+
 ## 🚀 Despliegue en Render (Producción)
 
 1. Backend de Acciones Personalizadas (actions-server)
@@ -66,6 +67,7 @@ chatbot-financiero/
 
     RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
 
+
 ## 🧪 Pruebas y Validación
  - Validar los datos de entrenamiento:
 
@@ -74,6 +76,7 @@ chatbot-financiero/
  - Probar el chatbot en la línea de comandos:
 
     rasa shell
+
 
 ## 💬 Interfaz de Usuario con Streamlit
  - Navega a la carpeta streamlit_app/.
@@ -88,6 +91,7 @@ chatbot-financiero/
 La interfaz estará disponible en: http://localhost:8501
 
 Nota: También puedes desplegar la aplicación Streamlit en Streamlit Community Cloud (https://streamlit.io/cloud) para acceso en línea.
+
 
 ## 🛠️ Instalación y Ejecución Local (Desarrollo)
  - Requisitos
@@ -155,6 +159,26 @@ cloudflared tunnel --url http://localhost:5005
 
 rasa data validate
 rasa shell
+
+
+## 🧠 Funcionalidades del Asistente Financiero
+
+Este chatbot reconoce múltiples intenciones del usuario para ayudarte a gestionar tus finanzas personales. A continuación se describen sus principales funcionalidades:
+
+| **Intent**                     | **Descripción** |
+|-------------------------------|-----------------|
+| `analizar_gastos`             | Analiza todos los **gastos registrados**, mostrando el total y la **distribución porcentual por categoría**. Si se menciona un mes, filtra por dicho periodo. También permite **comparar categorías**. |
+| `comparar_meses`              | Compara los **gastos o ingresos** entre dos meses diferentes, ayudando a identificar variaciones o tendencias. |
+| `consultar_configuracion`     | Muestra las **alertas presupuestarias activas**, incluyendo categoría, monto límite, medio de pago y periodo. |
+| `consultar_informacion_financiera` | Recupera los **ingresos o gastos registrados** por tipo, categoría y periodo específico. |
+| `crear_configuracion`         | Permite definir una **nueva alerta de presupuesto mensual**, indicando monto límite, categoría y mes (opcionalmente con año). |
+| `modificar_configuracion`     | Modifica una alerta existente con un **nuevo monto y periodo**. Si el año no se indica, se asume el actual. |
+| `eliminar_configuracion`      | Elimina una configuración de alerta según **categoría y mes**. También puede especificarse el año. |
+| `registrar_gasto`             | Registra un **gasto** con monto, categoría, medio de pago y fecha. Si no se indica fecha, se usa la actual. |
+| `registrar_ingreso`           | Registra un **ingreso** con monto, categoría, medio de ingreso y fecha. Se asigna la fecha actual si no se especifica. |
+| `resetear_categoria_gastos`   | Borra todos los montos de **una categoría de gastos** en un mes determinado. Puede incluir el año. |
+| `ver_historial_completo`      | Muestra todo el historial de **ingresos y gastos** organizados por categoría para un mes (y año) específico. |
+| `entrada_no_entendida`        | Captura mensajes ambiguos, incompletos o que no permiten identificar una intención válida. |
 
 
 ## 👨‍💻 Desarrollado por
