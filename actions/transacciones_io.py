@@ -3,13 +3,13 @@ import os
 from datetime import datetime
 
 # Ruta absoluta al archivo transacciones.json
-RUTA_ARCHIVO = os.path.join(os.path.dirname(os.path.abspath(__file__)), "transacciones.json")
+RUTA_TRANSACCIONES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "transacciones.json")
 
 def cargar_transacciones(filtrar_activos=True):
-    if not os.path.exists(RUTA_ARCHIVO):
+    if not os.path.exists(RUTA_TRANSACCIONES):
         return []
     try:
-        with open(RUTA_ARCHIVO, "r", encoding="utf-8") as f:
+        with open(RUTA_TRANSACCIONES, "r", encoding="utf-8") as f:
             transacciones = json.load(f)
             if filtrar_activos:
                 transacciones = [t for t in transacciones if t.get("status", 1) == 1]
@@ -53,7 +53,7 @@ def guardar_transaccion(transaccion):
     transaccion["status"] = transaccion.get("status", 1)  # 👈 importante aquí
 
     transacciones.append(transaccion)
-    with open(RUTA_ARCHIVO, "w", encoding="utf-8") as f:
+    with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
         
 def eliminar_transaccion_logicamente(condiciones):
@@ -82,7 +82,7 @@ def eliminar_transaccion_logicamente(condiciones):
             break
 
     if modificada:
-        with open(RUTA_ARCHIVO, "w", encoding="utf-8") as f:
+        with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
             json.dump(transacciones, f, ensure_ascii=False, indent=2)
         print(f"[INFO] Transacción eliminada lógicamente: {condiciones}")
     else:
