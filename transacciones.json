@@ -1,26 +1,14 @@
 [
   {
-    "tipo": "ingreso",
-    "monto": 950.0,
-    "categoria": "consultoría",
-    "fecha": "23 de abril",
+    "tipo": "gasto",
+    "monto": 500.0,
+    "categoria": "restaurante",
+    "fecha": "20 de abril",
     "medio": "efectivo",
-    "dia": 23,
+    "dia": 20,
     "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-23T06:22:19.278047",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
-    "monto": 1500.0,
-    "categoria": "empleo",
-    "fecha": "1 de abril",
-    "medio": "efectivo",
-    "dia": 1,
-    "mes": "abril",
-    "año": 2025,
-    "timestamp": "2025-04-23T06:36:06.556840",
+    "timestamp": "2025-04-23T06:50:56.701674",
     "status": 1
   }
 ]
