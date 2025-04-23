@@ -1,40 +1,121 @@
-# 🤖 Chatbot de Finanzas Personales con Rasa + Streamlit
+# 🤖 Chatbot Financiero con Rasa y Streamlit
 
-Este proyecto integra un chatbot de finanzas personales construido con [Rasa](https://rasa.com) y desplegado en línea mediante [Streamlit Community Cloud](https://streamlit.io/cloud), utilizando un túnel seguro con [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/).
+Este proyecto integra un asistente conversacional para la gestión de finanzas personales, construido con Rasa y una interfaz web desarrollada en Streamlit. 
+Ambos servicios están desplegados en la plataforma Render, permitiendo una interacción fluida y en línea.
 
 ---
 
 ## 📦 Estructura del Proyecto
 
-```bash
-chatbot-finanzas/
+chatbot-financiero/
 ├── actions/
 │   ├── actions.py
 │   ├── transacciones_io.py
-│   └── alertas_io.py
+│   ├── alertas_io.py
+│   ├── requirements.txt
+│   └── Dockerfile
 ├── data/
 │   ├── nlu.yml
 │   ├── rules.yml
 │   └── stories.yml
-├── domain.yml
-├── config.yml
-├── credentials.yml
-├── endpoints.yml
 ├── models/
 ├── streamlit_app/
 │   └── app.py
 ├── alertas.json
 ├── transacciones.json
+├── config.yml
+├── credentials.yml
+├── endpoints.yml
 ├── README.md
+└── requirements.txt
 
 
-## 🧩 Requisitos Previos
+## ⚙️ Requisitos Previos
 
-Python 3.10
+- Python 3.10
+- pip
+- Cuenta en Render
+- Cuenta en Streamlit Community Cloud (opcional)
 
-pip
+## 🚀 Despliegue en Render (Producción)
 
-Cloudflared
+1. Backend de Acciones Personalizadas (actions-server)
+ - Se despliega desde la carpeta actions/, usando su propio Dockerfile.
+ - Debe exponerse en el puerto 5055.
+ - Al desplegar, Render entregará una URL pública como:
+
+    https://actions-server-1wwf.onrender.com
+
+2. Servidor Principal de Rasa (chatbot-financiero)
+ - Debe estar conectado al servidor de acciones, editando endpoints.yml:
+
+    action_endpoint:
+    url: "https://actions-server-xxxx.onrender.com/webhook"
+
+ - El servicio principal se ejecuta con:
+
+    rasa run --enable-api --cors "*" --debug
+
+ - Render asignará una URL pública como:
+
+    https://chatbot-financiero.onrender.com
+
+3. Frontend con Streamlit (opcional)
+ - Streamlit puede ejecutarse localmente o desplegarse en Streamlit Community Cloud.
+ - Edita en app.py la URL del endpoint:
+
+    RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
+
+## 🧪 Pruebas y Validación
+ - Validar los datos de entrenamiento:
+
+    rasa data validate
+
+ - Probar el chatbot en la línea de comandos:
+
+    rasa shell
+
+## 💬 Interfaz de Usuario con Streamlit
+ - Navega a la carpeta streamlit_app/.
+ - Asegúrate de que el archivo app.py esté configurado para apuntar al servidor de Rasa desplegado:
+
+    RASA_ENDPOINT = "https://chatbot-financiero.onrender.com/webhooks/rest/webhook"
+
+ - Ejecuta la aplicación localmente con:
+
+    streamlit run app.py
+
+La interfaz estará disponible en: http://localhost:8501
+
+Nota: También puedes desplegar la aplicación Streamlit en Streamlit Community Cloud (https://streamlit.io/cloud) para acceso en línea.
+
+## 🛠️ Instalación y Ejecución Local (Desarrollo)
+ - Requisitos
+   - Python 3.10
+   - pip
+   - Cuenta en Streamlit Cloud (opcional)
+
+ - Instalación
+    # Clona el repositorio
+    git clone https://github.com/MaximoGuzmanH/chatbot-financiero.git
+    cd chatbot-financiero
+
+    # Crea un entorno virtual
+    python -m venv venv
+    source venv/bin/activate        # Linux/Mac
+    venv\Scripts\activate           # Windows
+
+    # Instala dependencias
+    pip install -r requirements.txt
+
+    # Entrena el modelo
+    rasa train
+
+ - Ejecutar Interfaz Streamlit (local)
+   
+    streamlit run streamlit_app/app.py
+
+ - Abre el navegador en: http://localhost:8501
 
 
 ## 🛠️ Instalación y Configuración
@@ -70,19 +151,6 @@ cloudflared tunnel --url http://localhost:5005
 3. Copia la URL generada (ej. https://glowing-tunnel.trycloudflare.com)
 
 
-## 🌐 Ejecutar Interfaz Streamlit
-
-Edita streamlit_app/app.py y reemplaza esta línea con la URL generada por Cloudflare:
-
-    RASA_URL = "https://glowing-tunnel.trycloudflare.com/webhooks/rest/webhook"
-
-Luego:
-
-    streamlit run streamlit_app/app.py
-
-Y abre el navegador en: http://localhost:8501
-
-
 ## 🧪 Pruebas
 
 rasa data validate
@@ -95,4 +163,3 @@ rasa shell
     Sergio Renato Zegarra Villanueva
 
 Este proyecto busca facilitar la gestión de finanzas personales mediante inteligencia artificial conversacional.
-
