@@ -1,14 +1,14 @@
 [
   {
-    "tipo": "gasto",
-    "monto": 500.0,
-    "categoria": "restaurante",
-    "fecha": "20 de abril",
-    "medio": "efectivo",
-    "dia": 20,
+    "tipo": "ingreso",
+    "monto": 200.0,
+    "categoria": "servicios",
+    "fecha": "2 de abril",
+    "medio": "débito",
+    "dia": 2,
     "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-23T06:50:56.701674",
+    "timestamp": "2025-04-23T07:00:48.929963",
     "status": 1
   }
 ]
