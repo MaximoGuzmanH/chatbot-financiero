@@ -16,6 +16,10 @@ from transacciones_io import eliminar_transaccion_logicamente
 from alertas_io import guardar_alerta, eliminar_alerta_logicamente, cargar_alertas, guardar_todas_las_alertas
 import alertas_io
 
+def construir_mensaje(*partes: str) -> str:
+    """Concatena múltiples partes en un solo mensaje con saltos de línea, evitando múltiples utter_message."""
+    return "\n".join(parte.strip() for parte in partes if parte)
+
 def formatear_fecha(fecha: str) -> str:
     try:
         partes = fecha.strip().split("/")
@@ -349,7 +353,7 @@ class ActionVerHistorialCompleto(Action):
             mensaje.append("\n¿Deseas registrar algo nuevo o consultar tu resumen mensual?")
 
             # Enviar todo como una sola burbuja
-            dispatcher.utter_message(text="\n".join(mensaje))
+            dispatcher.utter_message(text=construir_mensaje(mensaje))
 
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
@@ -365,7 +369,6 @@ class ActionAnalizarGastos(Action):
         return "action_analizar_gastos"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
-        from collections import Counter, defaultdict
         from datetime import datetime
         import re
 
@@ -399,18 +402,11 @@ class ActionAnalizarGastos(Action):
             gastos = [g for g in gastos if g.get("periodo", "").lower() == periodo.lower()]
 
         if not gastos:
-            if periodo:
-                dispatcher.utter_message(text=f"No se encontraron gastos registrados para el periodo *{periodo}*.")
-            else:
-                dispatcher.utter_message(text="No se han registrado gastos aún. ¿Deseas ingresar uno?")
+            mensaje = f"No se encontraron gastos registrados para el periodo *{periodo}*." if periodo else "No se han registrado gastos aún. ¿Deseas ingresar uno?"
+            dispatcher.utter_message(text=mensaje)
             return []
 
-        # ⚠️ Advertencia si hay registros sin categoría
         sin_categoria = [g for g in gastos if not g.get("categoria")]
-        if sin_categoria:
-            dispatcher.utter_message(
-                text=f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis."
-            )
 
         # 📂 Si se indicó categoría específica
         if categoria:
@@ -418,16 +414,19 @@ class ActionAnalizarGastos(Action):
             total_categoria = sum(float(g["monto"]) for g in gastos_categoria)
 
             if not gastos_categoria:
-                dispatcher.utter_message(
-                    text=f"No se encontraron gastos en la categoría *{categoria}*" +
-                         (f" durante *{periodo}*" if periodo else "") + "."
+                mensaje = construir_mensaje(
+                    f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis." if sin_categoria else "",
+                    f"No se encontraron gastos en la categoría *{categoria}*" +
+                    (f" durante *{periodo}*" if periodo else "") + "."
                 )
             else:
-                dispatcher.utter_message(
-                    text=f"Has gastado un total de *{total_categoria:.2f} soles* en *{categoria}*" +
-                         (f" durante *{periodo}*" if periodo else "") + "."
+                mensaje = construir_mensaje(
+                    f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis." if sin_categoria else "",
+                    f"Has gastado un total de *{total_categoria:.2f} soles* en *{categoria}*" +
+                    (f" durante *{periodo}*" if periodo else "") + "."
                 )
 
+            dispatcher.utter_message(text=mensaje)
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
         # 📊 Agrupar por categoría y calcular totales
@@ -444,6 +443,9 @@ class ActionAnalizarGastos(Action):
         if periodo:
             respuesta += f" durante *{periodo}*"
         respuesta += ":\n\n"
+
+        if sin_categoria:
+            respuesta += f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis.\n\n"
 
         respuesta += "📊 *Categorías con mayor gasto*:\n"
         for cat, total in top_categorias:
@@ -508,12 +510,10 @@ class ActionCompararMeses(Action):
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
             ]
 
-            # 🔍 Normalizar conectores comunes
             texto_normalizado = texto
             for sep in [" y ", " o ", " vs ", " versus ", " entre ", "contra", "comparar "]:
                 texto_normalizado = texto_normalizado.replace(sep, " y ")
 
-            # 📅 Buscar dos periodos explícitos (mes y año)
             matches = re.findall(rf"({'|'.join(posibles_meses)})(?:\s+de)?\s+(\d{{4}})", texto_normalizado)
             if len(matches) == 2:
                 periodo1 = f"{matches[0][0]} de {matches[0][1]}"
@@ -539,22 +539,18 @@ class ActionCompararMeses(Action):
                     )
                     return []
 
-                mensaje = f"📊 Comparativa de *{tipo}s*:\n"
-                mensaje += f"- {periodo1.capitalize()}: {v1:.2f} soles\n"
-                mensaje += f"- {periodo2.capitalize()}: {v2:.2f} soles\n"
-
-                if v1 > v2:
-                    mensaje += f"⬅️ En *{periodo1}* tuviste más {tipo}s que en *{periodo2}*."
-                elif v2 > v1:
-                    mensaje += f"➡️ En *{periodo2}* tuviste más {tipo}s que en *{periodo1}*."
-                else:
-                    mensaje += f"✅ Tus {tipo}s fueron iguales en ambos periodos."
-
+                mensaje = construir_mensaje(
+                    f"📊 Comparativa de *{tipo}s*:",
+                    f"- {periodo1.capitalize()}: {v1:.2f} soles",
+                    f"- {periodo2.capitalize()}: {v2:.2f} soles",
+                    f"⬅️ En *{periodo1}* tuviste más {tipo}s que en *{periodo2}*." if v1 > v2 else
+                    f"➡️ En *{periodo2}* tuviste más {tipo}s que en *{periodo1}*." if v2 > v1 else
+                    f"✅ Tus {tipo}s fueron iguales en ambos periodos.",
+                    "¿Quieres configurar un presupuesto o consultar tus ingresos recientes?"
+                )
                 dispatcher.utter_message(text=mensaje)
-                dispatcher.utter_message(text="¿Quieres configurar un presupuesto o consultar tus ingresos recientes?")
                 return [SlotSet("sugerencia_pendiente", "action_crear_configuracion")]
 
-            # 🧠 No hay 2 periodos explícitos → Asumir análisis de todo el año
             elif "en qué mes" in texto:
                 totales_por_mes = defaultdict(float)
                 for t in transacciones:
@@ -572,12 +568,12 @@ class ActionCompararMeses(Action):
                 mes_max = max(totales_por_mes.items(), key=lambda x: x[1])[0]
                 monto_max = totales_por_mes[mes_max]
 
-                mensaje = (
-                    f"📅 En el año {año_actual}, el mes con mayor {tipo} fue *{mes_max}* "
-                    f"con un total de *{monto_max:.2f} soles*."
+                mensaje = construir_mensaje(
+                    f"📅 En el año {año_actual}, el mes con mayor {tipo} fue *{mes_max}*",
+                    f"con un total de *{monto_max:.2f} soles*.",
+                    "¿Deseas comparar otros periodos o revisar tu historial completo?"
                 )
                 dispatcher.utter_message(text=mensaje)
-                dispatcher.utter_message(text="¿Deseas comparar otros periodos o revisar tu historial completo?")
                 return [SlotSet("sugerencia_pendiente", "action_ver_historial_completo")]
 
             else:
@@ -613,21 +609,26 @@ class ActionConsultarInformacionFinanciera(Action):
         fecha_raw = get_entity(tracker, "fecha") or tracker.get_slot("fecha")
         periodo_raw = get_entity(tracker, "periodo") or tracker.get_slot("periodo")
 
-        # 🧠 Verificar si la frase parece ambigua o incompleta
+        # Verificación de ambigüedad o entrada demasiado corta
         verbos_clave = [
             "gasté", "gaste", "pagué", "ingresé", "recibí", "consulté", "usé",
             "muestra", "consultar", "ver", "registré", "gané", "cuánto", "invertí"
         ]
         contiene_verbo = any(v in texto for v in verbos_clave)
-
         if not contiene_verbo and len(tokens) <= 5:
-            dispatcher.utter_message(text=f"No logré entender tu intención con: “{texto}”. ¿Podrías reformularlo?")
+            mensaje = construir_mensaje(
+                f"No logré entender tu intención con: “{texto}”. ¿Podrías reformularlo?",
+                "Estoy aquí para ayudarte con tus finanzas. Puedes decir cosas como:",
+                "- “¿Cuánto gasté en comida en abril?”",
+                "- “Muéstrame mis ingresos por sueldo en marzo.”"
+            )
+            dispatcher.utter_message(text=mensaje)
             return [
                 SlotSet("sugerencia_pendiente", "action_ayuda_general"),
                 FollowupAction("action_entrada_no_entendida")
             ]
 
-        # 📆 Interpretar fecha relativa como "lunes pasado"
+        # Procesar fecha relativa
         fecha = None
         if fecha_raw:
             try:
@@ -636,7 +637,7 @@ class ActionConsultarInformacionFinanciera(Action):
             except:
                 fecha = fecha_raw
 
-        # 📅 Normalizar periodo
+        # Normalizar periodo
         periodo = None
         if periodo_raw:
             match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
@@ -647,7 +648,7 @@ class ActionConsultarInformacionFinanciera(Action):
             else:
                 periodo = periodo_raw.strip().lower()
 
-        # 🔍 Filtrar transacciones
+        # Filtrar transacciones
         resultados = []
         for t in transacciones:
             if tipo and t.get("tipo") != tipo:
@@ -664,46 +665,42 @@ class ActionConsultarInformacionFinanciera(Action):
 
         total = sum(t["monto"] for t in resultados)
 
-        # 🚫 Si no hay resultados
         if not resultados:
-            if categoria and periodo:
-                dispatcher.utter_message(
-                    text=f"No se encontraron {tipo}s registrados en la categoría *{categoria}* durante *{periodo}*."
-                )
-            elif tipo and periodo:
-                dispatcher.utter_message(
-                    text=f"No se encontraron {tipo}s registrados durante *{periodo}*."
-                )
-            elif tipo:
-                dispatcher.utter_message(
-                    text=f"No se encontraron registros de tipo *{tipo}*."
-                )
-            else:
-                dispatcher.utter_message(text="No se encontraron registros financieros con los criterios proporcionados.")
+            mensaje = construir_mensaje(
+                f"No se encontraron registros financieros con los criterios proporcionados.",
+                f"🧾 Parámetros usados:",
+                f"- Tipo: {tipo}" if tipo else "",
+                f"- Categoría: {categoria}" if categoria else "",
+                f"- Medio: {medio}" if medio else "",
+                f"- Fecha: {fecha}" if fecha else "",
+                f"- Periodo: {periodo}" if periodo else ""
+            )
+            dispatcher.utter_message(text=mensaje.strip())
             return []
 
-        # ✅ Generar respuesta
+        # Construir mensaje principal
+        partes = []
+
         if categoria and periodo:
-            msg = f"Tu {tipo} total en la categoría *{categoria}* durante *{periodo}* es de *{total:.2f} soles*."
+            partes.append(f"Tu {tipo} total en la categoría *{categoria}* durante *{periodo}* es de *{total:.2f} soles*.")
         elif tipo and periodo:
-            msg = f"Tu {tipo} total durante *{periodo}* es de *{total:.2f} soles*."
+            partes.append(f"Tu {tipo} total durante *{periodo}* es de *{total:.2f} soles*.")
         elif tipo:
             resumen_cat = defaultdict(float)
             for t in resultados:
                 resumen_cat[t.get("categoria", "Sin categoría")] += t["monto"]
 
-            msg = f"📊 Tu resumen de *{tipo}s*"
-            if periodo:
-                msg += f" durante *{periodo}*"
-            msg += " por categoría:\n"
+            partes.append(f"📊 Tu resumen de *{tipo}s* por categoría:")
             for cat, monto in resumen_cat.items():
-                msg += f"- {cat}: {monto:.2f} soles\n"
+                partes.append(f"- {cat}: {monto:.2f} soles")
         elif medio:
-            msg = f"Total registrado usando *{medio}*: *{total:.2f} soles*."
+            partes.append(f"Total registrado usando *{medio}*: *{total:.2f} soles*.")
         else:
-            msg = f"📊 Total filtrado: *{total:.2f} soles*."
+            partes.append(f"📊 Total filtrado: *{total:.2f} soles*.")
 
-        dispatcher.utter_message(text=msg.strip())
+        partes.append("¿Deseas ver tu historial o analizar tus gastos por categoría?")
+        dispatcher.utter_message(text=construir_mensaje(*partes))
+
         return [SlotSet("sugerencia_pendiente", "action_analizar_gastos")]
         
 class ActionEntradaNoEntendida(Action):
@@ -712,35 +709,36 @@ class ActionEntradaNoEntendida(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
         try:
-            texto = tracker.latest_message.get("text", "")
+            texto = tracker.latest_message.get("text", "").strip()
             intent = tracker.latest_message.get("intent", {}).get("name", "")
-            entidades_detectadas = [e.get("entity") for e in tracker.latest_message.get("entities", [])]
+            entidades = [e.get("entity") for e in tracker.latest_message.get("entities", [])]
 
-            # ⛔️ Evitar guardar afirmaciones, negaciones o saludos como entradas no entendidas
+            # ❌ Evitar guardar afirmaciones, negaciones o saludos como no entendidas
             if intent not in ["entrada_no_entendida", "nlu_fallback"]:
                 dispatcher.utter_message(text="No logré entender completamente tu mensaje. ¿Podrías reformularlo o dar más detalles?")
                 return []
 
-            # 🧠 Guardar solo si el intent es realmente no entendido
+            # 🧠 Guardar entrada como 'no entendida'
             guardar_transaccion({
                 "tipo": "entrada_no_entendida",
                 "descripcion": texto,
                 "timestamp": datetime.now().isoformat()
             })
 
-            if entidades_detectadas:
+            # 📌 Mensaje adaptado según si hubo detección parcial de entidades
+            if entidades:
                 mensaje = (
-                    f"No logré entender completamente tu mensaje: “{texto}”.\n\n"
-                    f"📌 Detecté estas entidades: *{', '.join(entidades_detectadas)}*.\n"
-                    f"¿Podrías darme más contexto o reformularlo?"
+                    f"🤔 No logré comprender del todo tu mensaje: “{texto}”.\n\n"
+                    f"🔎 Detecté las siguientes entidades: *{', '.join(entidades)}*.\n"
+                    f"¿Podrías darme más contexto o reformular tu solicitud?"
                 )
             else:
                 mensaje = (
-                    f"No logré entender tu mensaje: “{texto}”.\n\n"
-                    f"👉 Prueba con frases como:\n"
+                    f"🤔 No logré entender tu mensaje: “{texto}”.\n\n"
+                    f"👉 Ejemplos que puedes probar:\n"
                     f"- “Registré un gasto de 100 soles en comida”\n"
                     f"- “¿Cuánto ingresé en marzo?”\n"
-                    f"- “Configura una alerta de 300 soles para abril”\n"
+                    f"- “Configura una alerta de 300 soles para abril”"
                 )
 
             dispatcher.utter_message(text=mensaje)
@@ -750,7 +748,7 @@ class ActionEntradaNoEntendida(Action):
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_entrada_no_entendida: {e}")
-            dispatcher.utter_message(text="Ocurrió un error procesando tu mensaje. Por favor, intenta nuevamente.")
+            dispatcher.utter_message(text="Ocurrió un error procesando tu mensaje. Intenta nuevamente.")
             return []
 
 class ActionResetearCategoriaGastos(Action):
@@ -1230,25 +1228,32 @@ class ActionFollowSuggestion(Action):
     def name(self) -> Text:
         return "action_follow_suggestion"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         sugerencia = tracker.get_slot("sugerencia_pendiente")
 
+        # ✅ Si hay una sugerencia pendiente, la ejecutamos
         if sugerencia:
             dispatcher.utter_message(text="Perfecto, procedo con tu solicitud.")
             return [
                 FollowupAction(sugerencia),
                 SlotSet("sugerencia_pendiente", None)
             ]
-        
-        # Si no hay sugerencia válida
-        dispatcher.utter_message(text="No tengo ninguna acción pendiente que ejecutar.")
+
+        # ❌ Si no hay sugerencia válida, informamos al usuario
+        dispatcher.utter_message(text="No tengo ninguna acción pendiente por ejecutar. ¿Te gustaría registrar algo o hacer una consulta?")
         return []
 
 class ActionBienvenida(Action):
     def name(self) -> Text:
         return "action_bienvenida"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         meses_es = {
             "January": "enero", "February": "febrero", "March": "marzo", "April": "abril",
             "May": "mayo", "June": "junio", "July": "julio", "August": "agosto",
@@ -1260,19 +1265,17 @@ class ActionBienvenida(Action):
         nombre_mes_es = meses_es.get(nombre_mes_en, nombre_mes_en).capitalize()
         fecha_formateada = f"{ahora.day} de {nombre_mes_es} de {ahora.year}"
 
-        mensaje = f"""💼 **¡Hola! Bienvenido 👋**
-
-📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.
-
-🛠️ **Puedo ayudarte a:**
-- Registrar ingresos y gastos
-- Ver tu historial o saldo
-- Configurar alertas
-- Comparar tus gastos entre meses
-
-💡 *Ejemplo:* `Muéstrame mis gastos de abril`
-
-👉 ¿Qué deseas hacer hoy?"""
+        mensaje = (
+            f"💼 **¡Hola! Bienvenido 👋**\n\n"
+            f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.\n\n"
+            f"🛠️ **Puedo ayudarte a:**\n"
+            f"- Registrar ingresos y gastos\n"
+            f"- Ver tu historial o saldo\n"
+            f"- Configurar alertas\n"
+            f"- Comparar tus gastos entre meses\n\n"
+            f"💡 *Ejemplo:* `Muéstrame mis gastos de abril`\n\n"
+            f"👉 ¿Qué deseas hacer hoy?"
+        )
 
         dispatcher.utter_message(text=mensaje)
         return []
@@ -1286,14 +1289,16 @@ class ActionAyudaGeneral(Action):
             domain: Dict[Text, Any]) -> List[EventType]:
 
         mensaje = (
-            "🧭 Aquí tienes algunas cosas que puedo hacer:\n"
+            "🧭 *Aquí tienes algunas cosas que puedo hacer por ti:*\n\n"
             "- Registrar ingresos o gastos\n"
-            "- Consultar tu saldo o historial\n"
+            "- Consultar tu saldo o tu historial financiero\n"
             "- Configurar o eliminar alertas por categoría\n"
-            "- Analizar tus hábitos de gasto\n"
-            "- Comparar meses\n\n"
-            "Ejemplo: *'Gaste 80 soles en comida con débito el 2 de abril'*"
+            "- Analizar tus hábitos de consumo\n"
+            "- Comparar tus gastos entre meses\n\n"
+            "💡 *Ejemplo útil:* `Gaste 80 soles en comida con débito el 2 de abril`\n\n"
+            "¿Con qué te gustaría comenzar?"
         )
+
         dispatcher.utter_message(text=mensaje)
         return []
 
@@ -1306,12 +1311,13 @@ class ActionSessionStart(Action):
     async def run(
         self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
     ) -> List[EventType]:
-        # Inicio de sesión estándar
+
+        # 🟢 Inicio de sesión estándar de Rasa
         events = [SessionStarted(), ActionExecuted("action_listen")]
 
-        # Aquí llamamos manualmente a tu acción personalizada de bienvenida
+        # 📣 Ejecutar manualmente la acción de bienvenida personalizada
         bienvenida = ActionBienvenida()
-        bienvenida.run(dispatcher, tracker, domain)
+        await bienvenida.run(dispatcher, tracker, domain)
 
         return events
 
@@ -1322,11 +1328,15 @@ class ActionNegacion(Action):
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
         sugerencia = tracker.get_slot("sugerencia_pendiente")
 
-        # 🧾 Si había una sugerencia pendiente y se niega, entonces se despide
+        # 🔄 Si había una acción pendiente y el usuario la niega, se cancela educadamente
         if sugerencia:
-            dispatcher.utter_message(text="Entendido. ¡Hasta luego! Recuerda que puedes volver cuando lo necesites.")
+            dispatcher.utter_message(
+                text="👌 Perfecto, no se realizará la acción pendiente. ¡Hasta luego! Recuerda que puedes volver cuando lo necesites."
+            )
             return [SlotSet("sugerencia_pendiente", None)]
 
-        # ❓ Si no había sugerencia, responde de forma neutra
-        dispatcher.utter_message(text="Está bien, dime si deseas hacer otra consulta o registrar algo.")
+        # 🤷‍♀️ Si no había acción sugerida, ofrece continuar
+        dispatcher.utter_message(
+            text="Entendido. Si necesitas consultar algo o registrar una transacción, estoy aquí para ayudarte."
+        )
         return []
