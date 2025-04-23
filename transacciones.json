@@ -58,5 +58,17 @@
     "año": 2025,
     "timestamp": "2025-04-23T07:04:47.197891",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 5.0,
+    "categoria": "restaurantes",
+    "fecha": "23 de abril de 2025",
+    "medio": "efectivo",
+    "dia": 23,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-23T07:05:33.778808",
+    "status": 1
   }
 ]
