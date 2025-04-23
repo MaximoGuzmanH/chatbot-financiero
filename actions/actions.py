@@ -7,6 +7,7 @@ from rasa_sdk.events import SlotSet
 from collections import defaultdict
 import json
 import os
+import re
 from datetime import datetime
 from collections import Counter, defaultdict
 from rasa_sdk.types import DomainDict
