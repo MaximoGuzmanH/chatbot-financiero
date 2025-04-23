@@ -4,12 +4,53 @@ from datetime import datetime
 from typing import Dict, Any
 import requests
 
-RUTA_ALERTAS = "/tmp/alertas.json"
+RUTA_ALERTAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "alertas.json")
 
 # --- GitHub Sync (producción en Render) ---
 GITHUB_REPO = "MaximoGuzmanH/chatbot-financiero"
 ARCHIVO_ALERTAS = "alertas.json"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+
+def subir_a_github_alertas():
+    if not GITHUB_TOKEN:
+        print("[WARN] No se definió GITHUB_TOKEN. No se subirá a GitHub.")
+        return
+
+    try:
+        with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
+            contenido = f.read()
+
+        api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{ARCHIVO_ALERTAS}"
+
+        # Obtener el SHA actual del archivo
+        response_get = requests.get(api_url, headers={"Authorization": f"Bearer {GITHUB_TOKEN}"})
+        if response_get.status_code == 200:
+            sha = response_get.json()["sha"]
+        else:
+            sha = None
+
+        payload = {
+            "message": "🟢 Actualización de alertas desde el bot",
+            "content": contenido.encode("utf-8").decode("utf-8").encode("base64"),
+            "branch": "main"
+        }
+        if sha:
+            payload["sha"] = sha
+
+        headers = {
+            "Authorization": f"Bearer {GITHUB_TOKEN}",
+            "Accept": "application/vnd.github+json"
+        }
+
+        res = requests.put(api_url, headers=headers, json=payload)
+        if res.status_code in [200, 201]:
+            print("[SYNC] alertas.json actualizado correctamente en GitHub.")
+        else:
+            print(f"[ERROR] No se pudo actualizar alertas en GitHub: {res.status_code}", res.text)
+    except Exception as e:
+        print(f"[ERROR] al subir alertas a GitHub: {e}")
+
 
 def cargar_alertas(filtrar_activos=True):
     if not os.path.exists(RUTA_ALERTAS):
@@ -34,15 +75,6 @@ def guardar_alerta(alerta):
         json.dump(alertas, f, ensure_ascii=False, indent=2)
 
     subir_a_github_alertas()
-    
-    from github_sync import subir_a_github
-
-    subir_a_github(
-        ruta_archivo_local=RUTA_ALERTAS,
-        ruta_destino_repo="alertas.json",
-        mensaje_commit="Actualización automática de alertas desde Streamlit"
-    )
-
 
 
 def eliminar_alerta_logicamente(condiciones):
@@ -86,13 +118,6 @@ def guardar_todas_las_alertas(nuevas_alertas):
 
     subir_a_github_alertas()
 
-    from github_sync import subir_a_github
-
-    subir_a_github(
-        ruta_archivo_local=RUTA_ALERTAS,
-        ruta_destino_repo="alertas.json",
-        mensaje_commit="Actualización automática de alertas desde Streamlit"
-    )
 
 def actualizar_alerta_existente(condiciones: Dict[str, str], nueva_alerta: Dict[str, Any]) -> bool:
     ahora = datetime.now().isoformat()
