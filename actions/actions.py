@@ -147,17 +147,15 @@ class ActionRegistrarGasto(Action):
                         )
                     )
 
-            # ✅ Confirmación de registro
-            mensaje = (
-                f"💸 *Gasto registrado correctamente*\n\n"
-                f"• **Monto**: {monto:.2f} soles\n"
-                f"• **Categoría**: {categoria}\n"
-                f"• **Fecha**: {fecha}\n"
-                f"• **Medio**: {medio}\n\n"
-                f"¿Deseas registrar otro gasto o consultar tu saldo?"
+            # ✅ Confirmación de registro con formato optimizado
+            mensaje = construir_mensaje(
+                "💸 **Gasto registrado correctamente**",
+                f"💰 *Monto:* {monto:.2f} soles  📁 *Categoría:* {categoria}  📅 *Fecha:* {fecha}",
+                f"💳 *Medio:* {medio}",
+                "👉 ¿Deseas *registrar otro gasto* o *consultar tu saldo*?"
             )
 
-            dispatcher.utter_message(text=mensaje.strip())
+            dispatcher.utter_message(text=mensaje)
 
             return [
                 SlotSet("tipo", None),
