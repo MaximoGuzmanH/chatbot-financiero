@@ -1339,7 +1339,13 @@ class ActionConsultarConfiguracion(Action):
 
         # 🔍 Si se menciona "este mes", usamos mes y año actual
         if "este mes" in texto_usuario:
-            mes_actual = datetime.now().strftime("%B").lower()
+            mes_actual_en = datetime.now().strftime("%B").lower()
+            meses_es = {
+                "january": "enero", "february": "febrero", "march": "marzo", "april": "abril",
+                "may": "mayo", "june": "junio", "july": "julio", "august": "agosto",
+                "september": "septiembre", "october": "octubre", "november": "noviembre", "december": "diciembre"
+            }
+            mes_actual = meses_es.get(mes_actual_en, mes_actual_en)
             año_actual = datetime.now().year
             periodo_normalizado = f"{mes_actual} de {año_actual}"
         elif periodo_raw:
