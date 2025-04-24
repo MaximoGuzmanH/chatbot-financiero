@@ -62,8 +62,6 @@ def cargar_alertas(filtrar_activos=True):
 
 import json, os
 
-RUTA_ALERTAS = os.path.join(os.path.dirname(__file__), "alertas.json")
-
 def guardar_alerta(alerta):
     alertas = cargar_alertas(filtrar_activos=False)
     
