@@ -16,5 +16,14 @@
     "año": 2024,
     "timestamp": "2025-04-24T22:17:26.734361",
     "status": 1
+  },
+  {
+    "categoria": "entretenimiento",
+    "monto": 300.0,
+    "periodo": "abril de 2024",
+    "mes": "abril",
+    "año": 2024,
+    "timestamp": "2025-04-24T22:17:41.468367",
+    "status": 1
   }
 ]
