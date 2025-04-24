@@ -258,5 +258,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T00:32:11.475395",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 150.0,
+    "categoria": "comida",
+    "fecha": "10 de marzo",
+    "medio": "efectivo",
+    "dia": 10,
+    "mes": "marzo",
+    "año": 2025,
+    "timestamp": "2025-04-24T00:32:37.308293",
+    "status": 1
   }
 ]
