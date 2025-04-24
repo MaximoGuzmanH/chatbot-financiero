@@ -546,5 +546,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T07:30:37.604535",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 120.0,
+    "categoria": "salud",
+    "fecha": "8 de abril",
+    "medio": "débito",
+    "dia": 8,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T07:30:58.360871",
+    "status": 1
   }
 ]
