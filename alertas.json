@@ -16,5 +16,14 @@
     "año": 2024,
     "timestamp": "2025-04-24T07:36:32.713228",
     "status": 1
+  },
+  {
+    "categoria": "Spotify",
+    "monto": 50.0,
+    "periodo": "abril de 2024",
+    "mes": "abril",
+    "año": 2024,
+    "timestamp": "2025-04-24T07:42:15.188498",
+    "status": 1
   }
 ]
