@@ -64,8 +64,6 @@ class ActionRegistrarGasto(Action):
     def run(self, dispatcher, tracker, domain):
         try:
             texto_usuario = tracker.latest_message.get("text", "").lower()
-
-            # Establecer el tipo en el slot para mantener el contexto
             tipo_actual = tracker.get_slot("tipo") or "gasto"
 
             monto_raw = get_entity(tracker, "monto") or tracker.get_slot("monto")
@@ -81,9 +79,8 @@ class ActionRegistrarGasto(Action):
             if not medio:
                 campos_faltantes.append("medio")
 
-            # Preguntar por los campos faltantes sin guardar aún
             if campos_faltantes:
-                mensaje = "Para registrar tu gasto, necesito también:\n"
+                mensaje = "❗ Para registrar tu gasto, necesito también:\n\n"
                 for campo in campos_faltantes:
                     if campo == "medio":
                         mensaje += "• ¿Con qué medio realizaste el gasto? (efectivo, débito o crédito)\n"
@@ -92,7 +89,7 @@ class ActionRegistrarGasto(Action):
                     elif campo == "categoría":
                         mensaje += "• ¿En qué categoría clasificarías este gasto?\n"
 
-                dispatcher.utter_message(text=mensaje)
+                dispatcher.utter_message(text=mensaje.strip())
                 return [
                     SlotSet("tipo", "gasto"),
                     SlotSet("monto", monto_raw),
@@ -103,10 +100,10 @@ class ActionRegistrarGasto(Action):
 
             monto = parse_monto(monto_raw)
             if monto == 0.0:
-                dispatcher.utter_message(text="El monto ingresado no es válido. Intenta nuevamente.")
+                dispatcher.utter_message(text="⚠️ El monto ingresado no es válido. Intenta nuevamente.")
                 return []
 
-            # Procesamiento de fecha
+            # 🗓️ Procesar fecha
             if not fecha_raw:
                 fecha_raw = datetime.now().strftime("%d/%m/%Y")
             elif len(fecha_raw.split("/")) == 2:
@@ -124,7 +121,7 @@ class ActionRegistrarGasto(Action):
             guardar_transaccion(transaccion)
             mes_actual = transaccion.get("mes", "").lower()
 
-            # Verificar alertas
+            # 🚨 Verificar alertas activas
             alertas = cargar_alertas()
             alertas_activas = [
                 a for a in alertas
@@ -144,21 +141,23 @@ class ActionRegistrarGasto(Action):
                 if total_categoria > limite:
                     exceso = total_categoria - limite
                     dispatcher.utter_message(
-                        text=f"⚠️ Atención: has superado el límite de {limite:.2f} soles en {categoria} para {mes_actual}. "
-                             f"Te has excedido por {exceso:.2f} soles."
+                        text=(
+                            f"⚠️ *Atención*: Has superado el límite de *{limite:.2f} soles* en *{categoria}* "
+                            f"para *{mes_actual}*. Te has excedido por *{exceso:.2f} soles*."
+                        )
                     )
 
-            # Confirmación clara
+            # ✅ Confirmación de registro
             mensaje = (
-                f"💸 Gasto registrado:\n"
-                f"• Monto: {monto:.2f} soles\n"
-                f"• Categoría: {categoria}\n"
-                f"• Fecha: {fecha}\n"
-                f"• Medio: {medio}\n\n"
+                f"💸 *Gasto registrado correctamente*\n\n"
+                f"• **Monto**: {monto:.2f} soles\n"
+                f"• **Categoría**: {categoria}\n"
+                f"• **Fecha**: {fecha}\n"
+                f"• **Medio**: {medio}\n\n"
                 f"¿Deseas registrar otro gasto o consultar tu saldo?"
             )
 
-            dispatcher.utter_message(text=mensaje)
+            dispatcher.utter_message(text=mensaje.strip())
 
             return [
                 SlotSet("tipo", None),
@@ -171,14 +170,19 @@ class ActionRegistrarGasto(Action):
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_registrar_gasto: {e}")
-            dispatcher.utter_message(text="Ocurrió un error al registrar tu gasto. Por favor, intenta nuevamente.")
+            dispatcher.utter_message(
+                text="❌ Ocurrió un error al registrar tu gasto. Por favor, intenta nuevamente."
+            )
             return []
 
 class ActionRegistrarIngreso(Action):
     def name(self) -> Text:
         return "action_registrar_ingreso"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         try:
             texto_usuario = tracker.latest_message.get("text", "").lower()
             tipo_actual = tracker.get_slot("tipo") or "ingreso"
@@ -197,15 +201,14 @@ class ActionRegistrarIngreso(Action):
                 campos_faltantes.append("medio")
 
             if campos_faltantes:
-                mensaje = "Para registrar tu ingreso, necesito también:\n"
-                for campo in campos_faltantes:
-                    if campo == "medio":
-                        mensaje += "• ¿Con qué medio recibiste el ingreso? (efectivo, tarjeta de débito, etc.)\n"
-                    elif campo == "monto":
-                        mensaje += "• ¿Cuál fue el monto?\n"
-                    elif campo == "categoría":
-                        mensaje += "• ¿Qué tipo de ingreso fue? (sueldo, venta, etc.)\n"
-
+                mensaje = "⚠️ **Faltan algunos datos para registrar tu ingreso:**\n\n"
+                if "monto" in campos_faltantes:
+                    mensaje += "- ¿Cuál fue el **monto** del ingreso?\n"
+                if "categoría" in campos_faltantes:
+                    mensaje += "- ¿Qué **tipo de ingreso** fue? (sueldo, venta, etc.)\n"
+                if "medio" in campos_faltantes:
+                    mensaje += "- ¿Con qué **medio** recibiste el ingreso? (efectivo, tarjeta de débito, etc.)\n"
+                
                 dispatcher.utter_message(text=mensaje)
                 return [
                     SlotSet("tipo", "ingreso"),
@@ -217,7 +220,7 @@ class ActionRegistrarIngreso(Action):
 
             monto = parse_monto(monto_raw)
             if monto == 0.0:
-                dispatcher.utter_message(text="El monto ingresado no es válido. Intenta nuevamente.")
+                dispatcher.utter_message(text="❌ El monto ingresado no es válido. Intenta nuevamente.")
                 return []
 
             # Procesamiento de fecha
@@ -238,12 +241,12 @@ class ActionRegistrarIngreso(Action):
             guardar_transaccion(transaccion)
 
             mensaje = (
-                f"💰 Ingreso registrado:\n"
-                f"• Monto: {monto:.2f} soles\n"
-                f"• Categoría: {categoria}\n"
-                f"• Fecha: {fecha}\n"
-                f"• Medio: {medio}\n\n"
-                f"¿Deseas registrar otro ingreso o consultar tu saldo?"
+                f"✅ **Ingreso registrado con éxito:**\n\n"
+                f"💵 Monto: *{monto:.2f} soles*\n"
+                f"📂 Categoría: *{categoria}*\n"
+                f"📅 Fecha: *{fecha}*\n"
+                f"💳 Medio: *{medio}*\n\n"
+                f"¿Deseas *registrar otro ingreso* o *consultar tu saldo*?"
             )
 
             dispatcher.utter_message(text=mensaje)
@@ -259,14 +262,17 @@ class ActionRegistrarIngreso(Action):
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_registrar_ingreso: {e}")
-            dispatcher.utter_message(text="Ocurrió un error al registrar tu ingreso. Por favor, intenta nuevamente.")
+            dispatcher.utter_message(text="❌ Ocurrió un error al registrar tu ingreso. Por favor, intenta nuevamente.")
             return []
 
 class ActionConsultarSaldo(Action):
     def name(self) -> Text:
         return "action_consultar_saldo"
 
-    def run(self, dispatcher, tracker, domain):
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         try:
             transacciones = cargar_transacciones()
             medio = next(tracker.get_latest_entity_values("medio"), None)
@@ -280,29 +286,48 @@ class ActionConsultarSaldo(Action):
 
             if total_ingresos == 0 and total_gastos == 0:
                 if medio:
-                    msg = f"No se han registrado ingresos ni gastos con {medio}. ¿Deseas registrar uno ahora?"
+                    mensaje = (
+                        f"📭 *No se han registrado ingresos ni gastos con* **{medio}**.\n\n"
+                        f"¿Deseas registrar uno ahora?"
+                    )
                 else:
-                    msg = "Aún no se han registrado ingresos ni gastos. ¿Deseas registrar uno ahora?"
-                dispatcher.utter_message(text=msg)
+                    mensaje = (
+                        f"📭 *Aún no se han registrado ingresos ni gastos.*\n\n"
+                        f"Puedes comenzar registrando tu primer ingreso o gasto."
+                    )
+
+                dispatcher.utter_message(text=mensaje)
                 return []
+
+            if medio:
+                mensaje = (
+                    f"🧮 **Saldo disponible en {medio}:**\n\n"
+                    f"💰 *{saldo:.2f} soles*\n\n"
+                    f"¿Deseas *ver tu historial* o *consultar tus ingresos*?"
+                )
             else:
-                if medio:
-                    msg = f"Tu saldo actual en {medio} es de {saldo:.2f} soles. ¿Quieres ver tu historial o consultar tus ingresos?"
-                else:
-                    msg = f"Tu saldo actual es de {saldo:.2f} soles. ¿Quieres ver tu historial o consultar tus ingresos?"
-                dispatcher.utter_message(text=msg)
-                return [SlotSet("sugerencia_pendiente", "action_ver_historial_completo")]
+                mensaje = (
+                    f"🧮 **Saldo total disponible:**\n\n"
+                    f"💰 *{saldo:.2f} soles*\n\n"
+                    f"¿Deseas *ver tu historial* o *consultar tus ingresos*?"
+                )
+
+            dispatcher.utter_message(text=mensaje)
+            return [SlotSet("sugerencia_pendiente", "action_ver_historial_completo")]
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_consultar_saldo: {e}")
-            dispatcher.utter_message(text="Ocurrió un error al consultar tu saldo.")
+            dispatcher.utter_message(text="❌ Ocurrió un error al consultar tu saldo. Por favor, intenta nuevamente.")
             return []
 
 class ActionVerHistorialCompleto(Action):
     def name(self) -> Text:
         return "action_ver_historial_completo"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         try:
             from transacciones_io import cargar_transacciones
 
@@ -321,18 +346,20 @@ class ActionVerHistorialCompleto(Action):
                 ]
 
             if not transacciones_filtradas:
-                mensaje = f"No se encontraron movimientos registrados para el periodo {periodo}." if periodo else "No se encontraron transacciones registradas."
+                mensaje = (
+                    f"📭 *No se encontraron movimientos registrados*"
+                    + (f" para el periodo **{periodo}**." if periodo else ".")
+                )
                 dispatcher.utter_message(text=mensaje)
                 return []
 
             mensaje = []
 
             # Encabezado
-            encabezado = "📋 Estas son tus transacciones registradas"
+            encabezado = "📋 **Historial de transacciones**"
             if periodo:
-                encabezado += f" para el periodo *{periodo}*"
-            encabezado += ":\n"
-            mensaje.append(encabezado)
+                encabezado += f" para *{periodo}*"
+            mensaje.append(encabezado + ":\n")
 
             # Detalles de cada transacción
             for t in transacciones_filtradas:
@@ -342,24 +369,22 @@ class ActionVerHistorialCompleto(Action):
                 fecha = formatear_fecha(t.get("fecha", "")) if t.get("fecha") else ""
                 medio = t.get("medio", "")
 
-                linea = f"- *{tipo}*: {monto:.2f} soles en *{categoria}*"
+                linea = f"🔸 *{tipo}* de *{monto:.2f} soles* en *{categoria}*"
                 if fecha:
-                    linea += f" el {fecha}"
-                if medio and medio != "N/A":
-                    linea += f" con {medio}"
+                    linea += f", el *{fecha}*"
+                if medio and medio.lower() != "n/a":
+                    linea += f", con *{medio}*"
                 mensaje.append(linea)
 
-            # Cierre
-            mensaje.append("\n¿Deseas registrar algo nuevo o consultar tu resumen mensual?")
+            # Cierre motivador
+            mensaje.append("\n📊 ¿Deseas *registrar algo nuevo* o *consultar tu resumen mensual*?")
 
-            # Enviar todo como una sola burbuja
             dispatcher.utter_message(text=construir_mensaje(mensaje))
-
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_ver_historial_completo: {e}")
-            dispatcher.utter_message(text="Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente.")
+            dispatcher.utter_message(text="❌ Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente.")
             return []
 
 from collections import Counter, defaultdict
@@ -368,9 +393,13 @@ class ActionAnalizarGastos(Action):
     def name(self) -> Text:
         return "action_analizar_gastos"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         from datetime import datetime
         import re
+        from collections import defaultdict
 
         transacciones = cargar_transacciones(filtrar_activos=True)
         texto_usuario = tracker.latest_message.get("text", "").lower()
@@ -397,12 +426,15 @@ class ActionAnalizarGastos(Action):
             t for t in transacciones
             if t.get("tipo") == "gasto" and t.get("monto") and t.get("categoria")
         ]
-
         if periodo:
             gastos = [g for g in gastos if g.get("periodo", "").lower() == periodo.lower()]
 
         if not gastos:
-            mensaje = f"No se encontraron gastos registrados para el periodo *{periodo}*." if periodo else "No se han registrado gastos aún. ¿Deseas ingresar uno?"
+            mensaje = (
+                f"📭 *No se encontraron gastos registrados*"
+                + (f" para el periodo **{periodo}**." if periodo else ".")
+                + "\n\n¿Deseas ingresar uno?"
+            )
             dispatcher.utter_message(text=mensaje)
             return []
 
@@ -416,13 +448,13 @@ class ActionAnalizarGastos(Action):
             if not gastos_categoria:
                 mensaje = construir_mensaje(
                     f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis." if sin_categoria else "",
-                    f"No se encontraron gastos en la categoría *{categoria}*" +
+                    f"🔍 No se encontraron gastos en la categoría *{categoria}*" +
                     (f" durante *{periodo}*" if periodo else "") + "."
                 )
             else:
                 mensaje = construir_mensaje(
                     f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis." if sin_categoria else "",
-                    f"Has gastado un total de *{total_categoria:.2f} soles* en *{categoria}*" +
+                    f"📂 Has gastado un total de *{total_categoria:.2f} soles* en *{categoria}*" +
                     (f" durante *{periodo}*" if periodo else "") + "."
                 )
 
@@ -438,23 +470,26 @@ class ActionAnalizarGastos(Action):
         total_gasto = sum(categorias_sumadas.values())
         top_categorias = sorted(categorias_sumadas.items(), key=lambda x: x[1], reverse=True)[:3]
 
-        # 🧾 Generar mensaje principal
-        respuesta = "🧾 *Análisis de tus hábitos de consumo*"
+        # 🧾 Generar respuesta formateada
+        mensaje = []
+
+        titulo = "🧾 **Análisis de tus hábitos de consumo**"
         if periodo:
-            respuesta += f" durante *{periodo}*"
-        respuesta += ":\n\n"
+            titulo += f" durante *{periodo}*"
+        mensaje.append(titulo)
 
         if sin_categoria:
-            respuesta += f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis.\n\n"
+            mensaje.append(f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis.")
 
-        respuesta += "📊 *Categorías con mayor gasto*:\n"
+        resumen = "📊 **Categorías con mayor gasto:**"
         for cat, total in top_categorias:
             porcentaje = (total / total_gasto) * 100
-            respuesta += f"• {cat.title()}: {total:.2f} soles ({porcentaje:.1f}%)\n"
+            resumen += f"\n• {cat.title()}: {total:.2f} soles ({porcentaje:.1f}%)"
+        mensaje.append(resumen)
 
-        respuesta += f"\n💸 *Total gastado*: *{total_gasto:.2f} soles*\n"
+        mensaje.append(f"💸 **Total gastado:** *{total_gasto:.2f} soles*")
 
-        # 🧾 Ejemplos recientes (ordenados por fecha)
+        # 📋 Ejemplos recientes
         def parse_fecha(fecha_str):
             try:
                 return datetime.strptime(fecha_str, "%Y-%m-%d")
@@ -462,16 +497,17 @@ class ActionAnalizarGastos(Action):
                 return datetime.min
 
         recientes = sorted(gastos, key=lambda x: parse_fecha(x.get("fecha", "")), reverse=True)[:5]
-
-        respuesta += "\n📋 *Ejemplos recientes*:\n"
+        detalles = "📋 **Ejemplos recientes:**"
         for g in recientes:
             fecha = g.get("fecha", "sin fecha")
             monto = g.get("monto", 0)
             cat = g.get("categoria", "Sin categoría")
-            respuesta += f"- {cat.title()}: {monto:.2f} soles ({fecha})\n"
+            detalles += f"\n- {cat.title()}: {monto:.2f} soles ({fecha})"
+        mensaje.append(detalles)
 
-        respuesta += "\n¿Quieres comparar tus gastos entre meses o configurar una alerta?"
-        dispatcher.utter_message(text=respuesta.strip())
+        mensaje.append("👉 ¿Quieres *comparar tus gastos entre meses* o *configurar una alerta*?")
+
+        dispatcher.utter_message(text=construir_mensaje(*mensaje))
 
         return [SlotSet("sugerencia_pendiente", "action_comparar_meses")]
 
@@ -496,9 +532,15 @@ class ActionCompararMeses(Action):
     def name(self) -> Text:
         return "action_comparar_meses"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         try:
             from datetime import datetime
+            import re
+            from collections import defaultdict
+
             transacciones = cargar_transacciones(filtrar_activos=True)
             texto = tracker.latest_message.get("text", "").lower()
 
@@ -515,12 +557,13 @@ class ActionCompararMeses(Action):
                 texto_normalizado = texto_normalizado.replace(sep, " y ")
 
             matches = re.findall(rf"({'|'.join(posibles_meses)})(?:\s+de)?\s+(\d{{4}})", texto_normalizado)
+
             if len(matches) == 2:
                 periodo1 = f"{matches[0][0]} de {matches[0][1]}"
                 periodo2 = f"{matches[1][0]} de {matches[1][1]}"
 
                 if periodo1 == periodo2:
-                    dispatcher.utter_message(text="Por favor, proporciona dos periodos diferentes para la comparación.")
+                    dispatcher.utter_message(text="⚠️ Por favor, proporciona *dos periodos diferentes* para la comparación.")
                     return []
 
                 total = defaultdict(float)
@@ -535,18 +578,22 @@ class ActionCompararMeses(Action):
                 v1, v2 = total.get(periodo1, 0), total.get(periodo2, 0)
                 if v1 == 0 and v2 == 0:
                     dispatcher.utter_message(
-                        text=f"No se encontraron {tipo}s registrados para *{periodo1}* ni *{periodo2}*."
+                        text=f"📭 *No se encontraron {tipo}s registrados* para *{periodo1}* ni *{periodo2}*."
                     )
                     return []
 
+                comparativa = (
+                    f"⬅️ En *{periodo1}* tuviste más {tipo}s que en *{periodo2}*" if v1 > v2 else
+                    f"➡️ En *{periodo2}* tuviste más {tipo}s que en *{periodo1}*" if v2 > v1 else
+                    f"✅ Tus {tipo}s fueron iguales en ambos periodos."
+                )
+
                 mensaje = construir_mensaje(
-                    f"📊 Comparativa de *{tipo}s*:",
-                    f"- {periodo1.capitalize()}: {v1:.2f} soles",
-                    f"- {periodo2.capitalize()}: {v2:.2f} soles",
-                    f"⬅️ En *{periodo1}* tuviste más {tipo}s que en *{periodo2}*." if v1 > v2 else
-                    f"➡️ En *{periodo2}* tuviste más {tipo}s que en *{periodo1}*." if v2 > v1 else
-                    f"✅ Tus {tipo}s fueron iguales en ambos periodos.",
-                    "¿Quieres configurar un presupuesto o consultar tus ingresos recientes?"
+                    f"📊 **Comparativa de {tipo}s:**",
+                    f"• *{periodo1.capitalize()}*: {v1:.2f} soles",
+                    f"• *{periodo2.capitalize()}*: {v2:.2f} soles",
+                    comparativa,
+                    "👉 ¿Quieres *configurar un presupuesto* o *consultar tus ingresos recientes*?"
                 )
                 dispatcher.utter_message(text=mensaje)
                 return [SlotSet("sugerencia_pendiente", "action_crear_configuracion")]
@@ -562,42 +609,46 @@ class ActionCompararMeses(Action):
                         totales_por_mes[mes] += float(t.get("monto", 0))
 
                 if not totales_por_mes:
-                    dispatcher.utter_message(text=f"No se encontraron {tipo}s registrados durante el año {año_actual}.")
+                    dispatcher.utter_message(
+                        text=f"📭 No se encontraron {tipo}s registrados durante el año *{año_actual}*."
+                    )
                     return []
 
                 mes_max = max(totales_por_mes.items(), key=lambda x: x[1])[0]
                 monto_max = totales_por_mes[mes_max]
 
                 mensaje = construir_mensaje(
-                    f"📅 En el año {año_actual}, el mes con mayor {tipo} fue *{mes_max}*",
-                    f"con un total de *{monto_max:.2f} soles*.",
-                    "¿Deseas comparar otros periodos o revisar tu historial completo?"
+                    f"📅 **Mes con mayor {tipo} en {año_actual}:**",
+                    f"• *{mes_max}* con *{monto_max:.2f} soles*",
+                    "👉 ¿Deseas *comparar otros periodos* o *revisar tu historial completo*?"
                 )
                 dispatcher.utter_message(text=mensaje)
                 return [SlotSet("sugerencia_pendiente", "action_ver_historial_completo")]
 
             else:
                 dispatcher.utter_message(
-                    text="Por favor, indícame dos periodos válidos con mes y año. Ejemplo: 'marzo de 2024 y abril de 2024'."
+                    text="ℹ️ Por favor, indícame *dos periodos válidos* con mes y año.\n\n*Ejemplo:* `marzo de 2024 y abril de 2024`"
                 )
                 return []
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_comparar_meses: {e}")
             dispatcher.utter_message(
-                text="Ocurrió un error al comparar los meses. Intenta de nuevo usando dos periodos como 'marzo de 2024 y abril de 2024'."
+                text="❌ Ocurrió un error al comparar los meses. Intenta de nuevo usando dos periodos como *marzo de 2024 y abril de 2024*."
             )
             return []
-
-from dateparser import parse as parse_fecha_relativa
 
 class ActionConsultarInformacionFinanciera(Action):
     def name(self) -> Text:
         return "action_consultar_informacion_financiera"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         from datetime import datetime
         from collections import defaultdict
+        import re
 
         transacciones = cargar_transacciones(filtrar_activos=True)
         texto = tracker.latest_message.get("text", "").strip().lower()
@@ -609,7 +660,7 @@ class ActionConsultarInformacionFinanciera(Action):
         fecha_raw = get_entity(tracker, "fecha") or tracker.get_slot("fecha")
         periodo_raw = get_entity(tracker, "periodo") or tracker.get_slot("periodo")
 
-        # Verificación de ambigüedad o entrada demasiado corta
+        # Verificación de ambigüedad o entrada muy breve
         verbos_clave = [
             "gasté", "gaste", "pagué", "ingresé", "recibí", "consulté", "usé",
             "muestra", "consultar", "ver", "registré", "gané", "cuánto", "invertí"
@@ -617,8 +668,8 @@ class ActionConsultarInformacionFinanciera(Action):
         contiene_verbo = any(v in texto for v in verbos_clave)
         if not contiene_verbo and len(tokens) <= 5:
             mensaje = construir_mensaje(
-                f"No logré entender tu intención con: “{texto}”. ¿Podrías reformularlo?",
-                "Estoy aquí para ayudarte con tus finanzas. Puedes decir cosas como:",
+                f"❓ No logré entender tu intención con: “{texto}”. ¿Podrías reformularlo?",
+                "🧠 Estoy aquí para ayudarte con tus finanzas. Puedes decir cosas como:",
                 "- “¿Cuánto gasté en comida en abril?”",
                 "- “Muéstrame mis ingresos por sueldo en marzo.”"
             )
@@ -667,38 +718,38 @@ class ActionConsultarInformacionFinanciera(Action):
 
         if not resultados:
             mensaje = construir_mensaje(
-                f"No se encontraron registros financieros con los criterios proporcionados.",
-                f"🧾 Parámetros usados:",
-                f"- Tipo: {tipo}" if tipo else "",
-                f"- Categoría: {categoria}" if categoria else "",
-                f"- Medio: {medio}" if medio else "",
-                f"- Fecha: {fecha}" if fecha else "",
-                f"- Periodo: {periodo}" if periodo else ""
+                f"📭 *No se encontraron registros financieros* con los criterios proporcionados.",
+                f"🧾 **Parámetros usados:**",
+                f"- Tipo: *{tipo}*" if tipo else "",
+                f"- Categoría: *{categoria}*" if categoria else "",
+                f"- Medio: *{medio}*" if medio else "",
+                f"- Fecha: *{fecha}*" if fecha else "",
+                f"- Periodo: *{periodo}*" if periodo else ""
             )
-            dispatcher.utter_message(text=mensaje.strip())
+            dispatcher.utter_message(text=mensaje)
             return []
 
-        # Construir mensaje principal
+        # Construir respuesta
         partes = []
 
         if categoria and periodo:
-            partes.append(f"Tu {tipo} total en la categoría *{categoria}* durante *{periodo}* es de *{total:.2f} soles*.")
+            partes.append(f"📌 Tu *{tipo}* total en la categoría *{categoria}* durante *{periodo}* es de *{total:.2f} soles*.")
         elif tipo and periodo:
-            partes.append(f"Tu {tipo} total durante *{periodo}* es de *{total:.2f} soles*.")
+            partes.append(f"📌 Tu *{tipo}* total durante *{periodo}* es de *{total:.2f} soles*.")
         elif tipo:
             resumen_cat = defaultdict(float)
             for t in resultados:
                 resumen_cat[t.get("categoria", "Sin categoría")] += t["monto"]
 
-            partes.append(f"📊 Tu resumen de *{tipo}s* por categoría:")
+            partes.append(f"📊 *Resumen de {tipo}s por categoría:*")
             for cat, monto in resumen_cat.items():
                 partes.append(f"- {cat}: {monto:.2f} soles")
         elif medio:
-            partes.append(f"Total registrado usando *{medio}*: *{total:.2f} soles*.")
+            partes.append(f"📌 Total registrado usando *{medio}*: *{total:.2f} soles*.")
         else:
-            partes.append(f"📊 Total filtrado: *{total:.2f} soles*.")
+            partes.append(f"📊 *Total filtrado*: *{total:.2f} soles*.")
 
-        partes.append("¿Deseas ver tu historial o analizar tus gastos por categoría?")
+        partes.append("👉 ¿Deseas *ver tu historial* o *analizar tus gastos por categoría*?")
         dispatcher.utter_message(text=construir_mensaje(*partes))
 
         return [SlotSet("sugerencia_pendiente", "action_analizar_gastos")]
@@ -707,48 +758,61 @@ class ActionEntradaNoEntendida(Action):
     def name(self) -> Text:
         return "action_entrada_no_entendida"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         try:
+            from datetime import datetime
+
             texto = tracker.latest_message.get("text", "").strip()
             intent = tracker.latest_message.get("intent", {}).get("name", "")
             entidades = [e.get("entity") for e in tracker.latest_message.get("entities", [])]
 
-            # ❌ Evitar guardar afirmaciones, negaciones o saludos como no entendidas
+            # ❌ No registrar saludos, afirmaciones o negaciones como entradas no entendidas
             if intent not in ["entrada_no_entendida", "nlu_fallback"]:
-                dispatcher.utter_message(text="No logré entender completamente tu mensaje. ¿Podrías reformularlo o dar más detalles?")
+                dispatcher.utter_message(
+                    text="❓ *No logré entender completamente tu mensaje.* ¿Podrías reformularlo o dar más detalles?"
+                )
                 return []
 
-            # 🧠 Guardar entrada como 'no entendida'
+            # 🧠 Guardar entrada como no comprendida
             guardar_transaccion({
                 "tipo": "entrada_no_entendida",
                 "descripcion": texto,
                 "timestamp": datetime.now().isoformat()
             })
 
-            # 📌 Mensaje adaptado según si hubo detección parcial de entidades
+            # 📌 Mensaje personalizado según si hubo detección parcial
             if entidades:
-                mensaje = (
-                    f"🤔 No logré comprender del todo tu mensaje: “{texto}”.\n\n"
-                    f"🔎 Detecté las siguientes entidades: *{', '.join(entidades)}*.\n"
+                mensaje = construir_mensaje(
+                    f"🤔 *No logré comprender del todo tu mensaje:* “{texto}”.",
+                    f"🔎 Detecté las siguientes entidades: *{', '.join(entidades)}*.",
                     f"¿Podrías darme más contexto o reformular tu solicitud?"
                 )
             else:
-                mensaje = (
-                    f"🤔 No logré entender tu mensaje: “{texto}”.\n\n"
-                    f"👉 Ejemplos que puedes probar:\n"
-                    f"- “Registré un gasto de 100 soles en comida”\n"
-                    f"- “¿Cuánto ingresé en marzo?”\n"
-                    f"- “Configura una alerta de 300 soles para abril”"
+                mensaje = construir_mensaje(
+                    f"🤔 *No logré entender tu mensaje:* “{texto}”.",
+                    "👉 *Ejemplos que puedes probar:*",
+                    "- “Registré un gasto de 100 soles en comida”",
+                    "- “¿Cuánto ingresé en marzo?”",
+                    "- “Configura una alerta de 300 soles para abril”"
                 )
 
             dispatcher.utter_message(text=mensaje)
-            dispatcher.utter_message(text="Estoy aquí para ayudarte con tus finanzas. ¿Qué te gustaría hacer ahora?")
+
+            # Mensaje final de continuidad
+            dispatcher.utter_message(
+                text="🧠 *Estoy aquí para ayudarte con tus finanzas.* ¿Qué te gustaría hacer ahora?"
+            )
 
             return [SlotSet("sugerencia_pendiente", "action_ayuda_general")]
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_entrada_no_entendida: {e}")
-            dispatcher.utter_message(text="Ocurrió un error procesando tu mensaje. Intenta nuevamente.")
+            dispatcher.utter_message(
+                text="❌ Ocurrió un error procesando tu mensaje. Por favor, intenta nuevamente."
+            )
             return []
 
 class ActionResetearCategoriaGastos(Action):
@@ -759,18 +823,26 @@ class ActionResetearCategoriaGastos(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
+        from datetime import datetime
+        import json
+        import re
+
         categoria = get_entity(tracker, "categoria")
         periodo = get_entity(tracker, "periodo")
         texto_usuario = tracker.latest_message.get("text", "").lower()
 
         if not categoria or not periodo:
-            dispatcher.utter_message(text="Necesito la categoría y el mes con año para resetear los gastos.")
+            dispatcher.utter_message(
+                text="⚠️ Necesito tanto la *categoría* como el *mes con año* para poder resetear los gastos."
+            )
             return []
 
         # Normalizar periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo.lower())
         if not match:
-            dispatcher.utter_message(text="El formato del periodo debe ser 'marzo de 2025', por ejemplo.")
+            dispatcher.utter_message(
+                text="🗓️ El periodo debe tener el formato *“marzo de 2025”*, por ejemplo."
+            )
             return []
 
         mes = match.group(1).strip().lower()
@@ -780,6 +852,7 @@ class ActionResetearCategoriaGastos(Action):
         ahora = datetime.now().isoformat()
         modificadas = 0
 
+        # Marcar gastos como eliminados (status 0)
         for t in transacciones:
             if (
                 t.get("tipo") == "gasto"
@@ -792,7 +865,7 @@ class ActionResetearCategoriaGastos(Action):
                 t["timestamp_modificacion"] = ahora
                 modificadas += 1
 
-        # Agregar registro de reinicio
+        # Agregar registro del reinicio
         transacciones.append({
             "tipo": "reinicio",
             "categoria": categoria,
@@ -803,14 +876,21 @@ class ActionResetearCategoriaGastos(Action):
             "status": 1
         })
 
-        # Guardar en transacciones.json
+        # Guardar cambios
         with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
             json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
+        # Mensaje de confirmación
         if modificadas > 0:
-            mensaje = f"🔄 Se han reseteado {modificadas} registros de gasto en *{categoria}* para *{mes} {año}*."
+            mensaje = construir_mensaje(
+                f"🔄 *Se han reseteado {modificadas} registros de gasto* en la categoría *{categoria}* para *{mes} {año}*.",
+                "📌 Estos registros ya no se considerarán en tus análisis financieros."
+            )
         else:
-            mensaje = f"No se encontraron gastos activos en *{categoria}* para *{mes} {año}*, pero el reinicio ha sido registrado."
+            mensaje = construir_mensaje(
+                f"ℹ️ *No se encontraron gastos activos* en *{categoria}* para *{mes} {año}*.",
+                "📌 Aun así, se ha registrado el reinicio para dejar constancia del cambio."
+            )
 
         dispatcher.utter_message(text=mensaje)
         return []
@@ -823,38 +903,42 @@ class ActionCrearConfiguracion(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
+        import re
+        from datetime import datetime
+
         categoria = get_entity(tracker, "categoria")
         monto = get_entity(tracker, "monto")
         periodo = get_entity(tracker, "periodo")
         texto_usuario = tracker.latest_message.get("text", "").lower()
 
         if not categoria or not monto or not periodo:
-            dispatcher.utter_message(text="Necesito la categoría, el monto y el mes con año para crear una configuración.")
+            dispatcher.utter_message(text="⚠️ Necesito la *categoría*, el *monto* y el *mes con año* para poder crear una configuración.")
             return []
 
         try:
             monto_float = parse_monto(monto)
         except Exception:
-            dispatcher.utter_message(text="El monto ingresado no es válido.")
+            dispatcher.utter_message(text="❌ El monto ingresado no es válido. Intenta con un valor numérico.")
             return []
 
         if monto_float <= 0:
-            dispatcher.utter_message(text="El monto debe ser mayor que cero.")
+            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor que cero*.")
             return []
 
+        # 📆 Normalizar periodo
         periodo = periodo.lower().strip()
-
-        # 🔍 Extraer mes y año del periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo)
         if not match:
-            dispatcher.utter_message(text="El formato del periodo debe ser 'abril de 2024', por ejemplo.")
+            dispatcher.utter_message(
+                text="📅 El formato del periodo debe ser *“abril de 2024”*, por ejemplo."
+            )
             return []
 
         mes = match.group(1).strip().lower()
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # Verificar si ya existe una alerta activa con la misma clave
+        # 🧠 Verificar si ya existe una alerta para esa categoría y mes
         alertas = cargar_alertas()
         ya_existe = any(
             a["categoria"].lower() == categoria.lower() and a["periodo"].lower() == periodo_normalizado
@@ -863,7 +947,7 @@ class ActionCrearConfiguracion(Action):
 
         if ya_existe:
             dispatcher.utter_message(
-                text=f"Ya existe una alerta activa para *{categoria}* en *{periodo_normalizado}*. Usa 'modificar' si deseas actualizarla."
+                text=f"🔔 Ya existe una *alerta activa* para *{categoria}* en *{periodo_normalizado}*.\n\n🛠️ Usa *modificar* si deseas actualizarla."
             )
             return []
 
@@ -879,9 +963,12 @@ class ActionCrearConfiguracion(Action):
 
         guardar_alerta(nueva_alerta)
 
-        dispatcher.utter_message(
-            text=f"✅ Se ha creado una alerta de *{monto_float} soles* para *{categoria}* en *{periodo_normalizado}*."
+        mensaje = construir_mensaje(
+            f"✅ *Configuración registrada correctamente*",
+            f"📌 Se ha creado una alerta de *{monto_float:.2f} soles* para *{categoria}* en *{periodo_normalizado}*.",
+            "👉 Puedes modificarla más adelante si es necesario."
         )
+        dispatcher.utter_message(text=mensaje)
 
         return []
             
@@ -893,36 +980,48 @@ class ActionModificarConfiguracion(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
+        import re
+        import json
+        from datetime import datetime
+
         categoria = get_entity(tracker, "categoria")
         monto = get_entity(tracker, "monto")
         periodo = get_entity(tracker, "periodo")
         texto_usuario = tracker.latest_message.get("text", "").lower()
 
         if not categoria or not monto or not periodo:
-            dispatcher.utter_message(text="Para modificar una configuración necesito la categoría, el monto y el mes con año.")
+            dispatcher.utter_message(
+                text="⚠️ Para *modificar una configuración*, necesito que me indiques la *categoría*, el *monto* y el *mes con año*."
+            )
             return []
 
         try:
             monto_float = parse_monto(monto)
         except Exception:
-            dispatcher.utter_message(text="El monto proporcionado no es válido.")
+            dispatcher.utter_message(
+                text="❌ El monto proporcionado no es válido. Intenta con un valor numérico."
+            )
             return []
 
         if monto_float <= 0:
-            dispatcher.utter_message(text="El monto debe ser mayor a cero para configurar una alerta.")
+            dispatcher.utter_message(
+                text="⚠️ El monto debe ser *mayor a cero* para configurar una alerta."
+            )
             return []
 
-        # Normalizar periodo
+        # 📅 Normalizar periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo.lower())
         if not match:
-            dispatcher.utter_message(text="El formato del periodo debe ser 'abril de 2024', por ejemplo.")
+            dispatcher.utter_message(
+                text="📅 El formato del periodo debe ser *“abril de 2024”*, por ejemplo."
+            )
             return []
 
         mes = match.group(1).strip().lower()
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # Buscar alerta existente
+        # 🔍 Buscar si existe una alerta activa
         alertas = cargar_alertas()
         alerta_existente = next((
             a for a in alertas
@@ -932,7 +1031,13 @@ class ActionModificarConfiguracion(Action):
         ), None)
 
         if alerta_existente:
-            # Guardar información actual y nueva para confirmar modificación
+            # ✅ Hay una alerta activa: proponer modificación
+            dispatcher.utter_message(
+                text=construir_mensaje(
+                    f"✏️ Se encontró una alerta activa para *{categoria}* en *{periodo_normalizado}*.",
+                    f"¿Deseas actualizarla al nuevo monto de *{monto_float:.2f} soles*?"
+                )
+            )
             return [
                 SlotSet("categoria", categoria),
                 SlotSet("monto", monto_float),
@@ -942,9 +1047,14 @@ class ActionModificarConfiguracion(Action):
                 SlotSet("alerta_original", json.dumps(alerta_existente)),
                 SlotSet("sugerencia_pendiente", "confirmar_modificacion_alerta")
             ]
+
         else:
+            # ❌ No existe: sugerir creación
             dispatcher.utter_message(
-                text=f"No encontré una alerta activa para *{categoria}* en *{periodo_normalizado}*. ¿Deseas crear una nueva alerta?"
+                text=construir_mensaje(
+                    f"🔍 *No encontré una alerta activa* para *{categoria}* en *{periodo_normalizado}*.",
+                    "¿Deseas crear una nueva alerta con esa información?"
+                )
             )
             return [
                 SlotSet("categoria", categoria),
@@ -963,11 +1073,13 @@ class ActionConfirmarModificacionAlerta(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
+        import json
+
         categoria = tracker.get_slot("categoria")
         monto = tracker.get_slot("monto")
         periodo = tracker.get_slot("periodo")
 
-        # Verificar si existe alerta activa
+        # 🔍 Verificar si la alerta aún existe y está activa
         alertas = cargar_alertas()
         alerta_existente = next((
             a for a in alertas
@@ -977,23 +1089,26 @@ class ActionConfirmarModificacionAlerta(Action):
         ), None)
 
         if not alerta_existente:
-            dispatcher.utter_message(text="La alerta a modificar ya no está activa o no existe.")
+            dispatcher.utter_message(
+                text="⚠️ *La alerta que intentas modificar ya no está activa o no existe.*"
+            )
             return []
 
-        # Preparar mensaje de confirmación
-        mensaje = (
-            f"Tienes esta alerta activa:\n"
-            f"• Categoría: {alerta_existente['categoria']}\n"
-            f"• Monto actual: {alerta_existente['monto']:.2f} soles\n"
-            f"• Periodo: {alerta_existente['periodo']}\n\n"
-            f"¿Deseas actualizarla a:\n"
-            f"• Monto nuevo: {monto:.2f} soles?\n\n"
-            f"Responde con 'sí' para confirmar o 'no' para cancelar."
+        # ✅ Preparar mensaje de confirmación
+        mensaje = construir_mensaje(
+            "✏️ *Esta es la alerta que tienes activa:*",
+            f"• Categoría: *{alerta_existente['categoria']}*",
+            f"• Monto actual: *{alerta_existente['monto']:.2f} soles*",
+            f"• Periodo: *{alerta_existente['periodo']}*",
+            "🔄 ¿Deseas actualizarla a:",
+            f"• *{monto:.2f} soles*?",
+            "✉️ *Responde con “sí” para confirmar* o *“no” para cancelar* la modificación."
         )
+
         dispatcher.utter_message(text=mensaje)
 
         return [
-            SlotSet("alerta_original", json.dumps(alerta_existente))  # para que luego pueda ser modificada
+            SlotSet("alerta_original", json.dumps(alerta_existente))  # Para su uso posterior
         ]
 
 class ActionEjecutarModificacionAlerta(Action):
@@ -1004,6 +1119,9 @@ class ActionEjecutarModificacionAlerta(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
+        import json
+        from datetime import datetime
+
         try:
             categoria = tracker.get_slot("categoria")
             monto = tracker.get_slot("monto")
@@ -1011,22 +1129,26 @@ class ActionEjecutarModificacionAlerta(Action):
             alerta_json = tracker.get_slot("alerta_original")
 
             if not (categoria and monto and periodo and alerta_json):
-                dispatcher.utter_message(text="No se pudo completar la modificación porque faltan datos.")
+                dispatcher.utter_message(
+                    text="⚠️ *No se pudo completar la modificación* porque faltan datos importantes."
+                )
                 return []
 
             alerta_original = json.loads(alerta_json)
             alertas = cargar_alertas()
             ahora = datetime.now()
 
-            # Desactivar la alerta original
+            # 🚫 Desactivar alerta anterior
             for alerta in alertas:
-                if (alerta.get("categoria", "").lower() == alerta_original.get("categoria", "").lower() and
-                        alerta.get("periodo", "").lower() == alerta_original.get("periodo", "").lower() and
-                        alerta.get("status", 1) == 1):
+                if (
+                    alerta.get("categoria", "").lower() == alerta_original.get("categoria", "").lower() and
+                    alerta.get("periodo", "").lower() == alerta_original.get("periodo", "").lower() and
+                    alerta.get("status", 1) == 1
+                ):
                     alerta["status"] = 0
                     alerta["timestamp_modificacion"] = ahora.isoformat()
 
-            # Crear nueva alerta
+            # 🆕 Crear alerta actualizada
             nueva_alerta = {
                 "categoria": categoria,
                 "monto": float(monto),
@@ -1036,14 +1158,19 @@ class ActionEjecutarModificacionAlerta(Action):
             }
             alertas.append(nueva_alerta)
 
-            # Guardar en archivo
+            # 💾 Guardar cambios
             with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
                 json.dump(alertas, f, ensure_ascii=False, indent=2)
 
-            dispatcher.utter_message(
-                text=f"✅ Alerta modificada correctamente:\n• Categoría: {categoria}\n"
-                     f"• Nuevo monto: {monto} soles\n• Periodo: {periodo}"
+            # ✅ Confirmación final
+            mensaje = construir_mensaje(
+                f"✅ *Alerta modificada correctamente*",
+                f"• Categoría: *{categoria}*",
+                f"• Nuevo monto: *{float(monto):.2f} soles*",
+                f"• Periodo: *{periodo}*",
+                "👉 Puedes consultar o modificarla nuevamente cuando lo necesites."
             )
+            dispatcher.utter_message(text=mensaje)
 
             return [
                 SlotSet("categoria", None),
@@ -1055,7 +1182,9 @@ class ActionEjecutarModificacionAlerta(Action):
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_ejecutar_modificacion_alerta: {e}")
-            dispatcher.utter_message(text="Hubo un error al intentar modificar la alerta. Intenta nuevamente.")
+            dispatcher.utter_message(
+                text="❌ *Hubo un error al intentar modificar la alerta.* Por favor, intenta nuevamente."
+            )
             return []
 
 def desactivar_alerta(categoria: str, periodo: str):
@@ -1073,15 +1202,22 @@ class ActionEliminarConfiguracion(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
+        import re
+
         categoria = get_entity(tracker, "categoria")
         periodo = get_entity(tracker, "periodo")
         texto_usuario = tracker.latest_message.get("text", "").lower()
 
         if not categoria or not periodo:
-            dispatcher.utter_message(text="Necesito la categoría y el mes con año para eliminar una configuración.")
+            dispatcher.utter_message(
+                text="⚠️ Necesito la *categoría* y el *mes con año* para poder eliminar una configuración."
+            )
             return []
 
+        # 📆 Normalizar periodo
         periodo = periodo.lower().strip()
+
+        # 🔍 Buscar alerta activa
         alertas = cargar_alertas()
         alerta = next((
             a for a in alertas
@@ -1091,15 +1227,18 @@ class ActionEliminarConfiguracion(Action):
         ), None)
 
         if not alerta:
-            dispatcher.utter_message(text=f"No encontré ninguna alerta activa para *{categoria}* en *{periodo}*.")
+            dispatcher.utter_message(
+                text=f"📭 *No se encontró ninguna alerta activa* para *{categoria}* en *{periodo}*."
+            )
             return []
 
-        mensaje = (
-            f"🔔 Se encontró esta alerta activa:\n"
-            f"• Categoría: {alerta['categoria']}\n"
-            f"• Monto: {alerta['monto']:.2f} soles\n"
-            f"• Periodo: {alerta['periodo']}\n\n"
-            f"¿Estás seguro de que deseas eliminarla?"
+        mensaje = construir_mensaje(
+            f"🔔 *Se encontró una alerta activa:*",
+            f"• Categoría: *{alerta['categoria']}*",
+            f"• Monto: *{alerta['monto']:.2f} soles*",
+            f"• Periodo: *{alerta['periodo']}*",
+            "⚠️ ¿Estás seguro de que deseas eliminar esta alerta?",
+            "✉️ *Responde con “sí” para confirmar* o *“no” para cancelar* la eliminación."
         )
         dispatcher.utter_message(text=mensaje)
 
@@ -1117,33 +1256,48 @@ class ActionConfirmarEliminacionAlerta(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
+        import json
+        from datetime import datetime
+
         intent_confirmacion = tracker.latest_message.get("intent", {}).get("name")
         categoria = tracker.get_slot("categoria")
         periodo = tracker.get_slot("periodo")
 
         if intent_confirmacion != "affirm":
-            dispatcher.utter_message(text="Perfecto, no se ha eliminado la alerta.")
+            dispatcher.utter_message(
+                text="👍 Perfecto, *no se ha eliminado la alerta*. Si deseas realizar otro cambio, solo dímelo."
+            )
             return [SlotSet("sugerencia_pendiente", None)]
 
+        # 🔍 Buscar y desactivar alerta
         alertas = cargar_alertas()
         encontrado = False
 
         for alerta in alertas:
-            if alerta.get("categoria", "").lower() == categoria.lower() and alerta.get("periodo", "").lower() == periodo.lower() and alerta.get("status", 1) == 1:
+            if (
+                alerta.get("categoria", "").lower() == categoria.lower()
+                and alerta.get("periodo", "").lower() == periodo.lower()
+                and alerta.get("status", 1) == 1
+            ):
                 alerta["status"] = 0
                 alerta["timestamp_modificacion"] = datetime.now().isoformat()
                 encontrado = True
 
         if encontrado:
+            # 💾 Guardar cambios
             with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
                 json.dump(alertas, f, ensure_ascii=False, indent=2)
 
-            dispatcher.utter_message(
-                text=f"🗑️ La alerta para *{categoria}* en *{periodo}* ha sido eliminada correctamente."
+            mensaje = construir_mensaje(
+                f"🗑️ *Alerta eliminada correctamente*",
+                f"• Categoría: *{categoria}*",
+                f"• Periodo: *{periodo}*",
+                "👉 Ya no será tenida en cuenta en tus análisis ni alertas futuras."
             )
+            dispatcher.utter_message(text=mensaje)
         else:
             dispatcher.utter_message(
-                text="No se encontró una alerta activa para eliminar."
+                text="⚠️ *No se encontró una alerta activa* para eliminar con esos datos."
             )
 
         return [
@@ -1157,20 +1311,31 @@ class ActionConsultarConfiguracion(Action):
         return "action_consultar_configuracion"
 
     def run(self, dispatcher, tracker, domain):
+        from datetime import datetime
+
         alertas = cargar_alertas()
 
         if not alertas:
-            dispatcher.utter_message(text="No tienes configuraciones de alertas registradas.")
+            dispatcher.utter_message(
+                text="📭 *No tienes configuraciones de alertas registradas actualmente.*"
+            )
             return []
 
-        # Agrupar por última alerta por categoría + periodo
+        # 📌 Agrupar por última alerta activa por categoría y periodo
         ultimas_alertas = {}
         for alerta in sorted(alertas, key=lambda x: x.get("timestamp", ""), reverse=True):
             clave = f"{alerta.get('categoria', '').lower()}_{alerta.get('periodo', '').lower()}"
-            if clave not in ultimas_alertas:
+            if clave not in ultimas_alertas and alerta.get("status", 1) == 1:
                 ultimas_alertas[clave] = alerta
 
-        mensaje = "Estas son tus configuraciones activas:\n"
+        if not ultimas_alertas:
+            dispatcher.utter_message(
+                text="📭 *No tienes alertas activas actualmente.*"
+            )
+            return []
+
+        mensaje = ["🔔 **Estas son tus configuraciones de alerta activas:**"]
+
         for alerta in ultimas_alertas.values():
             categoria = alerta.get("categoria", "desconocida").capitalize()
             monto = alerta.get("monto", "?")
@@ -1178,16 +1343,17 @@ class ActionConsultarConfiguracion(Action):
             fecha = ""
             if alerta.get("timestamp"):
                 try:
-                    fecha = datetime.fromisoformat(alerta["timestamp"]).strftime(" (registrado el %d/%m/%Y)")
+                    fecha = datetime.fromisoformat(alerta["timestamp"]).strftime(" _(registrado el %d/%m/%Y)_")
                 except:
                     fecha = ""
-            mensaje += f"• {categoria}: {monto} soles"
+            linea = f"• *{categoria}*: {monto} soles"
             if periodo:
-                mensaje += f" para {periodo}"
-            mensaje += f"{fecha}.\n"
+                linea += f" para *{periodo}*"
+            linea += f"{fecha}"
+            mensaje.append(linea)
 
-        mensaje += "¿Deseas modificar o eliminar alguna de estas configuraciones?"
-        dispatcher.utter_message(text=mensaje)
+        mensaje.append("👉 ¿Deseas *modificar o eliminar* alguna de estas configuraciones?")
+        dispatcher.utter_message(text=construir_mensaje(*mensaje))
         return []
 
 class ActionEliminarAlerta(Action):
@@ -1199,7 +1365,9 @@ class ActionEliminarAlerta(Action):
         periodo = get_entity(tracker, "periodo")
 
         if not categoria or not periodo:
-            dispatcher.utter_message(text="Necesito saber qué alerta deseas eliminar. Por favor indica la categoría y el mes.")
+            dispatcher.utter_message(
+                text="⚠️ Necesito saber qué *alerta deseas eliminar*. Por favor, indícame la *categoría* y el *mes con año*."
+            )
             return []
 
         condiciones = {
@@ -1210,16 +1378,28 @@ class ActionEliminarAlerta(Action):
         alertas = cargar_alertas()
         coincidencias = [
             a for a in alertas
-            if a["categoria"].lower() == condiciones["categoria"] and a["periodo"].lower() == condiciones["periodo"]
+            if a.get("categoria", "").lower() == condiciones["categoria"]
+            and a.get("periodo", "").lower() == condiciones["periodo"]
+            and a.get("status", 1) == 1
         ]
 
         if not coincidencias:
-            dispatcher.utter_message(text=f"No encontré una alerta configurada para {categoria} en {periodo}.")
+            dispatcher.utter_message(
+                text=f"📭 *No encontré ninguna alerta activa* para *{categoria}* en *{periodo}*."
+            )
             return []
 
+        # 🗑️ Eliminar lógicamente
         eliminar_alerta_logicamente(condiciones)
 
-        dispatcher.utter_message(text=f"He eliminado la alerta de {categoria} en {periodo}.")
+        mensaje = construir_mensaje(
+            f"🗑️ *Alerta eliminada correctamente*",
+            f"• Categoría: *{categoria}*",
+            f"• Periodo: *{periodo}*",
+            "👉 Ya no será considerada en tus análisis ni alertas futuras."
+        )
+
+        dispatcher.utter_message(text=mensaje)
         return []
     
 from rasa_sdk.events import FollowupAction
@@ -1236,14 +1416,18 @@ class ActionFollowSuggestion(Action):
 
         # ✅ Si hay una sugerencia pendiente, la ejecutamos
         if sugerencia:
-            dispatcher.utter_message(text="Perfecto, procedo con tu solicitud.")
+            dispatcher.utter_message(
+                text="✅ *Perfecto*, procedo con tu solicitud..."
+            )
             return [
                 FollowupAction(sugerencia),
                 SlotSet("sugerencia_pendiente", None)
             ]
 
-        # ❌ Si no hay sugerencia válida, informamos al usuario
-        dispatcher.utter_message(text="No tengo ninguna acción pendiente por ejecutar. ¿Te gustaría registrar algo o hacer una consulta?")
+        # ❌ Si no hay sugerencia válida
+        dispatcher.utter_message(
+            text="⚠️ *No tengo ninguna acción pendiente por ejecutar.*\n\n👉 ¿Te gustaría *registrar algo* o *hacer una consulta*?"
+        )
         return []
 
 class ActionBienvenida(Action):
@@ -1253,6 +1437,8 @@ class ActionBienvenida(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[EventType]:
+
+        from datetime import datetime
 
         meses_es = {
             "January": "enero", "February": "febrero", "March": "marzo", "April": "abril",
@@ -1265,16 +1451,16 @@ class ActionBienvenida(Action):
         nombre_mes_es = meses_es.get(nombre_mes_en, nombre_mes_en).capitalize()
         fecha_formateada = f"{ahora.day} de {nombre_mes_es} de {ahora.year}"
 
-        mensaje = (
-            f"💼 **¡Hola! Bienvenido 👋**\n\n"
-            f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.\n\n"
-            f"🛠️ **Puedo ayudarte a:**\n"
-            f"- Registrar ingresos y gastos\n"
-            f"- Ver tu historial o saldo\n"
-            f"- Configurar alertas\n"
-            f"- Comparar tus gastos entre meses\n\n"
-            f"💡 *Ejemplo:* `Muéstrame mis gastos de abril`\n\n"
-            f"👉 ¿Qué deseas hacer hoy?"
+        mensaje = construir_mensaje(
+            "💼 **¡Hola! Bienvenido 👋**",
+            f"📅 Hoy es *{fecha_formateada}* y estoy listo para ayudarte con tus finanzas.",
+            "🛠️ **Puedo ayudarte a:**",
+            "- Registrar ingresos y gastos",
+            "- Ver tu historial o saldo",
+            "- Configurar alertas",
+            "- Comparar tus gastos entre meses",
+            "💡 *Ejemplo:* `Muéstrame mis gastos de abril`",
+            "👉 ¿Qué deseas hacer hoy?"
         )
 
         dispatcher.utter_message(text=mensaje)
@@ -1288,15 +1474,15 @@ class ActionAyudaGeneral(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[EventType]:
 
-        mensaje = (
-            "🧭 *Aquí tienes algunas cosas que puedo hacer por ti:*\n\n"
-            "- Registrar ingresos o gastos\n"
-            "- Consultar tu saldo o tu historial financiero\n"
-            "- Configurar o eliminar alertas por categoría\n"
-            "- Analizar tus hábitos de consumo\n"
-            "- Comparar tus gastos entre meses\n\n"
-            "💡 *Ejemplo útil:* `Gaste 80 soles en comida con débito el 2 de abril`\n\n"
-            "¿Con qué te gustaría comenzar?"
+        mensaje = construir_mensaje(
+            "🧭 **Aquí tienes algunas cosas que puedo hacer por ti:**",
+            "- Registrar *ingresos* o *gastos*",
+            "- Consultar tu *saldo* o tu *historial financiero*",
+            "- Configurar, modificar o eliminar *alertas* por categoría",
+            "- *Analizar* tus hábitos de consumo",
+            "- *Comparar* tus gastos entre distintos meses",
+            "💡 *Ejemplo útil:* `Gasté 80 soles en comida con débito el 2 de abril`",
+            "👉 ¿Con qué te gustaría comenzar?"
         )
 
         dispatcher.utter_message(text=mensaje)
@@ -1312,31 +1498,33 @@ class ActionSessionStart(Action):
         self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict
     ) -> List[EventType]:
 
-        # 🟢 Inicio de sesión estándar de Rasa
+        # 🟢 Evento estándar de inicio de sesión en Rasa
         events = [SessionStarted(), ActionExecuted("action_listen")]
 
-        # 📣 Ejecutar manualmente la acción de bienvenida personalizada
+        # 📣 Ejecutar la acción de bienvenida personalizada (manual)
         bienvenida = ActionBienvenida()
         await bienvenida.run(dispatcher, tracker, domain)
 
+        # Retornar eventos para continuar con el flujo estándar
         return events
 
 class ActionNegacion(Action):
     def name(self) -> Text:
         return "action_negacion"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[EventType]:
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[EventType]:
+
         sugerencia = tracker.get_slot("sugerencia_pendiente")
 
-        # 🔄 Si había una acción pendiente y el usuario la niega, se cancela educadamente
         if sugerencia:
             dispatcher.utter_message(
-                text="👌 Perfecto, no se realizará la acción pendiente. ¡Hasta luego! Recuerda que puedes volver cuando lo necesites."
+                text="🙅‍♂️ *Perfecto, no se realizará la acción pendiente.*\n\n✅ Si deseas hacer otra consulta más adelante, estaré aquí para ayudarte."
             )
             return [SlotSet("sugerencia_pendiente", None)]
 
-        # 🤷‍♀️ Si no había acción sugerida, ofrece continuar
         dispatcher.utter_message(
-            text="Entendido. Si necesitas consultar algo o registrar una transacción, estoy aquí para ayudarte."
+            text="👍 Entendido.\n\n🧠 Si necesitas *registrar algo* o *consultar tus finanzas*, solo dímelo."
         )
         return []
