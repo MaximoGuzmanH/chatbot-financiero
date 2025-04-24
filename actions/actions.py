@@ -242,7 +242,9 @@ class ActionRegistrarIngreso(Action):
 
             mensaje = construir_mensaje(
                 "✅ **Ingreso registrado con éxito:**",
-                f"💰 *Monto:* {monto:.2f} soles  📁 *Categoría:* {categoria}  📅 *Fecha:* {fecha}",
+                f"💰 *Monto:* {monto:.2f} soles",
+                f"📁 *Categoría:* {categoria}",
+                f"📅 *Fecha:* {fecha}",
                 f"💳 *Medio:* {medio}",
                 "👉 ¿Deseas *registrar otro ingreso* o *consultar tu saldo*?"
             )
