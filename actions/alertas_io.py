@@ -53,22 +53,14 @@ def subir_a_github_alertas():
 def cargar_alertas(filtrar_activos=True):
     if not os.path.exists(RUTA_ALERTAS):
         return []
-    try:
-        with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
-            alertas = json.load(f)
-            return [a for a in alertas if a.get("status", 1) == 1] if filtrar_activos else alertas
-    except json.JSONDecodeError:
-        return []
+    with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return [a for a in data if a.get("status", 1) == 1] if filtrar_activos else data
 
 import json, os
 
 def guardar_alerta(alerta):
     alertas = cargar_alertas(filtrar_activos=False)
-    
-    # Asegurarse que la lista existe
-    if not isinstance(alertas, list):
-        alertas = []
-
     alerta["timestamp"] = datetime.now().isoformat()
     alerta["status"] = 1
     alertas.append(alerta)
@@ -76,8 +68,7 @@ def guardar_alerta(alerta):
     with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
         json.dump(alertas, f, ensure_ascii=False, indent=2)
 
-    # 🔄 Sincronización (si quieres mantenerla)
-    subir_a_github_alertas()
+    subir_a_github_alertas()  # Tu función de sincronización
 
 def eliminar_alerta_logicamente(condiciones):
     alertas = cargar_alertas(filtrar_activos=False)
