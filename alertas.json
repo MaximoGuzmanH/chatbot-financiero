@@ -43,5 +43,14 @@
     "año": 2024,
     "timestamp": "2025-04-24T08:14:59.218675",
     "status": 1
+  },
+  {
+    "categoria": "servicios",
+    "monto": 600.0,
+    "periodo": "abril de 2024",
+    "mes": "abril",
+    "año": 2024,
+    "timestamp": "2025-04-24T08:16:06.757849",
+    "status": 1
   }
 ]
