@@ -266,6 +266,8 @@ class ActionRegistrarIngreso(Action):
                 "👉 ¿Deseas *registrar otro ingreso* o *consultar tu saldo*?"
             )
 
+            print(f"[DEBUG] MENSAJE A ENVIAR:\n{mensaje}")
+
             dispatcher.utter_message(text=mensaje)
 
             return [
