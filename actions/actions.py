@@ -16,9 +16,9 @@ from transacciones_io import eliminar_transaccion_logicamente
 from alertas_io import guardar_alerta, eliminar_alerta_logicamente, cargar_alertas, guardar_todas_las_alertas
 import alertas_io
 
-def construir_mensaje(*partes: str) -> str:
-    """Concatena múltiples partes en un solo mensaje con saltos de línea, evitando múltiples utter_message."""
-    return "\n".join(parte.strip() for parte in partes if parte)
+def construir_mensaje(*bloques: str) -> str:
+    """Concatena bloques separados por doble salto, permitiendo saltos simples dentro de cada bloque."""
+    return "\n\n".join(bloque.strip() for bloque in bloques if bloque)
 
 def formatear_fecha(fecha: str) -> str:
     try:
@@ -240,7 +240,7 @@ class ActionRegistrarIngreso(Action):
 
             guardar_transaccion(transaccion)
 
-            mensaje = (
+            mensaje = construir_mensaje(
                 f"✅ **Ingreso registrado con éxito:**\n\n"
                 f"💵 Monto: *{monto:.2f} soles*\n"
                 f"📂 Categoría: *{categoria}*\n"
