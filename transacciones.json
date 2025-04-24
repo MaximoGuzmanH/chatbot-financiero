@@ -498,5 +498,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T07:24:02.824551",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 75.0,
+    "categoria": "transporte",
+    "fecha": "15 de abril",
+    "medio": "tarjeta de débito",
+    "dia": 15,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T07:26:26.730206",
+    "status": 1
   }
 ]
