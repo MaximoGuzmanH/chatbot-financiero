@@ -1335,9 +1335,10 @@ class ActionConsultarConfiguracion(Action):
 
         texto_usuario = tracker.latest_message.get("text", "").lower()
         periodo_raw = get_entity(tracker, "periodo")
+        categoria_raw = get_entity(tracker, "categoria") or tracker.get_slot("categoria")
         periodo_normalizado = None
 
-        # 🔍 Si se menciona "este mes", usamos mes y año actual
+        # 🔍 Detectar "este mes" o extraer periodo
         if "este mes" in texto_usuario:
             mes_actual_en = datetime.now().strftime("%B").lower()
             meses_es = {
@@ -1355,30 +1356,39 @@ class ActionConsultarConfiguracion(Action):
                 año = match.group(2) or str(datetime.now().year)
                 periodo_normalizado = f"{mes} de {año}"
 
-        # 📌 Filtrar alertas activas, y por periodo si aplica
+        # 📌 Filtrar alertas activas, por periodo y/o categoría
         ultimas_alertas = {}
         for alerta in sorted(alertas, key=lambda x: x.get("timestamp", ""), reverse=True):
             if alerta.get("status", 1) != 1:
                 continue
 
             periodo_alerta = alerta.get("periodo", "").lower()
-            clave = f"{alerta.get('categoria', '').lower()}_{periodo_alerta}"
+            categoria_alerta = alerta.get("categoria", "").lower()
+            clave = f"{categoria_alerta}_{periodo_alerta}"
 
-            if periodo_normalizado:
-                if periodo_alerta != periodo_normalizado:
-                    continue
+            if periodo_normalizado and periodo_alerta != periodo_normalizado:
+                continue
+            if categoria_raw and categoria_alerta != categoria_raw.lower():
+                continue
 
             if clave not in ultimas_alertas:
                 ultimas_alertas[clave] = alerta
 
+        # 📭 Mensaje si no se encontró ninguna alerta
         if not ultimas_alertas:
-            sin_periodo = "📭 *No tienes alertas activas actualmente.*"
-            con_periodo = f"📭 *No se encontraron alertas activas para* **{periodo_normalizado}**."
-            dispatcher.utter_message(text=con_periodo if periodo_normalizado else sin_periodo)
+            if categoria_raw and periodo_normalizado:
+                msg = f"📭 *No se encontraron alertas activas para* **{categoria_raw} en {periodo_normalizado}**."
+            elif categoria_raw:
+                msg = f"📭 *No se encontraron alertas activas para la categoría* **{categoria_raw}**."
+            elif periodo_normalizado:
+                msg = f"📭 *No se encontraron alertas activas para* **{periodo_normalizado}**."
+            else:
+                msg = "📭 *No tienes alertas activas actualmente.*"
+            dispatcher.utter_message(text=msg)
             return []
 
+        # ✅ Mostrar resultados
         mensaje = ["🔔 **Estas son tus configuraciones de alerta activas:**"]
-
         for alerta in ultimas_alertas.values():
             categoria = alerta.get("categoria", "desconocida").capitalize()
             monto = alerta.get("monto", "?")
