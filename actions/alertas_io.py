@@ -60,21 +60,26 @@ def cargar_alertas(filtrar_activos=True):
     except json.JSONDecodeError:
         return []
 
+import json, os
+
+RUTA_ALERTAS = os.path.join(os.path.dirname(__file__), "alertas.json")
 
 def guardar_alerta(alerta):
     alertas = cargar_alertas(filtrar_activos=False)
+    
+    # Asegurarse que la lista existe
+    if not isinstance(alertas, list):
+        alertas = []
+
     alerta["timestamp"] = datetime.now().isoformat()
     alerta["status"] = 1
     alertas.append(alerta)
 
-    if not alertas:
-        raise ValueError("⚠️ No se deben guardar alertas si la lista está vacía.")
-
     with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
         json.dump(alertas, f, ensure_ascii=False, indent=2)
 
+    # 🔄 Sincronización (si quieres mantenerla)
     subir_a_github_alertas()
-
 
 def eliminar_alerta_logicamente(condiciones):
     alertas = cargar_alertas(filtrar_activos=False)
