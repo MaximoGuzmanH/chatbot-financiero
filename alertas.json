@@ -1,56 +1,11 @@
 [
   {
-    "categoria": "salud",
-    "monto": 400.0,
-    "periodo": "mayo de 2024",
-    "mes": "mayo",
-    "año": 2024,
-    "timestamp": "2025-04-24T08:07:55.927989",
-    "status": 1
-  },
-  {
-    "categoria": "salud",
-    "monto": 500.0,
-    "periodo": "junio de 2024",
-    "mes": "junio",
-    "año": 2024,
-    "timestamp": "2025-04-24T08:13:31.742066",
-    "status": 1
-  },
-  {
-    "categoria": "comida",
-    "monto": 500.0,
-    "periodo": "mayo de 2024",
-    "mes": "mayo",
-    "año": 2024,
-    "timestamp": "2025-04-24T08:14:21.340257",
-    "status": 1
-  },
-  {
-    "categoria": "entretenimiento",
-    "monto": 300.0,
-    "periodo": "abril de 2024",
-    "mes": "abril",
-    "año": 2024,
-    "timestamp": "2025-04-24T08:14:37.655357",
-    "status": 1
-  },
-  {
-    "categoria": "transporte",
-    "monto": 200.0,
-    "periodo": "junio de 2024",
-    "mes": "junio",
-    "año": 2024,
-    "timestamp": "2025-04-24T08:14:59.218675",
-    "status": 1
-  },
-  {
-    "categoria": "servicios",
+    "categoria": "deporte",
     "monto": 600.0,
-    "periodo": "abril de 2024",
+    "periodo": "abril de 2025",
     "mes": "abril",
-    "año": 2024,
-    "timestamp": "2025-04-24T08:16:06.757849",
+    "año": 2025,
+    "timestamp": "2025-04-24T21:13:19.866458",
     "status": 1
   }
 ]
