@@ -414,5 +414,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T06:57:18.660767",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 1000.0,
+    "categoria": "honorarios",
+    "fecha": "abril",
+    "medio": "tarjeta de débito",
+    "dia": 24,
+    "mes": "april",
+    "año": 2025,
+    "timestamp": "2025-04-24T06:57:59.755700",
+    "status": 1
   }
 ]
