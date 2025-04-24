@@ -338,15 +338,17 @@ class ActionVerHistorialCompleto(Action):
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo = get_entity(tracker, "periodo")
 
+            # Filtrar solo ingresos y gastos
             transacciones_filtradas = [
                 t for t in transacciones if t.get("tipo") in ["ingreso", "gasto"]
             ]
 
+            # Aplicar filtro por periodo si se indica
             if periodo:
-                periodo = periodo.lower()
+                periodo = periodo.lower().strip()
                 transacciones_filtradas = [
                     t for t in transacciones_filtradas
-                    if periodo in str(t.get("fecha", "")).lower() or periodo == str(t.get("mes", "")).lower()
+                    if periodo == t.get("periodo", f"{t.get('mes', '').lower()} de {t.get('año')}").lower()
                 ]
 
             if not transacciones_filtradas:
@@ -383,12 +385,14 @@ class ActionVerHistorialCompleto(Action):
             # Cierre motivador
             mensaje.append("\n📊 ¿Deseas *registrar algo nuevo* o *consultar tu resumen mensual*?")
 
-            dispatcher.utter_message(text=construir_mensaje(mensaje))
+            dispatcher.utter_message(text=construir_mensaje(*mensaje))
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
         except Exception as e:
             print(f"[ERROR] Fallo en action_ver_historial_completo: {e}")
-            dispatcher.utter_message(text="❌ Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente.")
+            dispatcher.utter_message(
+                text="❌ Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente."
+            )
             return []
 
 from collections import Counter, defaultdict
