@@ -558,5 +558,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T07:30:58.360871",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 200.0,
+    "categoria": "servicios",
+    "fecha": "1 de abril",
+    "medio": "tarjeta de débito",
+    "dia": 1,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T07:31:11.708481",
+    "status": 1
   }
 ]
