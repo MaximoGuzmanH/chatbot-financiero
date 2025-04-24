@@ -25,5 +25,14 @@
     "año": 2024,
     "timestamp": "2025-04-24T22:17:41.468367",
     "status": 1
+  },
+  {
+    "categoria": "salud",
+    "monto": 400.0,
+    "periodo": "mayo de 2024",
+    "mes": "mayo",
+    "año": 2024,
+    "timestamp": "2025-04-24T22:18:35.587359",
+    "status": 1
   }
 ]
