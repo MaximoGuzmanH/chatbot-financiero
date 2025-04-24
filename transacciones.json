@@ -306,5 +306,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T00:34:18.854854",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 2500.0,
+    "categoria": "sueldo",
+    "fecha": "5 de abril",
+    "medio": "tarjeta de débito",
+    "dia": 5,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T06:39:10.181840",
+    "status": 1
   }
 ]
