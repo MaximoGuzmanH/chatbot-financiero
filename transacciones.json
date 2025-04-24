@@ -354,5 +354,29 @@
     "año": 2025,
     "timestamp": "2025-04-24T06:47:51.268316",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 2500.0,
+    "categoria": "sueldo",
+    "fecha": "5 de abril",
+    "medio": "tarjeta de débito",
+    "dia": 5,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T06:48:37.424313",
+    "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 2500.0,
+    "categoria": "sueldo",
+    "fecha": "5 de abril",
+    "medio": "tarjeta de débito",
+    "dia": 5,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T06:48:46.142380",
+    "status": 1
   }
 ]
