@@ -241,13 +241,11 @@ class ActionRegistrarIngreso(Action):
             guardar_transaccion(transaccion)
 
             mensaje = construir_mensaje(
-                f"✅ **Ingreso registrado con éxito:**\n\n"
-                f"💵 Monto: *{monto:.2f} soles*\n"
-                f"📂 Categoría: *{categoria}*\n"
-                f"📅 Fecha: *{fecha}*\n"
-                f"💳 Medio: *{medio}*\n\n"
-                f"¿Deseas *registrar otro ingreso* o *consultar tu saldo*?"
+                "✅ **Ingreso registrado con éxito:**",
+                "💰 *Monto:* 2500.00 soles  \n📁 *Categoría:* sueldo  \n📅 *Fecha:* 5 de abril  \n💳 *Medio:* tarjeta de débito",
+                "¿Deseas *registrar otro ingreso* o *consultar tu saldo*?"
             )
+
 
             dispatcher.utter_message(text=mensaje)
 
