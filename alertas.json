@@ -34,5 +34,14 @@
     "año": 2024,
     "timestamp": "2025-04-24T08:14:37.655357",
     "status": 1
+  },
+  {
+    "categoria": "transporte",
+    "monto": 200.0,
+    "periodo": "junio de 2024",
+    "mes": "junio",
+    "año": 2024,
+    "timestamp": "2025-04-24T08:14:59.218675",
+    "status": 1
   }
 ]
