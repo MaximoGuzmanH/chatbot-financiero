@@ -7,21 +7,37 @@ import requests
 
 RUTA_ALERTAS = "/tmp/alertas.json"
 
-# --- Inicialización: copiar desde el repo si no existe en /tmp ---
-RUTA_ALERTAS_ORIGINAL = os.path.join(os.path.dirname(__file__), "../alertas.json")
-if not os.path.exists(RUTA_ALERTAS):
-    if os.path.exists(RUTA_ALERTAS_ORIGINAL):
-        with open(RUTA_ALERTAS_ORIGINAL, "r", encoding="utf-8") as f_src:
-            with open(RUTA_ALERTAS, "w", encoding="utf-8") as f_dst:
-                f_dst.write(f_src.read())
-    else:
-        with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
-            json.dump([], f)
-
 # --- GitHub Sync ---
 GITHUB_REPO = "MaximoGuzmanH/chatbot-financiero"
 ARCHIVO_ALERTAS = "alertas.json"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+# --- Recuperación inicial desde GitHub si no existe alerta local ---
+def recuperar_alertas_desde_github():
+    if not GITHUB_TOKEN:
+        print("[WARN] GITHUB_TOKEN no definido. No se puede recuperar desde GitHub.")
+        return
+
+    api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{ARCHIVO_ALERTAS}"
+    headers = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
+
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 200:
+        contenido_base64 = response.json().get("content", "")
+        if contenido_base64:
+            contenido_json = base64.b64decode(contenido_base64).decode("utf-8")
+            with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
+                f.write(contenido_json)
+            print("[INIT] alertas.json restaurado desde GitHub.")
+    else:
+        print(f"[ERROR] No se pudo recuperar alertas desde GitHub: {response.status_code}")
+
+# --- Inicialización local desde GitHub si no existe o está vacío ---
+if not os.path.exists(RUTA_ALERTAS) or os.path.getsize(RUTA_ALERTAS) == 0:
+    recuperar_alertas_desde_github()
+    if not os.path.exists(RUTA_ALERTAS):  # Si aún no se creó, inicializar vacío
+        with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
+            json.dump([], f)
 
 def subir_a_github_alertas():
     if not GITHUB_TOKEN:
