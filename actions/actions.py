@@ -906,75 +906,83 @@ class ActionCrearConfiguracion(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-
-        import re
-        from datetime import datetime
-
-        categoria = get_entity(tracker, "categoria")
-        monto = get_entity(tracker, "monto")
-        periodo = get_entity(tracker, "periodo")
-        texto_usuario = tracker.latest_message.get("text", "").lower()
-
-        if not categoria or not monto or not periodo:
-            dispatcher.utter_message(text="⚠️ Necesito la *categoría*, el *monto* y el *mes con año* para poder crear una configuración.")
-            return []
-
+        
         try:
-            monto_float = parse_monto(monto)
-        except Exception:
-            dispatcher.utter_message(text="❌ El monto ingresado no es válido. Intenta con un valor numérico.")
-            return []
+            import re
+            from datetime import datetime
 
-        if monto_float <= 0:
-            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor que cero*.")
-            return []
+            categoria = get_entity(tracker, "categoria")
+            monto = get_entity(tracker, "monto")
+            periodo = get_entity(tracker, "periodo")
+            texto_usuario = tracker.latest_message.get("text", "").lower()
 
-        # 📆 Normalizar periodo
-        periodo = periodo.lower().strip()
-        match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo)
-        if not match:
-            dispatcher.utter_message(
-                text="📅 El formato del periodo debe ser *“abril de 2024”*, por ejemplo."
+            if not categoria or not monto or not periodo:
+                dispatcher.utter_message(text="⚠️ Necesito la *categoría*, el *monto* y el *mes con año* para poder crear una configuración.")
+                return []
+
+            try:
+                monto_float = parse_monto(monto)
+            except Exception:
+                dispatcher.utter_message(text="❌ El monto ingresado no es válido. Intenta con un valor numérico.")
+                return []
+
+            if monto_float <= 0:
+                dispatcher.utter_message(text="⚠️ El monto debe ser *mayor que cero*.")
+                return []
+
+            # 📆 Normalizar periodo
+            periodo = periodo.lower().strip()
+            match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo)
+            if not match:
+                dispatcher.utter_message(
+                    text="📅 El formato del periodo debe ser *“abril de 2024”*, por ejemplo."
+                )
+                return []
+
+            mes = match.group(1).strip().lower()
+            año = int(match.group(2))
+            periodo_normalizado = f"{mes} de {año}"
+
+            # 🧠 Verificar si ya existe una alerta activa
+            alertas = cargar_alertas()
+            ya_existe = any(
+                a.get("categoria", "").lower() == categoria.lower() and
+                a.get("periodo", "").lower() == periodo_normalizado and
+                a.get("status", 1) == 1
+                for a in alertas
             )
-            return []
 
-        mes = match.group(1).strip().lower()
-        año = int(match.group(2))
-        periodo_normalizado = f"{mes} de {año}"
+            if ya_existe:
+                dispatcher.utter_message(
+                    text=f"🔔 Ya existe una *alerta activa* para *{categoria}* en *{periodo_normalizado}*.\n\n🛠️ Usa *modificar* si deseas actualizarla."
+                )
+                return []
 
-        # 🧠 Verificar si ya existe una alerta para esa categoría y mes
-        alertas = cargar_alertas()
-        ya_existe = any(
-            a["categoria"].lower() == categoria.lower() and a["periodo"].lower() == periodo_normalizado
-            for a in alertas
-        )
+            nueva_alerta = {
+                "categoria": categoria,
+                "monto": monto_float,
+                "periodo": periodo_normalizado,
+                "mes": mes,
+                "año": año,
+                "timestamp": datetime.now().isoformat(),
+                "status": 1
+            }
 
-        if ya_existe:
-            dispatcher.utter_message(
-                text=f"🔔 Ya existe una *alerta activa* para *{categoria}* en *{periodo_normalizado}*.\n\n🛠️ Usa *modificar* si deseas actualizarla."
+            guardar_alerta(nueva_alerta)
+
+            mensaje = construir_mensaje(
+                f"✅ *Presupuesto/Alerta registrada correctamente*",
+                f"📌 Se ha creado una alerta de *{monto_float:.2f} soles* para *{categoria}* en *{periodo_normalizado}*.",
+                "👉 Puedes modificarla más adelante si es necesario."
             )
+            dispatcher.utter_message(text=mensaje)
+
             return []
 
-        nueva_alerta = {
-            "categoria": categoria,
-            "monto": monto_float,
-            "periodo": periodo_normalizado,
-            "mes": mes,
-            "año": año,
-            "timestamp": datetime.now().isoformat(),
-            "status": 1
-        }
-
-        guardar_alerta(nueva_alerta)
-
-        mensaje = construir_mensaje(
-            f"✅ *Presupuesto/Alerta registrada correctamente*",
-            f"📌 Se ha creado una alerta de *{monto_float:.2f} soles* para *{categoria}* en *{periodo_normalizado}*.",
-            "👉 Puedes modificarla más adelante si es necesario."
-        )
-        dispatcher.utter_message(text=mensaje)
-
-        return []
+        except Exception as e:
+            print(f"[ERROR] Fallo en action_crear_configuracion: {e}")
+            dispatcher.utter_message(text="❌ Ocurrió un error al crear la alerta. Por favor, intenta nuevamente.")
+            return []
             
 class ActionModificarConfiguracion(Action):
     def name(self) -> Text:
