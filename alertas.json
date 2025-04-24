@@ -1,47 +1,11 @@
 [
   {
-    "categoria": "salidas",
-    "monto": 500.0,
+    "categoria": "salud",
+    "monto": 400.0,
     "periodo": "mayo de 2024",
     "mes": "mayo",
     "año": 2024,
-    "timestamp": "2025-04-24T07:36:05.660444",
-    "status": 1
-  },
-  {
-    "categoria": "entretenimiento",
-    "monto": 300.0,
-    "periodo": "abril de 2024",
-    "mes": "abril",
-    "año": 2024,
-    "timestamp": "2025-04-24T07:36:32.713228",
-    "status": 1
-  },
-  {
-    "categoria": "Spotify",
-    "monto": 50.0,
-    "periodo": "abril de 2024",
-    "mes": "abril",
-    "año": 2024,
-    "timestamp": "2025-04-24T07:42:15.188498",
-    "status": 1
-  },
-  {
-    "categoria": "musica",
-    "monto": 200.0,
-    "periodo": "abril de 2025",
-    "mes": "abril",
-    "año": 2025,
-    "timestamp": "2025-04-24T07:48:11.340296",
-    "status": 1
-  },
-  {
-    "categoria": "transporte",
-    "monto": 200.0,
-    "periodo": "junio de 2024",
-    "mes": "junio",
-    "año": 2024,
-    "timestamp": "2025-04-24T07:55:55.612248",
+    "timestamp": "2025-04-24T08:07:55.927989",
     "status": 1
   }
 ]
