@@ -239,7 +239,7 @@ class ActionRegistrarIngreso(Action):
             }
 
             guardar_transaccion(transaccion)
-
+            
             mensaje = construir_mensaje(
                 "✅ **Ingreso registrado con éxito:**",
                 f"💰 *Monto:* {monto:.2f} soles",
