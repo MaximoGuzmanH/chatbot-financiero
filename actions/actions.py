@@ -242,8 +242,8 @@ class ActionRegistrarIngreso(Action):
 
             mensaje = construir_mensaje(
                 "✅ **Ingreso registrado con éxito:**",
-                f"💰 Monto: {monto:.2f} soles\n📁 Categoría: {categoria}\n📅 Fecha: {fecha}\n💳 Medio: {medio}",
-                "👉 ¿Deseas registrar otro ingreso o consultar tu saldo?"
+                f"💰 *Monto:* {monto:.2f} soles  \n📁 *Categoría:* {categoria}  \n📅 *Fecha:* {fecha}  \n💳 *Medio:* {medio}",
+                "👉 ¿Deseas *registrar otro ingreso* o *consultar tu saldo*?"
             )
 
             dispatcher.utter_message(text=mensaje)
