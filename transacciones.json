@@ -534,5 +534,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T07:30:19.794293",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 40.0,
+    "categoria": "entretenimiento",
+    "fecha": "24 de abril de 2025",
+    "medio": "tarjeta de crédito",
+    "dia": 24,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T07:30:37.604535",
+    "status": 1
   }
 ]
