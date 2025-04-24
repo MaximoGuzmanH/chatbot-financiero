@@ -177,6 +177,8 @@ class ActionRegistrarGasto(Action):
 
 from datetime import datetime, timedelta
 
+from datetime import datetime, timedelta
+
 class ActionRegistrarIngreso(Action):
     def name(self) -> Text:
         return "action_registrar_ingreso"
@@ -204,6 +206,15 @@ class ActionRegistrarIngreso(Action):
             categoria = get_entity(tracker, "categoria") or tracker.get_slot("categoria")
             fecha_raw = get_entity(tracker, "fecha") or tracker.get_slot("fecha")
             medio = get_entity(tracker, "medio") or tracker.get_slot("medio")
+
+            # 🔁 Forzar detección de fecha relativa si no fue reconocida por el modelo
+            if not fecha_raw:
+                if "ayer" in texto_usuario:
+                    fecha_raw = "ayer"
+                elif "hoy" in texto_usuario:
+                    fecha_raw = "hoy"
+                elif "mañana" in texto_usuario:
+                    fecha_raw = "mañana"
 
             campos_faltantes = []
             if not monto_raw:
