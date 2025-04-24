@@ -1333,16 +1333,31 @@ class ActionConsultarConfiguracion(Action):
             )
             return []
 
+        texto_usuario = tracker.latest_message.get("text", "").lower()
+
+        # 🧠 Detectar si se está preguntando por "este mes"
+        periodo_filtrado = None
+        if "este mes" in texto_usuario:
+            mes_actual = datetime.now().strftime("%B").lower()
+            año_actual = datetime.now().year
+            periodo_filtrado = f"{mes_actual} de {año_actual}"
+
         # 📌 Agrupar por última alerta activa por categoría y periodo
         ultimas_alertas = {}
         for alerta in sorted(alertas, key=lambda x: x.get("timestamp", ""), reverse=True):
             clave = f"{alerta.get('categoria', '').lower()}_{alerta.get('periodo', '').lower()}"
             if clave not in ultimas_alertas and alerta.get("status", 1) == 1:
-                ultimas_alertas[clave] = alerta
+                if periodo_filtrado:
+                    if alerta.get("periodo", "").lower() == periodo_filtrado:
+                        ultimas_alertas[clave] = alerta
+                else:
+                    ultimas_alertas[clave] = alerta
 
         if not ultimas_alertas:
             dispatcher.utter_message(
-                text="📭 *No tienes alertas activas actualmente.*"
+                text="📭 *No se encontraron alertas activas para el periodo actual.*"
+                if periodo_filtrado else
+                "📭 *No tienes alertas activas actualmente.*"
             )
             return []
 
