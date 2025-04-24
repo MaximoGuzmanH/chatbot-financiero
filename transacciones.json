@@ -222,5 +222,17 @@
     "año": 2025,
     "timestamp": "2025-04-24T00:30:46.356846",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 400.0,
+    "categoria": "de",
+    "fecha": "20 de abril",
+    "medio": "efectivo",
+    "dia": 20,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T00:31:28.559359",
+    "status": 1
   }
 ]
