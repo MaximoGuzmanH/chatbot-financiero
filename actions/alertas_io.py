@@ -7,6 +7,17 @@ import requests
 
 RUTA_ALERTAS = "/tmp/alertas.json"
 
+# --- Inicialización: copiar desde el repo si no existe en /tmp ---
+RUTA_ALERTAS_ORIGINAL = os.path.join(os.path.dirname(__file__), "../alertas.json")
+if not os.path.exists(RUTA_ALERTAS):
+    if os.path.exists(RUTA_ALERTAS_ORIGINAL):
+        with open(RUTA_ALERTAS_ORIGINAL, "r", encoding="utf-8") as f_src:
+            with open(RUTA_ALERTAS, "w", encoding="utf-8") as f_dst:
+                f_dst.write(f_src.read())
+    else:
+        with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
+            json.dump([], f)
+
 # --- GitHub Sync ---
 GITHUB_REPO = "MaximoGuzmanH/chatbot-financiero"
 ARCHIVO_ALERTAS = "alertas.json"
@@ -49,15 +60,12 @@ def subir_a_github_alertas():
     except Exception as e:
         print(f"[ERROR] al subir alertas: {e}")
 
-
 def cargar_alertas(filtrar_activos=True):
     if not os.path.exists(RUTA_ALERTAS):
         return []
     with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
         data = json.load(f)
     return [a for a in data if a.get("status", 1) == 1] if filtrar_activos else data
-
-import json, os
 
 def guardar_alerta(alerta):
     alertas = cargar_alertas(filtrar_activos=False)
@@ -68,7 +76,7 @@ def guardar_alerta(alerta):
     with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
         json.dump(alertas, f, ensure_ascii=False, indent=2)
 
-    subir_a_github_alertas()  # Tu función de sincronización
+    subir_a_github_alertas()
 
 def eliminar_alerta_logicamente(condiciones):
     alertas = cargar_alertas(filtrar_activos=False)
@@ -83,7 +91,6 @@ def eliminar_alerta_logicamente(condiciones):
         with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
             json.dump(alertas, f, ensure_ascii=False, indent=2)
         subir_a_github_alertas()
-
 
 def guardar_todas_las_alertas(nuevas_alertas):
     ahora = datetime.now()
@@ -108,7 +115,6 @@ def guardar_todas_las_alertas(nuevas_alertas):
         json.dump(alertas, f, ensure_ascii=False, indent=2)
 
     subir_a_github_alertas()
-
 
 def actualizar_alerta_existente(condiciones: Dict[str, str], nueva_alerta: Dict[str, Any]) -> bool:
     ahora = datetime.now().isoformat()
