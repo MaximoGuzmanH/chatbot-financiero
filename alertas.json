@@ -1,29 +1,11 @@
 [
   {
-    "categoria": "deporte",
-    "monto": 600.0,
-    "periodo": "abril de 2025",
-    "mes": "abril",
-    "año": 2025,
-    "timestamp": "2025-04-24T21:13:19.866458",
-    "status": 1
-  },
-  {
-    "categoria": "salud",
-    "monto": 400.0,
-    "periodo": "abril de 2024",
-    "mes": "abril",
+    "categoria": "transporte",
+    "monto": 200.0,
+    "periodo": "junio de 2024",
+    "mes": "junio",
     "año": 2024,
-    "timestamp": "2025-04-24T21:15:15.376173",
-    "status": 1
-  },
-  {
-    "categoria": "salud",
-    "monto": 400.0,
-    "periodo": "mayo de 2025",
-    "mes": "mayo",
-    "año": 2025,
-    "timestamp": "2025-04-24T21:18:15.890402",
+    "timestamp": "2025-04-24T22:09:50.836721",
     "status": 1
   }
 ]
