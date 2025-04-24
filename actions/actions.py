@@ -1333,40 +1333,16 @@ class ActionConsultarConfiguracion(Action):
             )
             return []
 
-        texto_usuario = tracker.latest_message.get("text", "").lower()
-        periodo_filtrado = None
-
-        # 🌐 Mapeo de nombres de meses en inglés a español
-        meses_es = {
-            "january": "enero", "february": "febrero", "march": "marzo", "april": "abril",
-            "may": "mayo", "june": "junio", "july": "julio", "august": "agosto",
-            "september": "septiembre", "october": "octubre", "november": "noviembre", "december": "diciembre"
-        }
-
-        # 🧠 Detectar si se menciona "este mes"
-        if "este mes" in texto_usuario:
-            ahora = datetime.now()
-            nombre_mes_en = ahora.strftime("%B").lower()
-            nombre_mes_es = meses_es.get(nombre_mes_en, nombre_mes_en)
-            periodo_filtrado = f"{nombre_mes_es} de {ahora.year}"
-
         # 📌 Agrupar por última alerta activa por categoría y periodo
         ultimas_alertas = {}
         for alerta in sorted(alertas, key=lambda x: x.get("timestamp", ""), reverse=True):
-            if alerta.get("status", 1) != 1:
-                continue
-            if periodo_filtrado and alerta.get("periodo", "").lower() != periodo_filtrado:
-                continue
-
             clave = f"{alerta.get('categoria', '').lower()}_{alerta.get('periodo', '').lower()}"
-            if clave not in ultimas_alertas:
+            if clave not in ultimas_alertas and alerta.get("status", 1) == 1:
                 ultimas_alertas[clave] = alerta
 
         if not ultimas_alertas:
             dispatcher.utter_message(
-                text="📭 *No se encontraron alertas activas para el periodo actual.*"
-                if periodo_filtrado else
-                "📭 *No tienes alertas activas actualmente.*"
+                text="📭 *No tienes alertas activas actualmente.*"
             )
             return []
 
