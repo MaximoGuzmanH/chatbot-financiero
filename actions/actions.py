@@ -338,17 +338,25 @@ class ActionVerHistorialCompleto(Action):
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo = get_entity(tracker, "periodo")
 
-            # Filtrar solo ingresos y gastos
+            # 🧠 Reconstruir periodo en todas las transacciones
+            for t in transacciones:
+                if not t.get("periodo"):
+                    mes = t.get("mes", "").strip().lower()
+                    año = str(t.get("año")).strip()
+                    if mes and año:
+                        t["periodo"] = f"{mes} de {año}"
+
+            # 🎯 Filtrar solo ingresos/gastos
             transacciones_filtradas = [
                 t for t in transacciones if t.get("tipo") in ["ingreso", "gasto"]
             ]
 
-            # Aplicar filtro por periodo si se indica
+            # 📆 Filtrar por periodo si se indicó
             if periodo:
                 periodo = periodo.lower().strip()
                 transacciones_filtradas = [
                     t for t in transacciones_filtradas
-                    if periodo == t.get("periodo", f"{t.get('mes', '').lower()} de {t.get('año')}").lower()
+                    if periodo == t.get("periodo", "").lower()
                 ]
 
             if not transacciones_filtradas:
@@ -359,15 +367,13 @@ class ActionVerHistorialCompleto(Action):
                 dispatcher.utter_message(text=mensaje)
                 return []
 
+            # 🧾 Construcción del mensaje
             mensaje = []
-
-            # Encabezado
             encabezado = "📋 **Historial de transacciones**"
             if periodo:
                 encabezado += f" para *{periodo}*"
             mensaje.append(encabezado + ":\n")
 
-            # Detalles de cada transacción
             for t in transacciones_filtradas:
                 tipo = t.get("tipo", "transacción").capitalize()
                 monto = float(t.get("monto", 0))
@@ -382,9 +388,7 @@ class ActionVerHistorialCompleto(Action):
                     linea += f", con *{medio}*"
                 mensaje.append(linea)
 
-            # Cierre motivador
             mensaje.append("\n📊 ¿Deseas *registrar algo nuevo* o *consultar tu resumen mensual*?")
-
             dispatcher.utter_message(text=construir_mensaje(*mensaje))
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
