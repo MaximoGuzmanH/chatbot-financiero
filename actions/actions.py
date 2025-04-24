@@ -187,17 +187,6 @@ class ActionRegistrarIngreso(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[EventType]:
 
-        def parse_fecha_relativa(texto: str) -> Optional[str]:
-            texto = texto.strip().lower()
-            hoy = datetime.now()
-            if texto == "ayer":
-                return (hoy - timedelta(days=1)).strftime("%d/%m/%Y")
-            elif texto == "hoy":
-                return hoy.strftime("%d/%m/%Y")
-            elif texto == "mañana":
-                return (hoy + timedelta(days=1)).strftime("%d/%m/%Y")
-            return None
-
         try:
             texto_usuario = tracker.latest_message.get("text", "").lower()
             tipo_actual = tracker.get_slot("tipo") or "ingreso"
@@ -223,7 +212,7 @@ class ActionRegistrarIngreso(Action):
                     mensaje += "- ¿Qué **tipo de ingreso** fue? (sueldo, venta, etc.)\n"
                 if "medio" in campos_faltantes:
                     mensaje += "- ¿Con qué **medio** recibiste el ingreso? (efectivo, tarjeta de débito, etc.)\n"
-
+                
                 dispatcher.utter_message(text=mensaje)
                 return [
                     SlotSet("tipo", "ingreso"),
@@ -238,15 +227,13 @@ class ActionRegistrarIngreso(Action):
                 dispatcher.utter_message(text="❌ El monto ingresado no es válido. Intenta nuevamente.")
                 return []
 
-            # 📅 Procesamiento de fecha
-            fecha_parseada = None
-            if fecha_raw:
-                fecha_parseada = parse_fecha_relativa(fecha_raw)
-                if not fecha_parseada and len(fecha_raw.split("/")) == 2:
-                    fecha_raw += f"/{datetime.now().year}"
-            fecha = formatear_fecha(fecha_parseada or fecha_raw or datetime.now().strftime("%d/%m/%Y"))
+            # Procesamiento de fecha
+            if not fecha_raw:
+                fecha_raw = datetime.now().strftime("%d/%m/%Y")
+            elif len(fecha_raw.split("/")) == 2:
+                fecha_raw += f"/{datetime.now().year}"
+            fecha = formatear_fecha(fecha_raw)
 
-            # 💾 Registro de la transacción
             transaccion = {
                 "tipo": "ingreso",
                 "monto": monto,
@@ -256,7 +243,7 @@ class ActionRegistrarIngreso(Action):
             }
 
             guardar_transaccion(transaccion)
-
+            
             mensaje = construir_mensaje(
                 "✅ **Ingreso registrado con éxito:**",
                 f"💰 *Monto:* {monto:.2f} soles",
@@ -265,8 +252,6 @@ class ActionRegistrarIngreso(Action):
                 f"💳 *Medio:* {medio}",
                 "👉 ¿Deseas *registrar otro ingreso* o *consultar tu saldo*?"
             )
-
-            print(f"[DEBUG] MENSAJE A ENVIAR:\n{mensaje}")
 
             dispatcher.utter_message(text=mensaje)
 
