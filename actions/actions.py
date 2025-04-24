@@ -156,6 +156,7 @@ class ActionRegistrarGasto(Action):
                 f"💳 *Medio:* {medio}",
                 "👉 ¿Deseas *registrar otro gasto* o *consultar tu saldo*?"
             )
+            
             dispatcher.utter_message(text=mensaje)
 
             return [
