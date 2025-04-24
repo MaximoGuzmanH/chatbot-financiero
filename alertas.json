@@ -1,11 +1,38 @@
 [
   {
-    "categoria": "transporte",
+    "categoria": "comida",
+    "monto": 500.0,
+    "periodo": "mayo de 2024",
+    "mes": "mayo",
+    "año": 2024,
+    "timestamp": "2025-04-24T00:35:30.142529",
+    "status": 1
+  },
+  {
+    "categoria": "entretenimiento",
     "monto": 300.0,
-    "periodo": "abril de 2025",
+    "periodo": "abril de 2024",
     "mes": "abril",
-    "año": 2025,
-    "timestamp": "2025-04-23T15:44:49.148527",
+    "año": 2024,
+    "timestamp": "2025-04-24T00:39:50.811291",
+    "status": 1
+  },
+  {
+    "categoria": "salud",
+    "monto": 400.0,
+    "periodo": "mayo de 2024",
+    "mes": "mayo",
+    "año": 2024,
+    "timestamp": "2025-04-24T01:03:09.212493",
+    "status": 1
+  },
+  {
+    "categoria": "servicios",
+    "monto": 600.0,
+    "periodo": "abril de 2024",
+    "mes": "abril",
+    "año": 2024,
+    "timestamp": "2025-04-24T01:04:10.582397",
     "status": 1
   }
 ]
