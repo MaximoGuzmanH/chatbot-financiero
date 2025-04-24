@@ -7,5 +7,14 @@
     "año": 2024,
     "timestamp": "2025-04-24T07:31:39.517277",
     "status": 1
+  },
+  {
+    "categoria": "juegos",
+    "monto": 500.0,
+    "periodo": "mayo de 2024",
+    "mes": "mayo",
+    "año": 2024,
+    "timestamp": "2025-04-24T07:33:38.130163",
+    "status": 1
   }
 ]
