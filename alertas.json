@@ -1,11 +1,11 @@
 [
   {
-    "categoria": "transporte",
-    "monto": 300.0,
-    "periodo": "abril de 2025",
-    "mes": "abril",
-    "año": 2025,
-    "timestamp": "2025-04-23T15:44:49.148527",
+    "categoria": "comida",
+    "monto": 500.0,
+    "periodo": "mayo de 2024",
+    "mes": "mayo",
+    "año": 2024,
+    "timestamp": "2025-04-24T00:35:30.142529",
     "status": 1
   }
 ]
