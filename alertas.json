@@ -25,5 +25,14 @@
     "año": 2024,
     "timestamp": "2025-04-24T07:42:15.188498",
     "status": 1
+  },
+  {
+    "categoria": "musica",
+    "monto": 200.0,
+    "periodo": "abril de 2025",
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T07:48:11.340296",
+    "status": 1
   }
 ]
