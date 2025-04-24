@@ -393,38 +393,14 @@
   },
   {
     "tipo": "ingreso",
-    "monto": 2500.0,
-    "categoria": "sueldo",
-    "fecha": "5 de abril",
-    "medio": "tarjeta de débito",
-    "dia": 5,
+    "monto": 400.0,
+    "categoria": "venta de productos",
+    "fecha": "20 de abril",
+    "medio": "efectivo",
+    "dia": 20,
     "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-24T06:56:52.133860",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
-    "monto": 300.0,
-    "categoria": "freelance",
-    "fecha": "10 de marzo",
-    "medio": "tarjeta débito",
-    "dia": 10,
-    "mes": "marzo",
-    "año": 2025,
-    "timestamp": "2025-04-24T06:57:18.660767",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
-    "monto": 1000.0,
-    "categoria": "honorarios",
-    "fecha": "abril",
-    "medio": "tarjeta de débito",
-    "dia": 24,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-24T06:57:59.755700",
+    "timestamp": "2025-04-24T06:58:44.583247",
     "status": 1
   }
 ]
