@@ -968,7 +968,7 @@ class ActionCrearConfiguracion(Action):
         guardar_alerta(nueva_alerta)
 
         mensaje = construir_mensaje(
-            f"✅ *Configuración registrada correctamente*",
+            f"✅ *Presupuesto/Alerta registrada correctamente*",
             f"📌 Se ha creado una alerta de *{monto_float:.2f} soles* para *{categoria}* en *{periodo_normalizado}*.",
             "👉 Puedes modificarla más adelante si es necesario."
         )
