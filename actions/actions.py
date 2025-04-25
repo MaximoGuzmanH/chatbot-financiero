@@ -520,8 +520,9 @@ class ActionAnalizarGastos(Action):
             domain: Dict[Text, Any]) -> List[EventType]:
 
         from datetime import datetime
-        import re
         from collections import defaultdict
+        import re
+        import calendar
 
         transacciones = cargar_transacciones(filtrar_activos=True)
         texto_usuario = tracker.latest_message.get("text", "").lower()
@@ -530,60 +531,61 @@ class ActionAnalizarGastos(Action):
         periodo_raw = get_entity(tracker, "periodo")
         categoria = get_entity(tracker, "categoria")
 
-        # 📆 Normalizar periodo
-        periodo = None
-        if "este mes" in texto_usuario and not periodo_raw:
-            periodo = f"{datetime.now().strftime('%B').lower()} de {datetime.now().year}"
-        elif periodo_raw:
-            match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
-            if match:
-                mes = match.group(1).strip()
-                año = match.group(2) or str(datetime.now().year)
-                periodo = f"{mes} de {año}"
-            else:
-                periodo = periodo_raw.strip().lower()
+        # 📆 Interpretar periodo (mes + año)
+        def interpretar_periodo(texto):
+            hoy = datetime.now()
+            if "este mes" in texto:
+                return hoy.strftime("%B"), hoy.year
+            elif "último mes" in texto or "mes pasado" in texto:
+                mes = hoy.month - 1 if hoy.month > 1 else 12
+                año = hoy.year if hoy.month > 1 else hoy.year - 1
+                return calendar.month_name[mes], año
+            elif texto:
+                match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", texto.lower())
+                if match:
+                    return match.group(1), int(match.group(2)) if match.group(2) else hoy.year
+            return None, None
 
-        # 🎯 Filtrar solo gastos válidos
-        gastos = [
-            t for t in transacciones
-            if t.get("tipo") == "gasto" and t.get("monto") and t.get("categoria")
-        ]
-        if periodo:
-            gastos = [g for g in gastos if g.get("periodo", "").lower() == periodo.lower()]
+        mes, año = interpretar_periodo(periodo_raw or texto_usuario)
+
+        # 🎯 Filtrar gastos válidos
+        gastos = [t for t in transacciones if t.get("tipo") == "gasto" and t.get("monto") and t.get("categoria")]
+
+        if mes and año:
+            gastos = [
+                g for g in gastos
+                if g.get("mes", "").lower() == mes.lower() and int(str(g.get("año", 0)).replace(",", "")) == año
+            ]
 
         if not gastos:
-            mensaje = (
-                f"📭 *No se encontraron gastos registrados*"
-                + (f" para el periodo **{periodo}**." if periodo else ".")
-                + "\n\n¿Deseas ingresar uno?"
-            )
-            dispatcher.utter_message(text=mensaje)
+            periodo_str = f"{mes} de {año}" if mes and año else "el periodo indicado"
+            dispatcher.utter_message(text=f"📭 *No se encontraron gastos registrados* para el periodo **{periodo_str}**.\n¿Deseas ingresar uno?")
             return []
 
         sin_categoria = [g for g in gastos if not g.get("categoria")]
 
-        # 📂 Si se indicó categoría específica
+        # 📂 Filtrar por categoría si fue indicada
         if categoria:
             gastos_categoria = [g for g in gastos if categoria.lower() in g.get("categoria", "").lower()]
             total_categoria = sum(float(g["monto"]) for g in gastos_categoria)
 
             if not gastos_categoria:
                 mensaje = construir_mensaje(
-                    f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis." if sin_categoria else "",
-                    f"🔍 No se encontraron gastos en la categoría *{categoria}*" +
-                    (f" durante *{periodo}*" if periodo else "") + "."
+                    f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría." if sin_categoria else "",
+                    f"🔍 No se encontraron gastos en la categoría *{categoria}*"
+                    + (f" durante *{mes} de {año}*" if mes and año else "") + "."
                 )
             else:
                 mensaje = construir_mensaje(
-                    f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis." if sin_categoria else "",
-                    f"📂 Has gastado un total de *{total_categoria:.2f} soles* en *{categoria}*" +
-                    (f" durante *{periodo}*" if periodo else "") + "."
+                    f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría." if sin_categoria else "",
+                    f"📂 Has gastado un total de *{total_categoria:.2f} soles* en *{categoria}*"
+                    + (f" durante *{mes} de {año}*" if mes and año else "") + "."
                 )
 
             dispatcher.utter_message(text=mensaje)
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
-        # 📊 Agrupar por categoría y calcular totales
+        # 📊 Agrupar por categoría
         categorias_sumadas = defaultdict(float)
         for g in gastos:
             nombre = g.get("categoria", "Sin categoría").strip().lower()
@@ -592,36 +594,33 @@ class ActionAnalizarGastos(Action):
         total_gasto = sum(categorias_sumadas.values())
         top_categorias = sorted(categorias_sumadas.items(), key=lambda x: x[1], reverse=True)[:3]
 
-        # 🧾 Generar respuesta formateada
+        # 🧾 Generar mensaje
         mensaje = []
 
         titulo = "🧾 **Análisis de tus hábitos de consumo**"
-        if periodo:
-            titulo += f" durante *{periodo}*"
+        if mes and año:
+            titulo += f" durante *{mes} de {año}*"
         mensaje.append(titulo)
 
         if sin_categoria:
             mensaje.append(f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis.")
 
         resumen = "📊 **Categorías con mayor gasto:**"
-        for cat, total in top_categorias:
-            porcentaje = (total / total_gasto) * 100
-            resumen += f"\n• {cat.title()}: {total:.2f} soles ({porcentaje:.1f}%)"
+        for cat, monto in top_categorias:
+            porcentaje = (monto / total_gasto) * 100 if total_gasto else 0
+            resumen += f"\n• {cat.title()}: {monto:.2f} soles ({porcentaje:.1f}%)"
         mensaje.append(resumen)
 
         mensaje.append(f"💸 **Total gastado:** *{total_gasto:.2f} soles*")
 
         # 📋 Ejemplos recientes
-        def parse_fecha(fecha_str):
-            try:
-                return datetime.strptime(fecha_str, "%Y-%m-%d")
-            except:
-                return datetime.min
-
-        recientes = sorted(gastos, key=lambda x: parse_fecha(x.get("fecha", "")), reverse=True)[:5]
+        recientes = sorted(gastos, key=lambda g: g.get("timestamp", ""), reverse=True)[:5]
         detalles = "📋 **Ejemplos recientes:**"
         for g in recientes:
-            fecha = g.get("fecha", "sin fecha")
+            dia = g.get("dia", "")
+            mes_r = g.get("mes", "").capitalize()
+            año_r = g.get("año", "")
+            fecha = f"{dia} de {mes_r} de {año_r}" if dia and mes_r and año_r else "sin fecha"
             monto = g.get("monto", 0)
             cat = g.get("categoria", "Sin categoría")
             detalles += f"\n- {cat.title()}: {monto:.2f} soles ({fecha})"
