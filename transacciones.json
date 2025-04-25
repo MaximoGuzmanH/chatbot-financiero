@@ -57,8 +57,7 @@
     "mes": "abril",
     "año": 2025,
     "timestamp": "2025-04-25T17:53:22.431190",
-    "status": 0,
-    "timestamp_modificacion": "2025-04-25T23:27:29.045899"
+    "status": 1
   },
   {
     "tipo": "gasto",
@@ -94,8 +93,7 @@
     "mes": "abril",
     "año": 2025,
     "timestamp": "2025-04-25T18:40:36.615834",
-    "status": 0,
-    "timestamp_modificacion": "2025-04-25T23:27:29.045899"
+    "status": 1
   },
   {
     "tipo": "ingreso",
@@ -140,7 +138,15 @@
     "mes": "abril",
     "año": 2025,
     "timestamp": "2025-04-25T23:13:33.568834",
-    "status": 0,
-    "timestamp_modificacion": "2025-04-25T23:27:29.045899"
+    "status": 1
+  },
+  {
+    "tipo": "entrada_no_entendida",
+    "descripcion": "no entiendo",
+    "timestamp": "2025-04-25T23:30:04.023381",
+    "dia": 25,
+    "mes": "abril",
+    "año": 2025,
+    "status": 1
   }
 ]
