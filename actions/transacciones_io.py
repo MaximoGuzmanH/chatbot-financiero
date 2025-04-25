@@ -106,17 +106,17 @@ def cargar_transacciones(filtrar_activos=True, sincronizar=True):
         return []
 
 def guardar_transaccion(transaccion):
-    from transacciones_io import descargar_de_github
+    # 🔄 Paso 1: sincronizar antes de cualquier lectura
+    descargar_de_github()  # Esto descarga desde GitHub y pisa el archivo local
 
-    # 🔄 Forzar sincronización ANTES de cargar
-    descargar_de_github()
-
+    # 📥 Paso 2: cargar lo que ahora está en local (ya sincronizado)
     try:
-        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)  # 🔥 NO volver a sincronizar aquí
+        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
 
+    # 🧱 Paso 3: agregar los campos auxiliares (fecha, timestamp, etc.)
     ahora = datetime.now()
     fecha_str = transaccion.get("fecha") or ahora.strftime("%d/%m/%Y")
 
@@ -142,17 +142,21 @@ def guardar_transaccion(transaccion):
         "status": transaccion.get("status", 1)
     })
 
+    # ➕ Paso 4: agregar la nueva transacción a la lista sincronizada
     transacciones.append(transaccion)
 
+    # 💾 Paso 5: guardar en el archivo local
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
+    # ☁️ Paso 6: subir la nueva versión a GitHub
     from github_sync import subir_log_a_github
     subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
         ruta_destino_repo=ARCHIVO_GITHUB,
         mensaje_commit="Ingreso registrado automáticamente"
     )
+
 
 def eliminar_transaccion_logicamente(condiciones):
     transacciones = cargar_transacciones(filtrar_activos=False)
