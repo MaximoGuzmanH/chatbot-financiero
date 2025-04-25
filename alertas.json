@@ -1,11 +1,12 @@
 [
   {
     "categoria": "entretenimiento",
-    "monto": 300.0,
+    "monto": 400.0,
     "periodo": "abril de 2025",
     "mes": "abril",
     "año": 2025,
     "timestamp": "2025-04-25T19:02:13.474231",
-    "status": 1
+    "status": 1,
+    "timestamp_modificacion": "2025-04-25T19:03:12.298811"
   }
 ]
