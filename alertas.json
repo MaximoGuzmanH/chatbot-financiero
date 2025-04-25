@@ -1,10 +1,11 @@
 [
   {
     "categoria": "salud",
-    "monto": 20.0,
+    "monto": 75.0,
     "periodo": "mayo de 2025",
     "status": 1,
-    "timestamp": "2025-04-25T06:57:27.980317"
+    "timestamp": "2025-04-25T06:57:27.980317",
+    "timestamp_modificacion": "2025-04-25T07:27:10.077446"
   },
   {
     "categoria": "salud",
