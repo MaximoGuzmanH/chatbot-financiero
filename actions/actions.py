@@ -1127,9 +1127,8 @@ class ActionModificarConfiguracion(Action):
 
         import re
         from datetime import datetime
-        from alertas_io import modificar_alerta
+        from alertas_io import modificar_alerta, cargar_alertas
         from utils import parse_monto, construir_mensaje
-        from typing import Any, Dict, List, Text
 
         categoria = get_entity(tracker, "categoria")
         monto = get_entity(tracker, "monto")
@@ -1148,10 +1147,9 @@ class ActionModificarConfiguracion(Action):
             return []
 
         if monto_float <= 0:
-            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.") 
+            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.")
             return []
 
-        # 📅 Normalizar periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo.lower())
         if not match:
             dispatcher.utter_message(
@@ -1163,7 +1161,14 @@ class ActionModificarConfiguracion(Action):
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # ✏️ Modificar alerta (si existe)
+        # Buscar el monto original antes de modificar
+        alertas = cargar_alertas(filtrar_activos=True)
+        monto_original = None
+        for alerta in alertas:
+            if alerta.get("categoria", "").lower() == categoria.lower() and alerta.get("periodo", "").lower() == periodo_normalizado:
+                monto_original = alerta.get("monto")
+                break
+
         modificada = modificar_alerta(
             condiciones={"categoria": categoria, "periodo": periodo_normalizado},
             nuevos_valores={"monto": monto_float}
@@ -1174,6 +1179,7 @@ class ActionModificarConfiguracion(Action):
                 f"✅ *Alerta modificada correctamente*",
                 f"• Categoría: *{categoria}*",
                 f"• Periodo: *{periodo_normalizado}*",
+                f"• Monto anterior: *{monto_original:.2f} soles*" if monto_original else "",
                 f"• Nuevo monto: *{monto_float:.2f} soles*",
                 "👉 Puedes consultarla nuevamente o modificar otra si lo deseas."
             )
