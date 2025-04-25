@@ -46,5 +46,17 @@
     "año": 2025,
     "timestamp": "2025-04-25T17:21:04.864548",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 5.0,
+    "categoria": "sueldo",
+    "fecha": "1 de febrero",
+    "medio": "efectivo",
+    "dia": 1,
+    "mes": "febrero",
+    "año": 2025,
+    "timestamp": "2025-04-25T17:30:40.398399",
+    "status": 1
   }
 ]
