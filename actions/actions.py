@@ -163,8 +163,10 @@ class ActionRegistrarGasto(Action):
             }
 
             # ✅ Guardar directamente (sin llamar descargar_de_github aquí)
-            from transacciones_io import guardar_transaccion
+            from transacciones_io import descargar_de_github, guardar_transaccion
+            descargar_de_github()  # 🔁 Descargar antes de guardar para evitar sobrescribir
             guardar_transaccion(transaccion)
+
 
             mes_actual = transaccion.get("mes", "").lower()
 
