@@ -1,0 +1,1802 @@
+[
+  {
+    "text": "¿Mis gastos son mayores en marzo?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuánto destino a alimentación cada mes?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9999604225158691
+    }
+  },
+  {
+    "text": "gasto total por tipo",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.23732402920722961
+    }
+  },
+  {
+    "text": "¿Tengo concentraciones altas de gastos en alguna categoría?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cómo se registró el último gasto?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuánto he gastado en comida este mes?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuánto he gastado en educación este mes?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuál fue el total de gastos del mes pasado?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9952846169471741
+    }
+  },
+  {
+    "text": "Quiero ver lo que gané por ventas en enero de 2023",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.638584315776825
+    }
+  },
+  {
+    "text": "Revisa las entradas clasificadas como trabajo",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.4709562659263611
+    }
+  },
+  {
+    "text": "Dame un resumen de mis gastos del mes pasado en ropa",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999997615814209
+    }
+  },
+  {
+    "text": "Quiero saber mis ingresos de enero",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999655485153198
+    }
+  },
+  {
+    "text": "Mostrar egresos por ropa de febrero",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.7496240139007568
+    }
+  },
+  {
+    "text": "¿Cuánto he recibido en enero por freelance?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "registrar_ingreso",
+      "confidence": 0.6550873517990112
+    }
+  },
+  {
+    "text": "Ver todos mis gastos por categoría",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9979116320610046
+    }
+  },
+  {
+    "text": "Ajusta mi presupuesto mensual de ocio a 420 soles en septiembre 2025",
+    "intent": "crear_configuracion",
+    "intent_prediction": {
+      "name": "modificar_configuracion",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "gasto ayer",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.8876792788505554
+    }
+  },
+  {
+    "text": "categoría: educación",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.8712977170944214
+    }
+  },
+  {
+    "text": "usé abreviaturas y creo que no se entendió",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9999997615814209
+    }
+  },
+  {
+    "text": "Escribe 40 soles bajo la categoría regalos",
+    "intent": "registrar_gasto",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9219686388969421
+    }
+  },
+  {
+    "text": "ingresos  de 1700 en abril de 2024 por sueldo",
+    "intent": "registrar_ingreso",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9257240891456604
+    }
+  },
+  {
+    "text": "Me hicieron una transferencia de 880 soles con tarjeta débito",
+    "intent": "registrar_ingreso",
+    "intent_prediction": {
+      "name": "crear_configuracion",
+      "confidence": 0.9766778349876404
+    }
+  },
+  {
+    "text": "Limpia las categorías asignadas a mis gastos",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.999906063079834
+    }
+  },
+  {
+    "text": "Limpiar los gastos en ocio durante septiembre del 2022",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9966906309127808
+    }
+  },
+  {
+    "text": "Enséñame los  ingresos  y gastos  de marzo 2024",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Necesito revisar todos los ingresos y gastos de abril",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9999957084655762
+    }
+  },
+  {
+    "text": "Mostrar todos mis gastos en entretenimiento este abril",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9999743700027466
+    }
+  },
+  {
+    "text": "Dame los registros de viajes de febrero",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.8237367272377014
+    }
+  },
+  {
+    "text": "saluditos",
+    "intent": "saludo",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9995737671852112
+    }
+  },
+  {
+    "text": "ya no necesito más ayuda",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.9882810711860657
+    }
+  },
+  {
+    "text": "hasta más tarde",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.5808262825012207
+    }
+  },
+  {
+    "text": "¿Cuál es tu propósito?",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "despedida",
+      "confidence": 0.5329087376594543
+    }
+  },
+  {
+    "text": "qué opciones tengo",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.9990018010139465
+    }
+  },
+  {
+    "text": "qué servicios brindas",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.2817397117614746
+    }
+  },
+  {
+    "text": "cómo empiezo",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.45598289370536804
+    }
+  },
+  {
+    "text": "no sé cómo seguir",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.737608015537262
+    }
+  },
+  {
+    "text": "quiero saber cómo funcionas",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.999795138835907
+    }
+  },
+  {
+    "text": "dime qué opciones tengo",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.7839030027389526
+    }
+  },
+  {
+    "text": "ayúdame a entender esto",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.6131614446640015
+    }
+  },
+  {
+    "text": "qué me recomiendas hacer primero",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.8540560603141785
+    }
+  },
+  {
+    "text": "no me ayuda",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.9352224469184875
+    }
+  },
+  {
+    "text": "¿Mis gastos en ropa aumentaron en enero?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Puedes mostrar mis gastos en ropa?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9964234232902527
+    }
+  },
+  {
+    "text": "¿Dónde invertí más en abril?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Haz un resumen de mis egresos en marzo de 2024",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9711852669715881
+    }
+  },
+  {
+    "text": "¿Qué parte de mi presupuesto se va en ocio?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.9920361638069153
+    }
+  },
+  {
+    "text": "Dame el resumen de mis gastos en transporte del mes actual.",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9991317391395569
+    }
+  },
+  {
+    "text": "Evalúa mis gastos de transporte este mes.",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9926915764808655
+    }
+  },
+  {
+    "text": "Dime si hay concentración alta de egresos en ropa en abril",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9370099902153015
+    }
+  },
+  {
+    "text": "Hazme un análisis comparativo de gastos en transporte y comida",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuánto he gastado en servicios básicos este mes?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Dónde se concentran más mis gastos este mes?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9999973773956299
+    }
+  },
+  {
+    "text": "¿En qué categoría superé el presupuesto de abril?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.9999570846557617
+    }
+  },
+  {
+    "text": "¿Mis gastos están concentrados en pocas categorías?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9990991353988647
+    }
+  },
+  {
+    "text": "¿Cuánto he gastado este mes?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Mis gastos en marzo de 2024 fueron equilibrados?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.81429523229599
+    }
+  },
+  {
+    "text": "¿Cuál fue el mes con mayor gasto total?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Qué mes destaca por más egresos?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9967244267463684
+    }
+  },
+  {
+    "text": "¿Cuál fue el mes con mayor gasto total?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Quiero ver si mi consumo subió en abril",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.9773552417755127
+    }
+  },
+  {
+    "text": "Muestra las transacciones de ingreso en abril",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.9999922513961792
+    }
+  },
+  {
+    "text": "¿Gasté algo el sábado?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9218910336494446
+    }
+  },
+  {
+    "text": "¿En qué me gasté más este mes?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Necesito el historial de gastos de los últimos 10 días",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.4925808310508728
+    }
+  },
+  {
+    "text": "¿Cuál fue mi ingreso más alto en febrero?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Reduce el presupuesto de educación a 200 para septiembre",
+    "intent": "modificar_configuracion",
+    "intent_prediction": {
+      "name": "crear_configuracion",
+      "confidence": 0.9976118803024292
+    }
+  },
+  {
+    "text": "Quiero remover el control de hogar de abril de 2024",
+    "intent": "eliminar_configuracion",
+    "intent_prediction": {
+      "name": "modificar_configuracion",
+      "confidence": 0.9878783822059631
+    }
+  },
+  {
+    "text": "Quiero desactivar la alerta de ocio en diciembre de 2024",
+    "intent": "eliminar_configuracion",
+    "intent_prediction": {
+      "name": "crear_configuracion",
+      "confidence": 0.9999971389770508
+    }
+  },
+  {
+    "text": "eso fue hace poco",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.36306536197662354
+    }
+  },
+  {
+    "text": "abril, no sé más",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.39689862728118896
+    }
+  },
+  {
+    "text": "puse un ingreso pero no cuánto ni cuándo",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9782382249832153
+    }
+  },
+  {
+    "text": "fue en marzo de 2025, no puse monto",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.8915423154830933
+    }
+  },
+  {
+    "text": "eh, lo del otro día",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "despedida",
+      "confidence": 0.3933974504470825
+    }
+  },
+  {
+    "text": "lo habitual",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.612636148929596
+    }
+  },
+  {
+    "text": "puedes hacer lo tuyo",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.9957202076911926
+    }
+  },
+  {
+    "text": "Carga los gastos en eventos de 80 soles",
+    "intent": "registrar_gasto",
+    "intent_prediction": {
+      "name": "registrar_ingreso",
+      "confidence": 0.8300352692604065
+    }
+  },
+  {
+    "text": "Clasifica este monto como ingreso por venta",
+    "intent": "registrar_ingreso",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9094940423965454
+    }
+  },
+  {
+    "text": "Quiero empezar de cero con los gastos en tecnología",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.1663859635591507
+    }
+  },
+  {
+    "text": "Eliminar mis gastos de viajes en julio de 2023",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "eliminar_configuracion",
+      "confidence": 0.9990313053131104
+    }
+  },
+  {
+    "text": "Quiero volver a empezar con la clasificación",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "modificar_configuracion",
+      "confidence": 0.7463628649711609
+    }
+  },
+  {
+    "text": "Ver resumen completo de gastos e ingresos de abril de 2024",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Mostrar ingresos y gastos por entretenimiento de febrero",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "salu2",
+    "intent": "saludo",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9999575614929199
+    }
+  },
+  {
+    "text": "cuídate",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.3887271285057068
+    }
+  },
+  {
+    "text": "que estés bien",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "affirm",
+      "confidence": 0.6744169592857361
+    }
+  },
+  {
+    "text": "¿Qué tipo de cosas puedo preguntarte?",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Qué tipo de consultas entiendes?",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "qué cosas puedo preguntarte",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.7282435894012451
+    }
+  },
+  {
+    "text": "qué puedo consultarte",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.9999998807907104
+    }
+  },
+  {
+    "text": "afirmativo",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "despedida",
+      "confidence": 0.7459582686424255
+    }
+  },
+  {
+    "text": "confirmado",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.5345998406410217
+    }
+  },
+  {
+    "text": "totalmente",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.8581399321556091
+    }
+  },
+  {
+    "text": "sin problema",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "completamente",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "despedida",
+      "confidence": 0.9255867004394531
+    }
+  },
+  {
+    "text": "ni hablar",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.7777839303016663
+    }
+  },
+  {
+    "text": "¿Gasto más con efectivo o con tarjeta de débito?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Qué mes fue el de mayor gasto?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Muestra mis gastos según categoría",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9926989674568176
+    }
+  },
+  {
+    "text": "¿Dónde se concentraron mis gastos en enero con efectivo?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Revisa si he tenido egresos excesivos en ropa en abril",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9366133809089661
+    }
+  },
+  {
+    "text": "análisis mensual comparativo",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuál es el valor límite de caridad?",
+    "intent": "consultar_configuracion",
+    "intent_prediction": {
+      "name": "modificar_configuracion",
+      "confidence": 0.8449877500534058
+    }
+  },
+  {
+    "text": "¿Se anotó un gasto ayer?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9999574422836304
+    }
+  },
+  {
+    "text": "¿En qué categoría se concentraron más mis gastos?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Qué transacciones tengo del 20 de marzo?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.9998916387557983
+    }
+  },
+  {
+    "text": "¿Cuál fue el total gastado el 2 de abril?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9869948029518127
+    }
+  },
+  {
+    "text": "Quiero ver todos los gastos relacionados con ropa en abril",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.7262840270996094
+    }
+  },
+  {
+    "text": "Quiero saber mis salidas en abril",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.980124831199646
+    }
+  },
+  {
+    "text": "¿Qué aportaciones hice en educación?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.7070186734199524
+    }
+  },
+  {
+    "text": "Dame un resumen de gastos en servicios básicos",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Haz un resumen de mis ingresos en transporte",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Desglosa mis egresos por categoría de enero",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Enséñame mis gastos altos",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9713057279586792
+    }
+  },
+  {
+    "text": "Mostrar todos mis gastos de febrero",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.9999775886535645
+    }
+  },
+  {
+    "text": "Ver resumen de ingresos y gastos en abril",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.9955723285675049
+    }
+  },
+  {
+    "text": "Nueva alerta de 600 para servicios en febrero",
+    "intent": "crear_configuracion",
+    "intent_prediction": {
+      "name": "modificar_configuracion",
+      "confidence": 0.9999866485595703
+    }
+  },
+  {
+    "text": "Establece un nuevo tope de 330 en cafés en junio de 2031",
+    "intent": "modificar_configuracion",
+    "intent_prediction": {
+      "name": "crear_configuracion",
+      "confidence": 0.9999635219573975
+    }
+  },
+  {
+    "text": "no entiendo",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.7376158237457275
+    }
+  },
+  {
+    "text": "no recuerdo bien",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.8022152781486511
+    }
+  },
+  {
+    "text": "500 en salud",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "salud, abril... y nada más",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Hoy recibí 500 soles como bono en mayo",
+    "intent": "registrar_ingreso",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.9682744741439819
+    }
+  },
+  {
+    "text": "Quitar las asignaciones de hogar del mes de junio 2024",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "eliminar_configuracion",
+      "confidence": 0.9998754262924194
+    }
+  },
+  {
+    "text": "Dime qué movimientos hubo este mes",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9894188642501831
+    }
+  },
+  {
+    "text": "¿Qué datos tengo en abril?",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9895433187484741
+    }
+  },
+  {
+    "text": "me despido",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.5609990954399109
+    }
+  },
+  {
+    "text": "listo, gracias",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.45530813932418823
+    }
+  },
+  {
+    "text": "¿Cómo te puedo usar?",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.978984534740448
+    }
+  },
+  {
+    "text": "podrías ayudarme con esto",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9980059266090393
+    }
+  },
+  {
+    "text": "no tengo claro cómo funciona",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.6423721313476562
+    }
+  },
+  {
+    "text": "quiero saber cómo usarte",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9998927116394043
+    }
+  },
+  {
+    "text": "efectivamente",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.5138536691665649
+    }
+  },
+  {
+    "text": "evidentemente",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.948996365070343
+    }
+  },
+  {
+    "text": "no lo creo",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.8988261818885803
+    }
+  },
+  {
+    "text": "no lo creo necesario",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.973042368888855
+    }
+  },
+  {
+    "text": "¿Estoy gastando más que el mes anterior?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Desglosa mis gastos por categoría.",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Quiero ver cuánto he gastado en educación este mes.",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9959343671798706
+    }
+  },
+  {
+    "text": "¿En qué suelo gastar más al mes?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9999984502792358
+    }
+  },
+  {
+    "text": "desglose de egresos",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9992326498031616
+    }
+  },
+  {
+    "text": "Quiero saber cuánto gasté en cada categoría este abril",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Puedes identificar cuál fue mi categoría con más gasto en abril?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9201789498329163
+    }
+  },
+  {
+    "text": "¿En qué porcentaje gasté en educación y ropa?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.9999969005584717
+    }
+  },
+  {
+    "text": "Quiero saber el total gastado en abril",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9996434450149536
+    }
+  },
+  {
+    "text": "¿Cuál fue el total de mis egresos en enero?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.8081965446472168
+    }
+  },
+  {
+    "text": "¿Qué mes fue más barato para ropa?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9988730549812317
+    }
+  },
+  {
+    "text": "¿Cuánto puedo gastar en salud este mes?",
+    "intent": "consultar_configuracion",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9999994039535522
+    }
+  },
+  {
+    "text": "Evalúa mis gastos de marzo por categoría",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Detecta gastos frecuentes",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.7307103276252747
+    }
+  },
+  {
+    "text": "¿Hay un gasto de más de 500 en abril?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.8909907341003418
+    }
+  },
+  {
+    "text": "¿Cuánto dinero usé en alquiler el mes pasado?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Lista los gastos en viajes en el mes de marzo",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "resetear_categoria_gastos",
+      "confidence": 0.622791588306427
+    }
+  },
+  {
+    "text": "¿En qué categorías gasté más este mes?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999980926513672
+    }
+  },
+  {
+    "text": "Dime cuánto he gastado en supermercado",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.7871232628822327
+    }
+  },
+  {
+    "text": "Muéstrame el total que he gastado en febrero con débito",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.8181867599487305
+    }
+  },
+  {
+    "text": "¿En qué categorías tuve más gastos este mes?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999997615814209
+    }
+  },
+  {
+    "text": "¿Qué categoría tuvo más gastos en abril?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9999998807907104
+    }
+  },
+  {
+    "text": "Establece un nuevo presupuesto de 500 para entretenimiento en marzo de 2024",
+    "intent": "crear_configuracion",
+    "intent_prediction": {
+      "name": "modificar_configuracion",
+      "confidence": 0.9985942244529724
+    }
+  },
+  {
+    "text": "en abril o marzo",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "no sé si fue en abril o mayo",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "se me pasó la fecha en el ingreso",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "dime tú qué piensas",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.865744411945343
+    }
+  },
+  {
+    "text": "no me acuerdo qué quería",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.9626644253730774
+    }
+  },
+  {
+    "text": "cómo era eso",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.7031269669532776
+    }
+  },
+  {
+    "text": "Anota 400 por actividades escolares el 9/5/2025",
+    "intent": "registrar_ingreso",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.9999994039535522
+    }
+  },
+  {
+    "text": "Elimina la categoría ropa correspondiente a septiembre",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "eliminar_configuracion",
+      "confidence": 0.9447939395904541
+    }
+  },
+  {
+    "text": "¿Cuáles son todos mis ingresos y gastos del mes de julio?",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9999926090240479
+    }
+  },
+  {
+    "text": "Historial de gastos con tarjeta crédito de enero",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9963464140892029
+    }
+  },
+  {
+    "text": "Quiero el resumen mensual de mis registros de alimentación en mayo",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.749823808670044
+    }
+  },
+  {
+    "text": "Ver movimientos realizados entre enero y marzo",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9999947547912598
+    }
+  },
+  {
+    "text": "cómo te va",
+    "intent": "saludo",
+    "intent_prediction": {
+      "name": "ayuda_general",
+      "confidence": 0.5929064750671387
+    }
+  },
+  {
+    "text": "cómo va",
+    "intent": "saludo",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.5677779316902161
+    }
+  },
+  {
+    "text": "bye",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.42169684171676636
+    }
+  },
+  {
+    "text": "dame una mano",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.3570180833339691
+    }
+  },
+  {
+    "text": "para qué sirves",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.8010507225990295
+    }
+  },
+  {
+    "text": "ok",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "saludo",
+      "confidence": 0.31462979316711426
+    }
+  },
+  {
+    "text": "eso es",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.28451013565063477
+    }
+  },
+  {
+    "text": "eso mismo",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9809685349464417
+    }
+  },
+  {
+    "text": "no estoy seguro",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9916985034942627
+    }
+  },
+  {
+    "text": "Genera un reporte de mis egresos",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9569190740585327
+    }
+  },
+  {
+    "text": "Revisa mis egresos por rubro",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "clasifica mis consumos recientes",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.9910109043121338
+    }
+  },
+  {
+    "text": "muéstrame el detalle de mis gastos",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "Ver desglose de gastos en ocio del mes pasado",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuál fue el total de mis gastos en abril?",
+    "intent": "analizar_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9089275002479553
+    }
+  },
+  {
+    "text": "¿Mes con mayor gasto acumulado?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.7427486777305603
+    }
+  },
+  {
+    "text": "¿Mis gastos aumentaron en marzo?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999756813049316
+    }
+  },
+  {
+    "text": "analizar los gastos de febrero y marzo",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Dónde se concentran mis gastos de febrero y marzo?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999991655349731
+    }
+  },
+  {
+    "text": "¿Dónde se concentran más gastos en efectivo?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuánto recibí en enero versus febrero?",
+    "intent": "comparar_meses",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "¿Cuáles son las categorías con presupuesto activo en abril de 2024?",
+    "intent": "consultar_configuracion",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.3710819184780121
+    }
+  },
+  {
+    "text": "¿Qué movimientos de ingresos tuve durante el periodo de enero de 2024?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.835048496723175
+    }
+  },
+  {
+    "text": "Dame el detalle de mis gastos en mascotas en abril de 2024",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.8809895515441895
+    }
+  },
+  {
+    "text": "Dime mis gastos de entretenimiento en marzo de 2025",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9718780517578125
+    }
+  },
+  {
+    "text": "Muéstrame todos los depósitos registrados este mes",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.9999803304672241
+    }
+  },
+  {
+    "text": "Quisiera saber lo que ingresó en abril por sueldo",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "registrar_ingreso",
+      "confidence": 0.2708909213542938
+    }
+  },
+  {
+    "text": "Gastos de supermercado en marzo, porfa",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "resetear_categoria_gastos",
+      "confidence": 0.7132006287574768
+    }
+  },
+  {
+    "text": "¿En qué gasté con tarjeta de crédito en servicios?",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.9991157650947571
+    }
+  },
+  {
+    "text": "Necesito un resumen de mis gastos actuales",
+    "intent": "consultar_informacion_financiera",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999933242797852
+    }
+  },
+  {
+    "text": "Ajusta el valor del tope de viajes este mes",
+    "intent": "modificar_configuracion",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.9999808073043823
+    }
+  },
+  {
+    "text": "Reconfigura la alerta de salud con 450 en julio",
+    "intent": "modificar_configuracion",
+    "intent_prediction": {
+      "name": "crear_configuracion",
+      "confidence": 0.9995136260986328
+    }
+  },
+  {
+    "text": "ese gasto fue alto",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.5687814950942993
+    }
+  },
+  {
+    "text": "fue un registro parcial con tarjeta crédito",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.9997163414955139
+    }
+  },
+  {
+    "text": "y eso cuando es",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "affirm",
+      "confidence": 0.5814285278320312
+    }
+  },
+  {
+    "text": "qué tal si mejor no",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.52199387550354
+    }
+  },
+  {
+    "text": "como ayer pero más barato",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "ponlo como la vez pasada",
+    "intent": "entrada_no_entendida",
+    "intent_prediction": {
+      "name": "modificar_configuracion",
+      "confidence": 0.999976396560669
+    }
+  },
+  {
+    "text": "Se hizo un pago de 50 por libros el 8 de abril",
+    "intent": "registrar_gasto",
+    "intent_prediction": {
+      "name": "registrar_ingreso",
+      "confidence": 0.9923741221427917
+    }
+  },
+  {
+    "text": "Entró 500 por eventos en marzo de 2024",
+    "intent": "registrar_ingreso",
+    "intent_prediction": {
+      "name": "registrar_gasto",
+      "confidence": 0.9999951124191284
+    }
+  },
+  {
+    "text": "Restablecer los gastos de hogar en febrero del 2025",
+    "intent": "resetear_categoria_gastos",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.9806023836135864
+    }
+  },
+  {
+    "text": "¿Qué transacciones tengo anotadas en abril?",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.6415806412696838
+    }
+  },
+  {
+    "text": "Mostrar ingresos y egresos registrados en octubre",
+    "intent": "ver_historial_completo",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.5661932826042175
+    }
+  },
+  {
+    "text": "qué más",
+    "intent": "saludo",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "nos estamos viendo",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 0.9918593764305115
+    }
+  },
+  {
+    "text": "ya no tengo preguntas",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "consultar_configuracion",
+      "confidence": 0.8826922178268433
+    }
+  },
+  {
+    "text": "adios",
+    "intent": "despedida",
+    "intent_prediction": {
+      "name": "affirm",
+      "confidence": 0.5081781148910522
+    }
+  },
+  {
+    "text": "en qué me puedes asistir",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 0.9999974966049194
+    }
+  },
+  {
+    "text": "no entiendo bien esto",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "dame información general",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "ver_historial_completo",
+      "confidence": 0.9873272776603699
+    }
+  },
+  {
+    "text": "dime cómo puedes asistirme",
+    "intent": "ayuda_general",
+    "intent_prediction": {
+      "name": "analizar_gastos",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "lo apruebo",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "deny",
+      "confidence": 0.6604099273681641
+    }
+  },
+  {
+    "text": "va bien para mí",
+    "intent": "affirm",
+    "intent_prediction": {
+      "name": "comparar_meses",
+      "confidence": 0.9570410251617432
+    }
+  },
+  {
+    "text": "no estoy de acuerdo",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "entrada_no_entendida",
+      "confidence": 1.0
+    }
+  },
+  {
+    "text": "no tengo ganas",
+    "intent": "deny",
+    "intent_prediction": {
+      "name": "consultar_informacion_financiera",
+      "confidence": 0.697050929069519
+    }
+  }
+]
