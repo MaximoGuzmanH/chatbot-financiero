@@ -1,2 +1,50 @@
 [
+  {
+    "tipo": "ingreso",
+    "monto": 500.0,
+    "categoria": "venta",
+    "fecha": "12 de marzo",
+    "medio": "efectivo",
+    "dia": 12,
+    "mes": "marzo",
+    "año": 2025,
+    "timestamp": "2025-04-25T17:05:50.078977",
+    "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 1500.0,
+    "categoria": "sueldo",
+    "fecha": "1 de abril",
+    "medio": "transferencia",
+    "dia": 1,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-25T17:06:05.105942",
+    "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 15.0,
+    "categoria": "sueldo",
+    "fecha": "de",
+    "medio": "efectivo",
+    "dia": 25,
+    "mes": "april",
+    "año": 2025,
+    "timestamp": "2025-04-25T17:06:49.987009",
+    "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 50.0,
+    "categoria": "sueldo",
+    "fecha": "30 de marzo",
+    "medio": "efectivo",
+    "dia": 30,
+    "mes": "marzo",
+    "año": 2025,
+    "timestamp": "2025-04-25T17:08:33.021392",
+    "status": 1
+  }
 ]
