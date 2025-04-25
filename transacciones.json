@@ -94,5 +94,26 @@
     "año": 2025,
     "timestamp": "2025-04-25T18:40:36.615834",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 12.0,
+    "categoria": "venta",
+    "fecha": "12 de marzo",
+    "medio": "efectivo",
+    "dia": 12,
+    "mes": "marzo",
+    "año": 2025,
+    "timestamp": "2025-04-25T18:51:05.763587",
+    "status": 1
+  },
+  {
+    "tipo": "entrada_no_entendida",
+    "descripcion": "no entiendo",
+    "timestamp": "2025-04-25T19:04:55.839534",
+    "dia": 25,
+    "mes": "abril",
+    "año": 2025,
+    "status": 1
   }
 ]
