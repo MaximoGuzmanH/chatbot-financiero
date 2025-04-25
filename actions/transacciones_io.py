@@ -69,9 +69,8 @@ def descargar_de_github():
         print(f"[ERROR] Al intentar sincronizar desde GitHub: {e}")
         return False
 
-def cargar_transacciones(filtrar_activos=True):
-    global SINCRONIZADO
-    if not SINCRONIZADO:
+def cargar_transacciones(filtrar_activos=True, sincronizar=True):
+    if sincronizar:
         if not descargar_de_github():
             print("[ERROR] No se pudo sincronizar transacciones antes de consulta")
             return []
@@ -88,7 +87,7 @@ def cargar_transacciones(filtrar_activos=True):
 
 def guardar_transaccion(transaccion):
     try:
-        transacciones = cargar_transacciones(filtrar_activos=False)
+        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
