@@ -1166,20 +1166,12 @@ class ActionModificarConfiguracion(Action):
         with open("alertas.json", encoding="utf-8") as f:
             alertas = json.load(f)
 
-        modificada = False
-        monto_original = None
+        from alertas_io import modificar_alerta
 
-        for alerta in alertas:
-            if (
-                alerta.get("categoria", "").lower() == categoria.lower()
-                and alerta.get("periodo", "").lower() == periodo_normalizado
-                and alerta.get("status", 1) == 1
-            ):
-                monto_original = alerta.get("monto")
-                alerta["monto"] = monto_float
-                alerta["timestamp_modificacion"] = ahora
-                modificada = True
-                break
+        modificada = modificar_alerta(
+            condiciones={"categoria": categoria, "periodo": periodo_normalizado},
+            nuevos_valores={"monto": monto_float}
+        )
 
         if modificada:
             with open("alertas.json", "w", encoding="utf-8") as f:
