@@ -372,7 +372,20 @@ class ActionVerHistorialCompleto(Action):
                     mes = match.group(1).strip()
                     año = int(match.group(2)) if match.group(2) else datetime.now().year
 
-            # 🔍 Filtrar transacciones válidas
+            # 📅 Diccionario para ordenamiento
+            meses_orden = {
+                "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
+                "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+            }
+
+            def orden_fecha(t):
+                return (
+                    int(t.get("año", 0)),
+                    meses_orden.get(t.get("mes", "").lower(), 0),
+                    int(t.get("dia", 0))
+                )
+
+            # 🔍 Filtrar y ordenar transacciones válidas
             transacciones_filtradas = [
                 t for t in transacciones if t.get("tipo") in ["ingreso", "gasto"]
             ]
@@ -405,19 +418,6 @@ class ActionVerHistorialCompleto(Action):
                 )
                 dispatcher.utter_message(text=mensaje)
                 return []
-
-            # 📅 Ordenar por año, mes y día
-            meses_orden = {
-                "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
-                "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-            }
-
-            def orden_fecha(t):
-                return (
-                    int(t.get("año", 0)),
-                    meses_orden.get(t.get("mes", "").lower(), 0),
-                    int(t.get("dia", 0))
-                )
 
             transacciones_filtradas.sort(key=orden_fecha)
 
