@@ -534,17 +534,24 @@ class ActionAnalizarGastos(Action):
         # 📆 Interpretar periodo (mes + año)
         def interpretar_periodo(texto):
             hoy = datetime.now()
+            if not texto or len(texto.strip()) < 4:
+                return None, hoy.year  # Por defecto, considerar todo el año actual
+            texto = texto.lower()
+
             if "este mes" in texto:
                 return hoy.strftime("%B"), hoy.year
             elif "último mes" in texto or "mes pasado" in texto:
                 mes = hoy.month - 1 if hoy.month > 1 else 12
                 año = hoy.year if hoy.month > 1 else hoy.year - 1
                 return calendar.month_name[mes], año
-            elif texto:
-                match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", texto.lower())
-                if match:
-                    return match.group(1), int(match.group(2)) if match.group(2) else hoy.year
-            return None, None
+
+            match = re.search(r"(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)(?:\s+de\s+)?(\d{4})?", texto)
+            if match:
+                mes = match.group(1)
+                año = int(match.group(2)) if match.group(2) else hoy.year
+                return mes, año
+
+            return None, hoy.year  # Si no se identifica correctamente, usar todo el año actual
 
         mes, año = interpretar_periodo(periodo_raw or texto_usuario)
         if not año:
