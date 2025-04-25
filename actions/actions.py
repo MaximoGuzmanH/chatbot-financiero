@@ -628,7 +628,7 @@ class ActionAnalizarGastos(Action):
 
         mensaje.append("👉 ¿Quieres *comparar tus gastos entre meses* o *configurar una alerta*?")
 
-        dispatcher.utter_message(text=construir_mensaje(*mensaje))
+        dispatcher.utter_message(text=construir_mensaje(*mensaje).replace("\n", "<br>"))
 
         return [SlotSet("sugerencia_pendiente", "action_comparar_meses")]
 
