@@ -1149,7 +1149,7 @@ class ActionModificarConfiguracion(Action):
             dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.") 
             return []
 
-        # 📆 Normalizar periodo
+        # 📅 Normalizar periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo.lower())
         if not match:
             dispatcher.utter_message(
@@ -1162,25 +1162,28 @@ class ActionModificarConfiguracion(Action):
         periodo_normalizado = f"{mes} de {año}"
         ahora = datetime.now().isoformat()
 
-        # 🔍 Cargar alertas y modificar en sitio
-        alertas = cargar_alertas()
-        monto_original = None
+        # 🧠 Recargar desde archivo original, evitando uso de memoria cacheada
+        with open("alertas.json", encoding="utf-8") as f:
+            alertas = json.load(f)
+
         modificada = False
+        monto_original = None
 
         for alerta in alertas:
             if (
-                alerta.get("categoria", "").lower() == categoria.lower() and
-                alerta.get("periodo", "").lower() == periodo_normalizado and
-                alerta.get("status", 1) == 1
+                alerta.get("categoria", "").lower() == categoria.lower()
+                and alerta.get("periodo", "").lower() == periodo_normalizado
+                and alerta.get("status", 1) == 1
             ):
                 monto_original = alerta.get("monto")
                 alerta["monto"] = monto_float
                 alerta["timestamp_modificacion"] = ahora
                 modificada = True
-                break  # Modificar solo una
+                break
 
         if modificada:
-            guardar_todas_las_alertas(alertas)
+            with open("alertas.json", "w", encoding="utf-8") as f:
+                json.dump(alertas, f, ensure_ascii=False, indent=2)
 
             mensaje = construir_mensaje(
                 f"✅ *Alerta modificada correctamente*",
