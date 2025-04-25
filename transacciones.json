@@ -58,5 +58,17 @@
     "año": 2025,
     "timestamp": "2025-04-25T17:53:22.431190",
     "status": 1
+  },
+  {
+    "tipo": "gasto",
+    "monto": 8.0,
+    "categoria": "transporte",
+    "fecha": "10 de marzo",
+    "medio": "efectivo",
+    "dia": 10,
+    "mes": "marzo",
+    "año": 2025,
+    "timestamp": "2025-04-25T18:09:34.422926",
+    "status": 1
   }
 ]
