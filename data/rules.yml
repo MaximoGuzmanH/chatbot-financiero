@@ -146,3 +146,28 @@ rules:
   steps:
   - intent: affirm
   - action: action_follow_suggestion
+
+- rule: Confirmar modificación directa de alerta
+  condition:
+    - slot_was_set:
+        - sugerencia_pendiente: action_ejecutar_modificacion_alerta
+  steps:
+    - intent: affirm
+    - action: action_ejecutar_modificacion_alerta
+    - slot_was_set:
+        - sugerencia_pendiente: null
+
+- rule: Cancelar modificación directa de alerta
+  condition:
+    - slot_was_set:
+        - sugerencia_pendiente: action_ejecutar_modificacion_alerta
+  steps:
+    - intent: deny
+    - action: action_negacion
+    - slot_was_set:
+        - sugerencia_pendiente: null
+
+- rule: Confirmar modificación de alerta
+  steps:
+    - intent: affirm
+    - action: action_ejecutar_modificacion_alerta
