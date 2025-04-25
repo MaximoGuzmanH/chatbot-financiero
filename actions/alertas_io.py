@@ -95,6 +95,7 @@ def guardar_alerta(alerta):
     subir_a_github_alertas()
 
 def eliminar_alerta_logicamente(condiciones):
+    recuperar_alertas_desde_github()
     alertas = cargar_alertas(filtrar_activos=False)
     modificada = False
     for alerta in alertas:
