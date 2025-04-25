@@ -525,18 +525,6 @@
   },
   {
     "tipo": "ingreso",
-    "monto": 500.0,
-    "categoria": "freelance",
-    "fecha": "3 de",
-    "medio": "efectivo",
-    "dia": 25,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-25T03:10:01.451554",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
     "monto": 2500.0,
     "categoria": "sueldo",
     "fecha": "4 de enero",
