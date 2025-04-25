@@ -676,7 +676,7 @@ class ActionCompararMeses(Action):
             texto = tracker.latest_message.get("text", "").lower()
 
             tipo = "ingreso" if "ingreso" in texto or "ingresos" in texto else "gasto"
-            año_actual = str(datetime.now().year)
+            año_actual = datetime.now().year
 
             posibles_meses = [
                 "enero", "febrero", "marzo", "abril", "mayo", "junio",
@@ -687,13 +687,14 @@ class ActionCompararMeses(Action):
             for sep in [" y ", " o ", " vs ", " versus ", " entre ", "contra", "comparar "]:
                 texto_normalizado = texto_normalizado.replace(sep, " y ")
 
+            # Buscar "marzo de 2025", "abril 2024", etc.
             matches = re.findall(rf"({'|'.join(posibles_meses)})(?:\s+de)?\s+(\d{{4}})", texto_normalizado)
 
             if len(matches) == 2:
-                periodo1 = f"{matches[0][0]} de {matches[0][1]}"
-                periodo2 = f"{matches[1][0]} de {matches[1][1]}"
+                mes1, año1 = matches[0][0].lower(), int(matches[0][1])
+                mes2, año2 = matches[1][0].lower(), int(matches[1][1])
 
-                if periodo1 == periodo2:
+                if mes1 == mes2 and año1 == año2:
                     dispatcher.utter_message(text="⚠️ Por favor, proporciona *dos periodos diferentes* para la comparación.")
                     return []
 
@@ -702,15 +703,17 @@ class ActionCompararMeses(Action):
                     if t.get("tipo") != tipo:
                         continue
                     mes_t = t.get("mes", "").lower()
-                    año_t = str(t.get("año", "")).replace(",", "")
-                    periodo_transaccion = f"{mes_t} de {año_t}"
+                    año_t = int(str(t.get("año", 0)).replace(",", ""))
 
-                    if periodo_transaccion == periodo1.lower():
-                        total[periodo1] += float(t.get("monto", 0))
-                    elif periodo_transaccion == periodo2.lower():
-                        total[periodo2] += float(t.get("monto", 0))
+                    if mes_t == mes1 and año_t == año1:
+                        total[f"{mes1} de {año1}"] += float(t.get("monto", 0))
+                    elif mes_t == mes2 and año_t == año2:
+                        total[f"{mes2} de {año2}"] += float(t.get("monto", 0))
 
+                periodo1 = f"{mes1} de {año1}"
+                periodo2 = f"{mes2} de {año2}"
                 v1, v2 = total.get(periodo1, 0), total.get(periodo2, 0)
+
                 if v1 == 0 and v2 == 0:
                     dispatcher.utter_message(
                         text=f"📭 *No se encontraron {tipo}s registrados* para *{periodo1}* ni *{periodo2}*."
@@ -739,7 +742,7 @@ class ActionCompararMeses(Action):
                     if t.get("tipo") != tipo:
                         continue
                     mes = t.get("mes", "").lower()
-                    año = str(t.get("año"))
+                    año = int(str(t.get("año", 0)).replace(",", ""))
                     if mes in posibles_meses and año == año_actual:
                         totales_por_mes[mes] += float(t.get("monto", 0))
 
@@ -762,7 +765,7 @@ class ActionCompararMeses(Action):
 
             else:
                 dispatcher.utter_message(
-                    text="ℹ️ Por favor, indícame *dos periodos válidos* con mes y año.\n\n*Ejemplo:* `marzo de 2024 y abril de 2024`"
+                    text="ℹ️ Por favor, indícame *dos periodos válidos* con mes y año.<br><br>*Ejemplo:* `marzo de 2024 y abril de 2024`"
                 )
                 return []
 
