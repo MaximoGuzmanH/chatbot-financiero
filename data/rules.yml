@@ -141,3 +141,8 @@ rules:
     - action: action_negacion
     - slot_was_set:
         - sugerencia_pendiente: null
+
+- rule: Confirmar sugerencia pendiente
+  steps:
+  - intent: affirm
+  - action: action_follow_suggestion
