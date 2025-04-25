@@ -1162,10 +1162,10 @@ class ActionModificarConfiguracion(Action):
         periodo_normalizado = f"{mes} de {año}"
         ahora = datetime.now().isoformat()
 
-        # 🔍 Cargar alertas y modificar la que coincide
+        # 🔍 Cargar alertas y modificar en sitio
         alertas = cargar_alertas()
-        modificada = False
         monto_original = None
+        modificada = False
 
         for alerta in alertas:
             if (
@@ -1177,7 +1177,7 @@ class ActionModificarConfiguracion(Action):
                 alerta["monto"] = monto_float
                 alerta["timestamp_modificacion"] = ahora
                 modificada = True
-                break  # Solo una modificación, sin duplicar
+                break  # Modificar solo una
 
         if modificada:
             guardar_todas_las_alertas(alertas)
