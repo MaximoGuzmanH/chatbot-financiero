@@ -3,42 +3,157 @@
     "categoria": "transporte",
     "monto": 200.0,
     "periodo": "junio de 2024",
+    "mes": "junio",
+    "año": 2024,
+    "timestamp": "2025-04-24T22:09:50.836721",
+    "status": 0,
+    "timestamp_modificacion": "2025-04-25T06:15:09.324654"
+  },
+  {
+    "categoria": "comida",
+    "monto": 500.0,
+    "periodo": "mayo de 2024",
+    "mes": "mayo",
+    "año": 2024,
+    "timestamp": "2025-04-24T22:17:26.734361",
+    "status": 0,
+    "timestamp_modificacion": "2025-04-25T06:15:09.324654"
+  },
+  {
+    "categoria": "entretenimiento",
+    "monto": 300.0,
+    "periodo": "abril de 2024",
+    "mes": "abril",
+    "año": 2024,
+    "timestamp": "2025-04-24T22:17:41.468367",
+    "status": 0,
+    "timestamp_modificacion": "2025-04-25T06:15:09.324654"
+  },
+  {
+    "categoria": "salud",
+    "monto": 400.0,
+    "periodo": "mayo de 2024",
+    "mes": "mayo",
+    "año": 2024,
+    "timestamp": "2025-04-24T22:18:35.587359",
+    "status": 0,
+    "timestamp_modificacion": "2025-04-25T06:15:09.324654"
+  },
+  {
+    "categoria": "salud",
+    "monto": 400.0,
+    "periodo": "mayo de 2025",
+    "mes": "mayo",
+    "año": 2025,
+    "timestamp": "2025-04-24T22:43:49.180190",
+    "status": 0,
+    "timestamp_modificacion": "2025-04-25T06:15:09.324654"
+  },
+  {
+    "categoria": "salud",
+    "monto": 400.0,
+    "periodo": "abril de 2025",
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-24T22:45:14.721171",
+    "status": 0,
+    "timestamp_modificacion": "2025-04-25T06:15:09.324654"
+  },
+  {
+    "categoria": "transporte",
+    "monto": 200.0,
+    "periodo": "junio de 2024",
+    "status": 0,
+    "timestamp": "2025-04-25T06:15:09.324654",
+    "timestamp_modificacion": "2025-04-25T06:30:59.507473"
+  },
+  {
+    "categoria": "comida",
+    "monto": 500.0,
+    "periodo": "mayo de 2024",
+    "status": 0,
+    "timestamp": "2025-04-25T06:15:09.324654",
+    "timestamp_modificacion": "2025-04-25T06:30:59.507473"
+  },
+  {
+    "categoria": "entretenimiento",
+    "monto": 300.0,
+    "periodo": "abril de 2024",
+    "status": 0,
+    "timestamp": "2025-04-25T06:15:09.324654",
+    "timestamp_modificacion": "2025-04-25T06:30:59.507473"
+  },
+  {
+    "categoria": "salud",
+    "monto": 400.0,
+    "periodo": "mayo de 2024",
+    "status": 0,
+    "timestamp": "2025-04-25T06:15:09.324654",
+    "timestamp_modificacion": "2025-04-25T06:30:59.507473"
+  },
+  {
+    "categoria": "salud",
+    "monto": 400.0,
+    "periodo": "mayo de 2025",
+    "status": 0,
+    "timestamp": "2025-04-25T06:15:09.324654",
+    "timestamp_modificacion": "2025-04-25T06:30:59.507473"
+  },
+  {
+    "categoria": "salud",
+    "monto": 600.0,
+    "periodo": "abril de 2025",
+    "status": 0,
+    "timestamp": "2025-04-25T06:15:09.324654",
+    "timestamp_modificacion": "2025-04-25T06:30:59.507473"
+  },
+  {
+    "categoria": "transporte",
+    "monto": 200.0,
+    "periodo": "junio de 2024",
     "status": 1,
-    "timestamp": "2025-04-25T06:15:09.324654"
+    "timestamp": "2025-04-25T06:30:59.507473"
   },
   {
     "categoria": "comida",
     "monto": 500.0,
     "periodo": "mayo de 2024",
     "status": 1,
-    "timestamp": "2025-04-25T06:15:09.324654"
+    "timestamp": "2025-04-25T06:30:59.507473"
   },
   {
     "categoria": "entretenimiento",
     "monto": 300.0,
     "periodo": "abril de 2024",
     "status": 1,
-    "timestamp": "2025-04-25T06:15:09.324654"
+    "timestamp": "2025-04-25T06:30:59.507473"
   },
   {
     "categoria": "salud",
     "monto": 400.0,
     "periodo": "mayo de 2024",
     "status": 1,
-    "timestamp": "2025-04-25T06:15:09.324654"
+    "timestamp": "2025-04-25T06:30:59.507473"
   },
   {
     "categoria": "salud",
     "monto": 400.0,
     "periodo": "mayo de 2025",
     "status": 1,
-    "timestamp": "2025-04-25T06:15:09.324654"
+    "timestamp": "2025-04-25T06:30:59.507473"
   },
   {
     "categoria": "salud",
     "monto": 600.0,
     "periodo": "abril de 2025",
     "status": 1,
-    "timestamp": "2025-04-25T06:15:09.324654"
+    "timestamp": "2025-04-25T06:30:59.507473"
+  },
+  {
+    "categoria": "transporte",
+    "monto": 600.0,
+    "periodo": "junio de 2024",
+    "status": 1,
+    "timestamp": "2025-04-25T06:30:59.507473"
   }
 ]
