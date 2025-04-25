@@ -97,14 +97,14 @@
   },
   {
     "tipo": "ingreso",
-    "monto": 14.0,
-    "categoria": "sueldo",
-    "fecha": "1 de abril",
-    "medio": "transferencia",
-    "dia": 1,
-    "mes": "abril",
+    "monto": 12.0,
+    "categoria": "venta",
+    "fecha": "12 de marzo",
+    "medio": "efectivo",
+    "dia": 12,
+    "mes": "marzo",
     "año": 2025,
-    "timestamp": "2025-04-25T18:50:11.842055",
+    "timestamp": "2025-04-25T18:51:05.763587",
     "status": 1
   }
 ]
