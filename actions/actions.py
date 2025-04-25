@@ -962,10 +962,19 @@ class ActionResetearCategoriaGastos(Action):
 
         from datetime import datetime
         import re
-        from transacciones_io import cargar_transacciones, RUTA_TRANSACCIONES, MESES, subir_a_github
-        from utils import get_entity, construir_mensaje
         import json
         import os
+        from transacciones_io import (
+            cargar_transacciones,
+            RUTA_TRANSACCIONES,
+            MESES,
+            subir_a_github,
+            descargar_de_github,
+            TOKEN,
+            REPO,
+            ARCHIVO_GITHUB
+        )
+        from utils import get_entity, construir_mensaje
 
         categoria = get_entity(tracker, "categoria")
         periodo = get_entity(tracker, "periodo")
@@ -986,18 +995,14 @@ class ActionResetearCategoriaGastos(Action):
 
         mes = match.group(1).strip().lower()
         año = int(match.group(2))
-
         ahora = datetime.now().isoformat()
 
-        # 📥 Cargar directamente desde archivo original
-        from transacciones_io import descargar_de_github
+        # 📥 Descargar el archivo más reciente desde GitHub y cargar todo
         descargar_de_github()
-
-        # 🔄 Cargar transacciones completas (incluso eliminadas)
         transacciones = cargar_transacciones(filtrar_activos=False)
 
+        # 🔍 Identificar y resetear gastos activos de la categoría y mes especificado
         gastos_reseteados = []
-
         for t in transacciones:
             if (
                 t.get("tipo") == "gasto"
@@ -1010,7 +1015,7 @@ class ActionResetearCategoriaGastos(Action):
                 t["timestamp_modificacion"] = ahora
                 gastos_reseteados.append(t)
 
-        # 📝 Registrar el reinicio como transacción
+        # 📝 Registrar el reinicio como evento
         transacciones.append({
             "tipo": "reinicio",
             "categoria": categoria,
@@ -1021,18 +1026,23 @@ class ActionResetearCategoriaGastos(Action):
             "status": 1
         })
 
-        # 💾 Guardar en /tmp y subir a GitHub
+        # 💾 Guardar cambios en /tmp y subir a GitHub
         with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
             json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
-        from transacciones_io import TOKEN, REPO, ARCHIVO_GITHUB
         if TOKEN:
             subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
 
-        # 📢 Construcción del mensaje
+        # 📢 Construir respuesta al usuario
         if gastos_reseteados:
             detalles = "\n".join([
-                f"• {g['categoria'].capitalize()} – {g['monto']:.2f} soles – {g.get('fecha', f'{g.get('dia', '?')} de {g['mes']} de {g['año']}')}"
+                "• {} – {:.2f} soles – {}".format(
+                    g["categoria"].capitalize(),
+                    g["monto"],
+                    g.get("fecha", "{} de {} de {}".format(
+                        g.get("dia", "?"), g["mes"], g["año"]
+                    ))
+                )
                 for g in gastos_reseteados
             ])
             mensaje = construir_mensaje(
