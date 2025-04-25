@@ -1162,40 +1162,25 @@ class ActionModificarConfiguracion(Action):
         periodo_normalizado = f"{mes} de {año}"
         ahora = datetime.now().isoformat()
 
-        # 🔍 Cargar alertas y buscar una coincidencia exacta
+        # 🔍 Cargar alertas y modificar la que coincide
         alertas = cargar_alertas()
-        nueva_lista_alertas = []
-        alerta_encontrada = None
+        modificada = False
+        monto_original = None
 
         for alerta in alertas:
-            misma_categoria = alerta.get("categoria", "").lower() == categoria.lower()
-            mismo_periodo = alerta.get("periodo", "").lower() == periodo_normalizado
-            es_activa = alerta.get("status", 1) == 1
-
-            if misma_categoria and mismo_periodo and es_activa and not alerta_encontrada:
-                # 🔁 Desactivar la alerta encontrada
-                alerta["status"] = 0
+            if (
+                alerta.get("categoria", "").lower() == categoria.lower() and
+                alerta.get("periodo", "").lower() == periodo_normalizado and
+                alerta.get("status", 1) == 1
+            ):
+                monto_original = alerta.get("monto")
+                alerta["monto"] = monto_float
                 alerta["timestamp_modificacion"] = ahora
-                alerta_encontrada = alerta
-                nueva_lista_alertas.append(alerta)
-            else:
-                nueva_lista_alertas.append(alerta)
+                modificada = True
+                break  # Solo una modificación, sin duplicar
 
-        if alerta_encontrada:
-            monto_original = alerta_encontrada.get("monto")
-
-            nueva_alerta = {
-                "categoria": categoria,
-                "monto": monto_float,
-                "periodo": periodo_normalizado,
-                "mes": mes,
-                "año": año,
-                "status": 1,
-                "timestamp": ahora
-            }
-
-            nueva_lista_alertas.append(nueva_alerta)
-            guardar_todas_las_alertas(nueva_lista_alertas)
+        if modificada:
+            guardar_todas_las_alertas(alertas)
 
             mensaje = construir_mensaje(
                 f"✅ *Alerta modificada correctamente*",
