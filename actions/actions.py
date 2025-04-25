@@ -806,7 +806,8 @@ class ActionConsultarInformacionFinanciera(Action):
                 "ingreso": "ingreso",
                 "egresos": "gasto",
                 "egreso": "gasto",
-                "gasto": "gasto"
+                "gasto": "gasto",
+                "gastos": "gasto"
             }
             return mapa.get(tipo_raw.lower(), tipo_raw.lower())
 
