@@ -36,15 +36,15 @@
     "status": 1
   },
   {
-    "tipo": "ingreso",
-    "monto": 500.0,
-    "categoria": "venta",
-    "fecha": "12 de marzo",
-    "medio": "efectivo",
-    "dia": 12,
-    "mes": "marzo",
+    "tipo": "gasto",
+    "monto": 100.0,
+    "categoria": "comida",
+    "fecha": "5 de abril",
+    "medio": "tarjeta de débito",
+    "dia": 5,
+    "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-25T17:42:02.740530",
+    "timestamp": "2025-04-25T17:42:27.739858",
     "status": 1
   }
 ]
