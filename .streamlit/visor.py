@@ -80,7 +80,7 @@ else:
     df["timestamp"] = pd.NaT
 
 if df.empty:
-    st.warning("⚠️ No se encontraron datos en transacciones.json ni alertas.json.")
+    st.info("📭 Aún no hay transacciones ni alertas registradas para mostrar.")
     st.stop()
 
 # ---------- BARRA LATERAL DE FILTROS ----------
