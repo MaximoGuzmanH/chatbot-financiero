@@ -106,15 +106,17 @@ def cargar_transacciones(filtrar_activos=True, sincronizar=True):
         return []
 
 def guardar_transaccion(transaccion):
-    # 1️⃣ Leer las transacciones LOCALES ya sincronizadas (sin volver a descargar)
+    from transacciones_io import descargar_de_github
+
+    # 🔄 Forzar sincronización ANTES de cargar
+    descargar_de_github()
+
     try:
-        with open(RUTA_TRANSACCIONES, "r", encoding="utf-8") as f:
-            transacciones = json.load(f)
+        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)  # 🔥 NO volver a sincronizar aquí
     except Exception as e:
-        print(f"[ERROR] No se pudo cargar transacciones locales: {e}")
+        print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
 
-    # 2️⃣ Procesar la nueva transacción
     ahora = datetime.now()
     fecha_str = transaccion.get("fecha") or ahora.strftime("%d/%m/%Y")
 
@@ -142,11 +144,9 @@ def guardar_transaccion(transaccion):
 
     transacciones.append(transaccion)
 
-    # 3️⃣ Guardar en local
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
-    # 4️⃣ Subir al GitHub
     from github_sync import subir_log_a_github
     subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
