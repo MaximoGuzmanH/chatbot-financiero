@@ -100,9 +100,17 @@ def cargar_transacciones(filtrar_activos=True, sincronizar=True):
 
     try:
         with open(RUTA_TRANSACCIONES, "r", encoding="utf-8") as f:
-            transacciones = json.load(f)
-            return [t for t in transacciones if t.get("status", 1) == 1] if filtrar_activos else transacciones
-    except json.JSONDecodeError:
+            try:
+                contenido = json.load(f)
+                if not isinstance(contenido, list):
+                    print("[WARN] El contenido del archivo no es una lista. Se ignorará.")
+                    return []
+                return [t for t in contenido if t.get("status", 1) == 1] if filtrar_activos else contenido
+            except json.JSONDecodeError as e:
+                print(f"[ERROR] No se pudo decodificar JSON: {e}")
+                return []
+    except Exception as e:
+        print(f"[ERROR] No se pudo leer el archivo local: {e}")
         return []
 
 def guardar_transaccion(transaccion):
@@ -112,6 +120,9 @@ def guardar_transaccion(transaccion):
     # 📥 Paso 2: cargar lo que ahora está en local (ya sincronizado)
     try:
         transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)
+        if not isinstance(transacciones, list):
+            print("[WARN] El contenido de transacciones no es una lista. Se inicializará una nueva lista vacía.")
+            transacciones = []
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
@@ -129,7 +140,8 @@ def guardar_transaccion(transaccion):
         else:
             dia, mes_num, año = map(int, fecha_str.split("/"))
             mes = MESES[mes_num - 1]
-    except:
+    except Exception as e:
+        print(f"[WARN] Fecha inválida '{fecha_str}': {e}")
         dia = ahora.day
         mes = ahora.strftime("%B").lower()
         año = ahora.year
@@ -154,9 +166,8 @@ def guardar_transaccion(transaccion):
     subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
         ruta_destino_repo=ARCHIVO_GITHUB,
-        mensaje_commit="Ingreso registrado automáticamente"
+        mensaje_commit="Transacción registrada automáticamente"
     )
-
 
 def eliminar_transaccion_logicamente(condiciones):
     transacciones = cargar_transacciones(filtrar_activos=False)
