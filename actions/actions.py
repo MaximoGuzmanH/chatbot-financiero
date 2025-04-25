@@ -961,12 +961,14 @@ class ActionResetearCategoriaGastos(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         from datetime import datetime
-        import json
         import re
+        from transacciones_io import cargar_transacciones, RUTA_TRANSACCIONES, MESES, subir_a_github
+        from utils import get_entity, construir_mensaje
+        import json
+        import os
 
         categoria = get_entity(tracker, "categoria")
         periodo = get_entity(tracker, "periodo")
-        texto_usuario = tracker.latest_message.get("text", "").lower()
 
         if not categoria or not periodo:
             dispatcher.utter_message(
@@ -974,7 +976,7 @@ class ActionResetearCategoriaGastos(Action):
             )
             return []
 
-        # Normalizar periodo
+        # 🗓️ Normalizar periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo.lower())
         if not match:
             dispatcher.utter_message(
@@ -985,11 +987,17 @@ class ActionResetearCategoriaGastos(Action):
         mes = match.group(1).strip().lower()
         año = int(match.group(2))
 
-        transacciones = cargar_transacciones()
         ahora = datetime.now().isoformat()
-        modificadas = 0
 
-        # Marcar gastos como eliminados (status 0)
+        # 📥 Cargar directamente desde archivo original
+        from transacciones_io import descargar_de_github
+        descargar_de_github()
+
+        # 🔄 Cargar transacciones completas (incluso eliminadas)
+        transacciones = cargar_transacciones(filtrar_activos=False)
+
+        gastos_reseteados = []
+
         for t in transacciones:
             if (
                 t.get("tipo") == "gasto"
@@ -1000,9 +1008,9 @@ class ActionResetearCategoriaGastos(Action):
             ):
                 t["status"] = 0
                 t["timestamp_modificacion"] = ahora
-                modificadas += 1
+                gastos_reseteados.append(t)
 
-        # Agregar registro del reinicio
+        # 📝 Registrar el reinicio como transacción
         transacciones.append({
             "tipo": "reinicio",
             "categoria": categoria,
@@ -1013,20 +1021,30 @@ class ActionResetearCategoriaGastos(Action):
             "status": 1
         })
 
-        # Guardar cambios
+        # 💾 Guardar en /tmp y subir a GitHub
         with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
             json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
-        # Mensaje de confirmación
-        if modificadas > 0:
+        from transacciones_io import TOKEN, REPO, ARCHIVO_GITHUB
+        if TOKEN:
+            subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
+
+        # 📢 Construcción del mensaje
+        if gastos_reseteados:
+            detalles = "\n".join([
+                f"• {g['categoria'].capitalize()} – {g['monto']:.2f} soles – {g.get('fecha', f'{g.get('dia', '?')} de {g['mes']} de {g['año']}')}"
+                for g in gastos_reseteados
+            ])
             mensaje = construir_mensaje(
-                f"🔄 *Se han reseteado {modificadas} registros de gasto* en la categoría *{categoria}* para *{mes} {año}*.",
-                "📌 Estos registros ya no se considerarán en tus análisis financieros."
+                f"🔄 *Se han reseteado {len(gastos_reseteados)} gastos* en la categoría *{categoria}* para *{mes} de {año}*.",
+                "📋 Detalles de los gastos reiniciados:",
+                detalles,
+                "📌 Ya no se considerarán en tus análisis financieros."
             )
         else:
             mensaje = construir_mensaje(
-                f"ℹ️ *No se encontraron gastos activos* en *{categoria}* para *{mes} {año}*.",
-                "📌 Aun así, se ha registrado el reinicio para dejar constancia del cambio."
+                f"ℹ️ *No se encontraron gastos activos* en *{categoria}* para *{mes} de {año}*.",
+                "📌 Aun así, se ha registrado el reinicio como referencia."
             )
 
         dispatcher.utter_message(text=mensaje)
