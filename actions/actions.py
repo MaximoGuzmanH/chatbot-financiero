@@ -349,12 +349,12 @@ class ActionVerHistorialCompleto(Action):
         try:
             from transacciones_io import cargar_transacciones
             import re
-            from collections import defaultdict
 
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo_raw = get_entity(tracker, "periodo")
             categoria_raw = get_entity(tracker, "categoria")
 
+            # 📆 Normalizar periodo a (mes, año)
             mes, año = None, None
             if periodo_raw:
                 match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
@@ -362,6 +362,7 @@ class ActionVerHistorialCompleto(Action):
                     mes = match.group(1).strip()
                     año = int(match.group(2)) if match.group(2) else datetime.now().year
 
+            # 🔍 Filtrar transacciones válidas
             transacciones_filtradas = [
                 t for t in transacciones if t.get("tipo") in ["ingreso", "gasto"]
             ]
@@ -388,9 +389,7 @@ class ActionVerHistorialCompleto(Action):
                 dispatcher.utter_message(text=mensaje)
                 return []
 
-            ingresos = [t for t in transacciones_filtradas if t["tipo"] == "ingreso"]
-            gastos = [t for t in transacciones_filtradas if t["tipo"] == "gasto"]
-
+            # 📅 Ordenar por año, mes y día
             meses_orden = {
                 "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
                 "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
@@ -403,16 +402,15 @@ class ActionVerHistorialCompleto(Action):
                     int(t.get("dia", 0))
                 )
 
-            ingresos.sort(key=orden_fecha)
-            gastos.sort(key=orden_fecha)
+            transacciones_filtradas.sort(key=orden_fecha)
 
-            def agrupar_por_anyo_y_mes(transacciones):
-                agrupadas = defaultdict(lambda: defaultdict(list))
-                for t in transacciones:
-                    y = t.get("año")
-                    m = t.get("mes", "").capitalize()
-                    agrupadas[y][m].append(t)
-                return agrupadas
+            # 🧾 Agrupar por tipo > año > mes
+            agrupadas = {"ingreso": {}, "gasto": {}}
+            for t in transacciones_filtradas:
+                tipo = t["tipo"]
+                año = int(t.get("año", 0))
+                mes = t.get("mes", "").capitalize()
+                agrupadas.setdefault(tipo, {}).setdefault(año, {}).setdefault(mes, []).append(t)
 
             def formatear_linea(t):
                 monto = float(t.get("monto", 0))
@@ -421,37 +419,25 @@ class ActionVerHistorialCompleto(Action):
                 mes = t.get("mes")
                 año = t.get("año")
                 medio = t.get("medio", "")
-
                 fecha_str = f"{dia} de {mes} de {año}" if dia and mes and año else ""
-                linea = f"🔸 {'Ingreso' if t['tipo'] == 'ingreso' else 'Gasto'} de *{monto:.2f} soles* en *{categoria}*"
+                linea = f"🔸 *{t['tipo'].capitalize()}* de *{monto:.2f} soles* en *{categoria}*"
                 if fecha_str:
                     linea += f", el *{fecha_str}*"
                 if medio and medio.lower() != "n/a":
                     linea += f", con *{medio}*"
                 return linea
 
-            mensaje = []
-            encabezado = "**📋 Historial de transacciones**"
-            if periodo_raw:
-                encabezado += f" para *{periodo_raw.strip()}*"
-            mensaje.append(encabezado + ":")
+            # 📦 Construcción del mensaje
+            mensaje = ["**📋 Historial de transacciones**:"]
 
-            if ingresos:
-                mensaje.append("💰 **Ingresos:**")
-                ingresos_agrupados = agrupar_por_anyo_y_mes(ingresos)
-                for año_key in sorted(ingresos_agrupados.keys()):
-                    for mes_key in sorted(ingresos_agrupados[año_key], key=lambda m: meses_orden[m.lower()]):
-                        mensaje.append(f"📆 *{mes_key} de {año_key}*:")
-                        for t in ingresos_agrupados[año_key][mes_key]:
-                            mensaje.append(formatear_linea(t))
-
-            if gastos:
-                mensaje.append("🧾 **Egresos:**")
-                gastos_agrupados = agrupar_por_anyo_y_mes(gastos)
-                for año_key in sorted(gastos_agrupados.keys()):
-                    for mes_key in sorted(gastos_agrupados[año_key], key=lambda m: meses_orden[m.lower()]):
-                        mensaje.append(f"📆 *{mes_key} de {año_key}*:")
-                        for t in gastos_agrupados[año_key][mes_key]:
+            for tipo, label in [("ingreso", "💰 **Ingresos:**"), ("gasto", "🧾 **Egresos:**")]:
+                if not agrupadas[tipo]:
+                    continue
+                mensaje.append(label)
+                for año in sorted(agrupadas[tipo].keys()):
+                    for mes in sorted(agrupadas[tipo][año].keys(), key=lambda m: meses_orden[m.lower()]):
+                        mensaje.append(f"📅 *{mes} de {año}*:")
+                        for t in agrupadas[tipo][año][mes]:
                             mensaje.append(formatear_linea(t))
 
             mensaje.append("👉 ¿Deseas *consultar otro periodo* o *registrar algo nuevo*?")
@@ -462,6 +448,7 @@ class ActionVerHistorialCompleto(Action):
             print(f"[ERROR] Fallo en action_ver_historial_completo: {e}")
             dispatcher.utter_message(text="❌ Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente.")
             return []
+
 
 from collections import Counter, defaultdict
 
