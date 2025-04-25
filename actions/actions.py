@@ -771,6 +771,7 @@ class ActionConsultarInformacionFinanciera(Action):
         from datetime import datetime
         from collections import defaultdict
         import re
+        import calendar
 
         transacciones = cargar_transacciones(filtrar_activos=True)
         texto = tracker.latest_message.get("text", "").strip().lower()
@@ -782,7 +783,25 @@ class ActionConsultarInformacionFinanciera(Action):
         fecha_raw = get_entity(tracker, "fecha") or tracker.get_slot("fecha")
         periodo_raw = get_entity(tracker, "periodo") or tracker.get_slot("periodo")
 
-        # Verificación de ambigüedad o entrada muy breve
+        def interpretar_periodo(periodo_raw):
+            hoy = datetime.now()
+            if not periodo_raw:
+                return None, None
+            texto = periodo_raw.lower().strip()
+            if "este mes" in texto:
+                return hoy.strftime("%B"), hoy.year
+            elif "último mes" in texto or "mes pasado" in texto:
+                mes = hoy.month - 1 if hoy.month > 1 else 12
+                año = hoy.year if hoy.month > 1 else hoy.year - 1
+                nombre_mes = calendar.month_name[mes]
+                return nombre_mes, año
+            else:
+                match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", texto)
+                if match:
+                    return match.group(1), int(match.group(2)) if match.group(2) else hoy.year
+            return None, None
+
+        # 🚨 Detectar ambigüedad
         verbos_clave = [
             "gasté", "gaste", "pagué", "ingresé", "recibí", "consulté", "usé",
             "muestra", "consultar", "ver", "registré", "gané", "cuánto", "invertí"
@@ -801,7 +820,7 @@ class ActionConsultarInformacionFinanciera(Action):
                 FollowupAction("action_entrada_no_entendida")
             ]
 
-        # Procesar fecha relativa
+        # ⏳ Fecha específica
         fecha = None
         if fecha_raw:
             try:
@@ -810,28 +829,25 @@ class ActionConsultarInformacionFinanciera(Action):
             except:
                 fecha = fecha_raw
 
-        # Normalizar periodo
-        periodo = None
+        # 📆 Periodo relativo o explícito
+        mes, año = None, None
         if periodo_raw:
-            match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
-            if match:
-                mes = match.group(1).strip()
-                año = match.group(2) or str(datetime.now().year)
-                periodo = f"{mes} de {año}"
-            else:
-                periodo = periodo_raw.strip().lower()
+            mes, año = interpretar_periodo(periodo_raw)
 
-        # Filtrar transacciones
+        # 🔍 Filtrar transacciones
         resultados = []
         for t in transacciones:
+            if t.get("status", 1) != 1:
+                continue
             if tipo and t.get("tipo") != tipo:
                 continue
-            if medio and t.get("medio", "").lower() != medio.lower():
+            if medio and medio.lower() not in t.get("medio", "").lower():
                 continue
             if categoria and categoria.lower() not in t.get("categoria", "").lower():
                 continue
-            if periodo and periodo.lower() != t.get("periodo", "").lower():
-                continue
+            if mes and año:
+                if t.get("mes", "").lower() != mes.lower() or int(t.get("año", 0)) != int(año):
+                    continue
             if fecha and fecha not in t.get("fecha", ""):
                 continue
             resultados.append(t)
@@ -839,25 +855,33 @@ class ActionConsultarInformacionFinanciera(Action):
         total = sum(t["monto"] for t in resultados)
 
         if not resultados:
+            parametros = []
+            if tipo:
+                parametros.append(f"- Tipo: *{tipo}*")
+            if categoria:
+                parametros.append(f"- Categoría: *{categoria}*")
+            if medio:
+                parametros.append(f"- Medio: *{medio}*")
+            if fecha:
+                parametros.append(f"- Fecha: *{fecha}*")
+            if mes and año:
+                parametros.append(f"- Periodo: *{mes} de {año}*")
+
             mensaje = construir_mensaje(
                 f"📭 *No se encontraron registros financieros* con los criterios proporcionados.",
-                f"🧾 **Parámetros usados:**",
-                f"- Tipo: *{tipo}*" if tipo else "",
-                f"- Categoría: *{categoria}*" if categoria else "",
-                f"- Medio: *{medio}*" if medio else "",
-                f"- Fecha: *{fecha}*" if fecha else "",
-                f"- Periodo: *{periodo}*" if periodo else ""
+                "🧾 **Parámetros usados:**",
+                *parametros
             )
             dispatcher.utter_message(text=mensaje)
             return []
 
-        # Construir respuesta
+        # 🧾 Construir respuesta
         partes = []
 
-        if categoria and periodo:
-            partes.append(f"📌 Tu *{tipo}* total en la categoría *{categoria}* durante *{periodo}* es de *{total:.2f} soles*.")
-        elif tipo and periodo:
-            partes.append(f"📌 Tu *{tipo}* total durante *{periodo}* es de *{total:.2f} soles*.")
+        if categoria and mes and año:
+            partes.append(f"📌 Tu *{tipo}* total en la categoría *{categoria}* durante *{mes} de {año}* es de *{total:.2f} soles*.")
+        elif tipo and mes and año:
+            partes.append(f"📌 Tu *{tipo}* total durante *{mes} de {año}* es de *{total:.2f} soles*.")
         elif tipo:
             resumen_cat = defaultdict(float)
             for t in resultados:
@@ -875,7 +899,7 @@ class ActionConsultarInformacionFinanciera(Action):
         dispatcher.utter_message(text=construir_mensaje(*partes))
 
         return [SlotSet("sugerencia_pendiente", "action_analizar_gastos")]
-        
+
 class ActionEntradaNoEntendida(Action):
     def name(self) -> Text:
         return "action_entrada_no_entendida"
