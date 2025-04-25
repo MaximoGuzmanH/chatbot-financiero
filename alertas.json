@@ -3,22 +3,6 @@
     "categoria": "salud",
     "monto": 20.0,
     "periodo": "mayo de 2025",
-    "status": 0,
-    "timestamp": "2025-04-25T06:41:19.731537",
-    "timestamp_modificacion": "2025-04-25T06:47:03.681985"
-  },
-  {
-    "categoria": "salud",
-    "monto": 50.0,
-    "periodo": "abril de 2025",
-    "status": 0,
-    "timestamp": "2025-04-25T06:41:19.731537",
-    "timestamp_modificacion": "2025-04-25T06:47:03.681985"
-  },
-  {
-    "categoria": "salud",
-    "monto": 20.0,
-    "periodo": "mayo de 2025",
     "status": 1,
     "timestamp": "2025-04-25T06:47:03.681985"
   },
@@ -26,13 +10,6 @@
     "categoria": "salud",
     "monto": 50.0,
     "periodo": "abril de 2025",
-    "status": 1,
-    "timestamp": "2025-04-25T06:47:03.681985"
-  },
-  {
-    "categoria": "salud",
-    "monto": 75.0,
-    "periodo": "mayo de 2025",
     "status": 1,
     "timestamp": "2025-04-25T06:47:03.681985"
   }
