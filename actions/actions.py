@@ -287,9 +287,11 @@ class ActionRegistrarIngreso(Action):
                 "medio": medio
             }
 
-            # 👉 Ya no sincronizamos aquí (descargar_de_github), solo guardamos
+            from transacciones_io import guardar_transaccion
+
+            # Solo guardar, la sincronización ya se maneja internamente en guardar_transaccion()
             guardar_transaccion(transaccion)
-            
+
             mensaje = construir_mensaje(
                 "✅ **Ingreso registrado con éxito:**",
                 f"💰 *Monto:* {monto:.2f} soles",
