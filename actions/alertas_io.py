@@ -158,3 +158,30 @@ def actualizar_alerta_existente(condiciones: Dict[str, str], nueva_alerta: Dict[
         subir_a_github_alertas()
 
     return modificada
+
+def modificar_alerta(condiciones: Dict[str, Any], nuevos_valores: Dict[str, Any]) -> bool:
+    """
+    Modifica una alerta existente activa según las condiciones dadas.
+    """
+    alertas = cargar_alertas(filtrar_activos=False)
+    ahora = datetime.now().isoformat()
+    modificada = False
+
+    for alerta in alertas:
+        if (
+            alerta.get("categoria", "").lower() == condiciones.get("categoria", "").lower()
+            and alerta.get("periodo", "").lower() == condiciones.get("periodo", "").lower()
+            and alerta.get("status", 1) == 1
+        ):
+            alerta.update(nuevos_valores)
+            alerta["timestamp_modificacion"] = ahora
+            modificada = True
+            break
+
+    if modificada:
+        with open(RUTA_ALERTAS, "w", encoding="utf-8") as f:
+            json.dump(alertas, f, ensure_ascii=False, indent=2)
+
+        subir_a_github_alertas()
+
+    return modificada
