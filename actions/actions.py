@@ -148,7 +148,6 @@ class ActionRegistrarGasto(Action):
                 dispatcher.utter_message(text="⚠️ El monto ingresado no es válido. Intenta nuevamente.")
                 return []
 
-            # 🗓️ Procesar fecha
             if not fecha_raw:
                 fecha_raw = datetime.now().strftime("%d/%m/%Y")
             elif len(fecha_raw.split("/")) == 2:
@@ -163,10 +162,14 @@ class ActionRegistrarGasto(Action):
                 "medio": medio
             }
 
+            # ✅ Importar y sincronizar antes de guardar
+            from transacciones_io import descargar_de_github, guardar_transaccion
+            descargar_de_github()
             guardar_transaccion(transaccion)
+
             mes_actual = transaccion.get("mes", "").lower()
 
-            # 🚨 Verificar alertas activas
+            # 🔔 Verificar alertas activas
             alertas = cargar_alertas()
             alertas_activas = [
                 a for a in alertas
@@ -192,7 +195,6 @@ class ActionRegistrarGasto(Action):
                         )
                     )
 
-            # ✅ Confirmación de registro con formato optimizado
             mensaje = construir_mensaje(
                 "💸 **Gasto registrado correctamente:**",
                 f"💰 *Monto:* {monto:.2f} soles",
@@ -201,7 +203,6 @@ class ActionRegistrarGasto(Action):
                 f"💳 *Medio:* {medio}",
                 "👉 ¿Deseas *registrar otro gasto* o *consultar tu saldo*?"
             )
-            
             dispatcher.utter_message(text=mensaje)
 
             return [
