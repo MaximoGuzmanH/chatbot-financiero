@@ -10,5 +10,17 @@
     "año": 2025,
     "timestamp": "2025-04-25T15:54:05.523193",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 15.5,
+    "categoria": "sueldo",
+    "fecha": "16 de abril",
+    "medio": "efectivo",
+    "dia": 16,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-25T16:12:56.991442",
+    "status": 1
   }
 ]
