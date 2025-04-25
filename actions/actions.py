@@ -355,7 +355,6 @@ class ActionVerHistorialCompleto(Action):
             periodo_raw = get_entity(tracker, "periodo")
             categoria_raw = get_entity(tracker, "categoria")
 
-            # 📆 Normalizar periodo a (mes, año)
             mes, año = None, None
             if periodo_raw:
                 match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
@@ -363,7 +362,6 @@ class ActionVerHistorialCompleto(Action):
                     mes = match.group(1).strip()
                     año = int(match.group(2)) if match.group(2) else datetime.now().year
 
-            # 🔍 Filtrar transacciones por tipo y estado
             transacciones_filtradas = [
                 t for t in transacciones if t.get("tipo") in ["ingreso", "gasto"]
             ]
@@ -390,11 +388,9 @@ class ActionVerHistorialCompleto(Action):
                 dispatcher.utter_message(text=mensaje)
                 return []
 
-            # 📋 Agrupar por tipo
             ingresos = [t for t in transacciones_filtradas if t["tipo"] == "ingreso"]
             gastos = [t for t in transacciones_filtradas if t["tipo"] == "gasto"]
 
-            # 📅 Ordenar por año, mes, día
             meses_orden = {
                 "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
                 "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
@@ -410,11 +406,12 @@ class ActionVerHistorialCompleto(Action):
             ingresos.sort(key=orden_fecha)
             gastos.sort(key=orden_fecha)
 
-            def agrupar_por_mes(transacciones):
-                agrupadas = defaultdict(list)
+            def agrupar_por_anyo_y_mes(transacciones):
+                agrupadas = defaultdict(lambda: defaultdict(list))
                 for t in transacciones:
-                    clave = f"{t.get('mes', '').capitalize()} de {t.get('año')}"
-                    agrupadas[clave].append(t)
+                    y = t.get("año")
+                    m = t.get("mes", "").capitalize()
+                    agrupadas[y][m].append(t)
                 return agrupadas
 
             def formatear_linea(t):
@@ -441,19 +438,21 @@ class ActionVerHistorialCompleto(Action):
 
             if ingresos:
                 mensaje.append("💰 **Ingresos:**")
-                ingresos_por_mes = agrupar_por_mes(ingresos)
-                for mes_año in sorted(ingresos_por_mes.keys(), key=lambda x: orden_fecha(ingresos_por_mes[x][0])):
-                    mensaje.append(f"📆 *{mes_año}*:")
-                    for t in ingresos_por_mes[mes_año]:
-                        mensaje.append(formatear_linea(t))
+                ingresos_agrupados = agrupar_por_anyo_y_mes(ingresos)
+                for año_key in sorted(ingresos_agrupados.keys()):
+                    for mes_key in sorted(ingresos_agrupados[año_key], key=lambda m: meses_orden[m.lower()]):
+                        mensaje.append(f"📆 *{mes_key} de {año_key}*:")
+                        for t in ingresos_agrupados[año_key][mes_key]:
+                            mensaje.append(formatear_linea(t))
 
             if gastos:
                 mensaje.append("🧾 **Egresos:**")
-                gastos_por_mes = agrupar_por_mes(gastos)
-                for mes_año in sorted(gastos_por_mes.keys(), key=lambda x: orden_fecha(gastos_por_mes[x][0])):
-                    mensaje.append(f"📆 *{mes_año}*:")
-                    for t in gastos_por_mes[mes_año]:
-                        mensaje.append(formatear_linea(t))
+                gastos_agrupados = agrupar_por_anyo_y_mes(gastos)
+                for año_key in sorted(gastos_agrupados.keys()):
+                    for mes_key in sorted(gastos_agrupados[año_key], key=lambda m: meses_orden[m.lower()]):
+                        mensaje.append(f"📆 *{mes_key} de {año_key}*:")
+                        for t in gastos_agrupados[año_key][mes_key]:
+                            mensaje.append(formatear_linea(t))
 
             mensaje.append("👉 ¿Deseas *consultar otro periodo* o *registrar algo nuevo*?")
             dispatcher.utter_message(text=construir_mensaje(*mensaje))
