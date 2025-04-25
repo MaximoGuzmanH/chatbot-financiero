@@ -8,5 +8,14 @@
     "timestamp": "2025-04-25T19:02:13.474231",
     "status": 0,
     "timestamp_modificacion": "2025-04-25T19:03:57.699960"
+  },
+  {
+    "categoria": "entretenimiento",
+    "monto": 300.0,
+    "periodo": "abril de 2025",
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-25T23:21:21.911651",
+    "status": 1
   }
 ]
