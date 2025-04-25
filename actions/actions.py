@@ -407,7 +407,7 @@ class ActionVerHistorialCompleto(Action):
                 dispatcher.utter_message(text=mensaje)
                 return []
 
-            # 📅 Función para ordenar por fecha
+            # 📅 Función para ordenar por fecha completa
             def orden_fecha(t):
                 return (
                     int(t.get("año", 0)),
@@ -415,11 +415,10 @@ class ActionVerHistorialCompleto(Action):
                     int(t.get("dia", 0))
                 )
 
-            transacciones_filtradas.sort(key=orden_fecha)
-
-            # 🧾 Agrupar por tipo > año > mes
+            # 🧾 Agrupar por tipo > año > mes, y ordenar previamente
+            transacciones_ordenadas = sorted(transacciones_filtradas, key=orden_fecha)
             agrupadas = {"ingreso": {}, "gasto": {}}
-            for t in transacciones_filtradas:
+            for t in transacciones_ordenadas:
                 tipo = t["tipo"]
                 año_t = int(t.get("año", 0))
                 mes_t = t.get("mes", "").capitalize()
@@ -461,6 +460,7 @@ class ActionVerHistorialCompleto(Action):
             print(f"[ERROR] Fallo en action_ver_historial_completo: {e}")
             dispatcher.utter_message(text="❌ Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente.")
             return []
+
 
 from collections import Counter, defaultdict
 
