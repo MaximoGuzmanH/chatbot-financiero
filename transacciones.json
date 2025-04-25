@@ -96,15 +96,15 @@
     "status": 1
   },
   {
-    "tipo": "gasto",
+    "tipo": "ingreso",
     "monto": 14.0,
-    "categoria": "entretenimiento",
-    "fecha": "14 de marzo",
-    "medio": "efectivo",
-    "dia": 14,
-    "mes": "marzo",
+    "categoria": "sueldo",
+    "fecha": "1 de abril",
+    "medio": "transferencia",
+    "dia": 1,
+    "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-25T18:49:44.862941",
+    "timestamp": "2025-04-25T18:50:11.842055",
     "status": 1
   }
 ]
