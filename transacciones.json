@@ -13,14 +13,14 @@
   },
   {
     "tipo": "ingreso",
-    "monto": 15.0,
+    "monto": 15.5,
     "categoria": "sueldo",
-    "fecha": "15 de abril",
+    "fecha": "16 de abril",
     "medio": "efectivo",
-    "dia": 15,
+    "dia": 16,
     "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-25T16:12:11.053045",
+    "timestamp": "2025-04-25T16:12:56.991442",
     "status": 1
   }
 ]
