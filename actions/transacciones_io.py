@@ -85,18 +85,18 @@ def cargar_transacciones(filtrar_activos=True):
         return []
 
 def guardar_transaccion(transaccion):
+    # 🔄 Descargar siempre la última versión
+    descargar_de_github()
+
     try:
-        transacciones = cargar_transacciones(filtrar_activos=False)
+        transacciones = cargar_transacciones(filtrar_activos=False)  # cargar todo, no solo activos
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
 
+    # 🧱 Normalización y agregado
     ahora = datetime.now()
-
-    fecha_str = transaccion.get("fecha")
-    if not fecha_str:
-        fecha_str = ahora.strftime("%d/%m/%Y")
-        transaccion["fecha"] = fecha_str
+    fecha_str = transaccion.get("fecha") or ahora.strftime("%d/%m/%Y")
 
     try:
         if "de" in fecha_str:
@@ -107,8 +107,7 @@ def guardar_transaccion(transaccion):
         else:
             dia, mes_num, año = map(int, fecha_str.split("/"))
             mes = MESES[mes_num - 1]
-    except Exception as e:
-        print(f"[WARN] Fecha inválida '{fecha_str}': {e}")
+    except:
         dia = ahora.day
         mes = ahora.strftime("%B").lower()
         año = ahora.year
@@ -122,16 +121,18 @@ def guardar_transaccion(transaccion):
     })
 
     transacciones.append(transaccion)
+
+    # 💾 Guardar localmente en tmp
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
+    # ☁️ Subir al repositorio GitHub
     from github_sync import subir_log_a_github
-    resultado = subir_log_a_github(
+    subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
         ruta_destino_repo=ARCHIVO_GITHUB,
-        mensaje_commit="Actualización automática de transacciones desde Streamlit"
+        mensaje_commit="Ingreso registrado automáticamente"
     )
-    print(f"[DEBUG] Resultado de subida a GitHub: {resultado}")
 
 def eliminar_transaccion_logicamente(condiciones):
     transacciones = cargar_transacciones(filtrar_activos=False)
