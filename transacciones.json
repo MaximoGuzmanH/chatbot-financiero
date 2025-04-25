@@ -21,7 +21,8 @@
     "mes": "abril",
     "año": 2025,
     "timestamp": "2025-04-23T07:01:33.515303",
-    "status": 1
+    "status": 0,
+    "timestamp_modificacion": "2025-04-25T08:21:53.273008"
   },
   {
     "tipo": "ingreso",
@@ -563,6 +564,15 @@
     "dia": 25,
     "mes": "abril",
     "año": 2025,
+    "status": 1
+  },
+  {
+    "tipo": "reinicio",
+    "categoria": "ropa",
+    "mes": "abril",
+    "año": 2025,
+    "motivo": "reseteo de gastos",
+    "timestamp": "2025-04-25T08:21:53.273008",
     "status": 1
   }
 ]
