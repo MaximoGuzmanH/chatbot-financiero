@@ -372,7 +372,6 @@ class ActionVerHistorialCompleto(Action):
                     mes = match.group(1).strip()
                     año = int(match.group(2)) if match.group(2) else datetime.now().year
 
-            # 📅 Diccionario para ordenamiento
             meses_orden = {
                 "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
                 "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
@@ -385,7 +384,7 @@ class ActionVerHistorialCompleto(Action):
                     int(t.get("dia", 0))
                 )
 
-            # 🔍 Filtrar y ordenar transacciones válidas
+            # 🔍 Filtrar transacciones válidas
             transacciones_filtradas = [
                 t for t in transacciones if t.get("tipo") in ["ingreso", "gasto"]
             ]
@@ -444,7 +443,6 @@ class ActionVerHistorialCompleto(Action):
                     linea += f", con *{medio}*"
                 return linea
 
-            # 📦 Construcción del mensaje
             mensaje = ["**📋 Historial de transacciones**:"]
 
             for tipo, label in [("ingreso", "💰 **Ingresos:**"), ("gasto", "🧾 **Egresos:**")]:
@@ -454,7 +452,9 @@ class ActionVerHistorialCompleto(Action):
                 for año_t in sorted(agrupadas[tipo].keys()):
                     for mes_t in sorted(agrupadas[tipo][año_t].keys(), key=lambda m: meses_orden[m.lower()]):
                         mensaje.append(f"📅 *{mes_t} de {año_t}*:")
-                        for t in sorted(agrupadas[tipo][año_t][mes_t], key=orden_fecha):
+                        transacciones_mes = agrupadas[tipo][año_t][mes_t]
+                        transacciones_mes.sort(key=orden_fecha)
+                        for t in transacciones_mes:
                             mensaje.append(formatear_linea(t))
 
             mensaje.append("👉 ¿Deseas *consultar otro periodo* o *registrar algo nuevo*?")
