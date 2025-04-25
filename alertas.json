@@ -1,38 +1,15 @@
 [
   {
     "categoria": "salud",
-    "monto": 400.0,
-    "periodo": "mayo de 2025",
-    "status": 0,
-    "timestamp": "2025-04-25T06:30:59.507473",
-    "timestamp_modificacion": "2025-04-25T06:38:09.478803"
-  },
-  {
-    "categoria": "salud",
-    "monto": 600.0,
-    "periodo": "abril de 2025",
-    "status": 0,
-    "timestamp": "2025-04-25T06:30:59.507473",
-    "timestamp_modificacion": "2025-04-25T06:38:09.478803"
-  },
-  {
-    "categoria": "salud",
-    "monto": 400.0,
+    "monto": 20.0,
     "periodo": "mayo de 2025",
     "status": 1,
     "timestamp": "2025-04-25T06:38:09.478803"
   },
   {
     "categoria": "salud",
-    "monto": 600.0,
+    "monto": 50.0,
     "periodo": "abril de 2025",
-    "status": 1,
-    "timestamp": "2025-04-25T06:38:09.478803"
-  },
-  {
-    "categoria": "salud",
-    "monto": 600.0,
-    "periodo": "mayo de 2025",
     "status": 1,
     "timestamp": "2025-04-25T06:38:09.478803"
   }
