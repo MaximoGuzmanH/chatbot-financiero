@@ -1,18 +1,6 @@
 [
   {
     "tipo": "ingreso",
-    "monto": 500.0,
-    "categoria": "venta",
-    "fecha": "12 de marzo",
-    "medio": "efectivo",
-    "dia": 12,
-    "mes": "marzo",
-    "año": 2025,
-    "timestamp": "2025-04-25T17:05:50.078977",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
     "monto": 1500.0,
     "categoria": "sueldo",
     "fecha": "1 de abril",
@@ -45,18 +33,6 @@
     "mes": "marzo",
     "año": 2025,
     "timestamp": "2025-04-25T17:21:04.864548",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
-    "monto": 500.0,
-    "categoria": "venta",
-    "fecha": "12 de marzo",
-    "medio": "efectivo",
-    "dia": 12,
-    "mes": "marzo",
-    "año": 2025,
-    "timestamp": "2025-04-25T17:32:19.215308",
     "status": 1
   }
 ]
