@@ -1344,7 +1344,7 @@ class ActionEliminarConfiguracion(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         import re
-        from alertas_io import eliminar_alerta_logicamente, cargar_alertas
+        from alertas_io import eliminar_alerta_logicamente, cargar_alertas, recuperar_alertas_desde_github
         from utils import construir_mensaje
 
         categoria = get_entity(tracker, "categoria")
@@ -1359,7 +1359,10 @@ class ActionEliminarConfiguracion(Action):
         # 📆 Normalizar periodo
         periodo = periodo.lower().strip()
 
-        # Verificar si existe una alerta activa con esos criterios
+        # 🔁 Recuperar la versión más reciente del archivo
+        recuperar_alertas_desde_github()
+
+        # 🔍 Buscar alerta activa con ese criterio
         alertas = cargar_alertas()
         alerta = next((
             a for a in alertas
@@ -1374,7 +1377,9 @@ class ActionEliminarConfiguracion(Action):
             )
             return []
 
-        # 🗑️ Eliminar directamente (eliminación lógica)
+        monto = alerta.get("monto", 0)
+
+        # 🗑️ Eliminar directamente
         eliminar_alerta_logicamente({
             "categoria": categoria,
             "periodo": periodo
@@ -1384,6 +1389,7 @@ class ActionEliminarConfiguracion(Action):
             f"🗑️ *Alerta eliminada correctamente*",
             f"• Categoría: *{categoria}*",
             f"• Periodo: *{periodo}*",
+            f"• Monto anterior: *{monto:.2f} soles*",
             "👉 Ya no recibirás notificaciones para esta configuración."
         )
         dispatcher.utter_message(text=mensaje)
