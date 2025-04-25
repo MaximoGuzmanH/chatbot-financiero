@@ -1127,7 +1127,9 @@ class ActionModificarConfiguracion(Action):
 
         import re
         from datetime import datetime
-        import json
+        from alertas_io import modificar_alerta
+        from utils import parse_monto, construir_mensaje
+        from typing import Any, Dict, List, Text
 
         categoria = get_entity(tracker, "categoria")
         monto = get_entity(tracker, "monto")
@@ -1160,28 +1162,18 @@ class ActionModificarConfiguracion(Action):
         mes = match.group(1).strip().lower()
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
-        ahora = datetime.now().isoformat()
 
-        # 🧠 Recargar desde archivo original, evitando uso de memoria cacheada
-        with open("alertas.json", encoding="utf-8") as f:
-            alertas = json.load(f)
-
-        from alertas_io import modificar_alerta
-
+        # ✏️ Modificar alerta (si existe)
         modificada = modificar_alerta(
             condiciones={"categoria": categoria, "periodo": periodo_normalizado},
             nuevos_valores={"monto": monto_float}
         )
 
         if modificada:
-            with open("alertas.json", "w", encoding="utf-8") as f:
-                json.dump(alertas, f, ensure_ascii=False, indent=2)
-
             mensaje = construir_mensaje(
                 f"✅ *Alerta modificada correctamente*",
                 f"• Categoría: *{categoria}*",
                 f"• Periodo: *{periodo_normalizado}*",
-                f"• Monto anterior: *{monto_original:.2f} soles*",
                 f"• Nuevo monto: *{monto_float:.2f} soles*",
                 "👉 Puedes consultarla nuevamente o modificar otra si lo deseas."
             )
