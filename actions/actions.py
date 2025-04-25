@@ -1126,9 +1126,11 @@ class ActionModificarConfiguracion(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         import re
+        import json
         from datetime import datetime
-        from alertas_io import cargar_alertas, modificar_alerta
+        from alertas_io import modificar_alerta, RUTA_ALERTAS
         from utils import parse_monto, construir_mensaje
+        from typing import Dict
 
         categoria = get_entity(tracker, "categoria")
         monto = get_entity(tracker, "monto")
@@ -1147,7 +1149,7 @@ class ActionModificarConfiguracion(Action):
             return []
 
         if monto_float <= 0:
-            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.") 
+            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.")
             return []
 
         # 📅 Normalizar periodo
@@ -1162,8 +1164,14 @@ class ActionModificarConfiguracion(Action):
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # 🧠 Recargar desde archivo original antes de modificar
-        alertas = cargar_alertas(filtrar_activos=False)
+        # 📂 Cargar desde archivo original directamente (sin cache)
+        if not os.path.exists(RUTA_ALERTAS):
+            dispatcher.utter_message(text="❌ No se encontró el archivo de alertas.")
+            return []
+
+        with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
+            alertas = json.load(f)
+
         monto_original = None
         for alerta in alertas:
             if (
@@ -1174,13 +1182,12 @@ class ActionModificarConfiguracion(Action):
                 monto_original = alerta.get("monto")
                 break
 
-        # 🛠️ Ejecutar la modificación (persistente)
+        # ✏️ Intentar modificar alerta
         modificada = modificar_alerta(
             condiciones={"categoria": categoria, "periodo": periodo_normalizado},
             nuevos_valores={"monto": monto_float}
         )
 
-        # ✅ Confirmación al usuario
         if modificada and monto_original is not None:
             mensaje = construir_mensaje(
                 f"✅ *Alerta modificada correctamente*",
