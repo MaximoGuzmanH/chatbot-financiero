@@ -1603,9 +1603,27 @@ class ActionFollowSuggestion(Action):
             domain: Dict[Text, Any]) -> List[EventType]:
 
         sugerencia = tracker.get_slot("sugerencia_pendiente")
+        intent = tracker.latest_message.get("intent", {}).get("name")
 
-        # ✅ Si hay una sugerencia pendiente, la ejecutamos
-        if sugerencia:
+        # ✅ Confirmación explícita (por ejemplo, después de "¿Deseas actualizarla?")
+        if sugerencia == "confirmar_modificacion_alerta" and intent == "affirm":
+            dispatcher.utter_message(
+                text="✅ *Confirmado*, procederé con la modificación de la alerta."
+            )
+            return [
+                FollowupAction("action_ejecutar_modificacion_alerta"),
+                SlotSet("sugerencia_pendiente", None)
+            ]
+
+        # ❌ Cancelación explícita
+        if sugerencia == "confirmar_modificacion_alerta" and intent == "deny":
+            dispatcher.utter_message(
+                text="❌ *Entendido, no se realizará ninguna modificación en la alerta.*"
+            )
+            return [SlotSet("sugerencia_pendiente", None)]
+
+        # 🧠 Confirmación de otras sugerencias
+        if sugerencia and intent == "affirm":
             dispatcher.utter_message(
                 text="✅ *Perfecto*, procedo con tu solicitud..."
             )
@@ -1614,7 +1632,7 @@ class ActionFollowSuggestion(Action):
                 SlotSet("sugerencia_pendiente", None)
             ]
 
-        # ❌ Si no hay sugerencia válida
+        # ❌ Si no hay acción por confirmar
         dispatcher.utter_message(
             text="⚠️ *No tengo ninguna acción pendiente por ejecutar.*\n\n👉 ¿Te gustaría *registrar algo* o *hacer una consulta*?"
         )
@@ -1707,6 +1725,12 @@ class ActionNegacion(Action):
             domain: Dict[Text, Any]) -> List[EventType]:
 
         sugerencia = tracker.get_slot("sugerencia_pendiente")
+
+        if sugerencia in ["confirmar_modificacion_alerta", "confirmar_eliminacion_alerta"]:
+            dispatcher.utter_message(
+                text="❌ *Entendido, no se realizará la acción solicitada.*\n\nSi deseas hacer otra modificación o eliminar algo más adelante, estaré aquí para ayudarte."
+            )
+            return [SlotSet("sugerencia_pendiente", None)]
 
         if sugerencia:
             dispatcher.utter_message(
