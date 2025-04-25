@@ -85,11 +85,11 @@ def cargar_transacciones(filtrar_activos=True):
         return []
 
 def guardar_transaccion(transaccion):
-    # 🔄 Descargar siempre la última versión
+    # 🔄 Forzar sincronización antes de leer el archivo
     descargar_de_github()
 
     try:
-        transacciones = cargar_transacciones(filtrar_activos=False)  # cargar todo, no solo activos
+        transacciones = cargar_transacciones(filtrar_activos=False)
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
