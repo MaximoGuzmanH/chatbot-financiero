@@ -163,10 +163,15 @@ def modificar_alerta(condiciones: Dict[str, Any], nuevos_valores: Dict[str, Any]
     """
     Modifica una alerta existente activa según las condiciones dadas.
     """
-    alertas = cargar_alertas(filtrar_activos=False)
     ahora = datetime.now().isoformat()
-    modificada = False
 
+    # 🔁 Leer directamente del archivo para evitar trabajar con memoria cacheada
+    if not os.path.exists(RUTA_ALERTAS):
+        return False
+    with open(RUTA_ALERTAS, "r", encoding="utf-8") as f:
+        alertas = json.load(f)
+
+    modificada = False
     for alerta in alertas:
         if (
             alerta.get("categoria", "").lower() == condiciones.get("categoria", "").lower()
