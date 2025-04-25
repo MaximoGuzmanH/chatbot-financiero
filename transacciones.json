@@ -85,18 +85,6 @@
   },
   {
     "tipo": "gasto",
-    "monto": 500.0,
-    "categoria": "restaurante",
-    "fecha": "dia",
-    "medio": "efectivo",
-    "dia": 23,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-23T16:48:31.126517",
-    "status": 1
-  },
-  {
-    "tipo": "gasto",
     "monto": 1500.0,
     "categoria": "rojo",
     "fecha": "23 de abril de 2025",
@@ -209,18 +197,6 @@
     "mes": "marzo",
     "año": 2025,
     "timestamp": "2025-04-24T00:30:21.741109",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
-    "monto": 1000.0,
-    "categoria": "honorarios",
-    "fecha": "abril",
-    "medio": "tarjeta de débito",
-    "dia": 24,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-24T00:30:46.356846",
     "status": 1
   },
   {
@@ -401,30 +377,6 @@
     "mes": "abril",
     "año": 2025,
     "timestamp": "2025-04-24T06:58:44.583247",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
-    "monto": 1000.0,
-    "categoria": "honorarios",
-    "fecha": "abril",
-    "medio": "tarjeta de débito",
-    "dia": 24,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-24T07:01:27.026869",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
-    "monto": 1000.0,
-    "categoria": "honorarios",
-    "fecha": "abril",
-    "medio": "tarjeta de débito",
-    "dia": 24,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-24T07:01:43.925272",
     "status": 1
   },
   {
