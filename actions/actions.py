@@ -1162,24 +1162,25 @@ class ActionModificarConfiguracion(Action):
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # Buscar alerta original activa
+        # 🧠 Recargar desde archivo original antes de modificar
         alertas = cargar_alertas(filtrar_activos=False)
         monto_original = None
-        for a in alertas:
+        for alerta in alertas:
             if (
-                a.get("categoria", "").lower() == categoria.lower() and
-                a.get("periodo", "").lower() == periodo_normalizado and
-                a.get("status", 1) == 1
+                alerta.get("categoria", "").lower() == categoria.lower()
+                and alerta.get("periodo", "").lower() == periodo_normalizado
+                and alerta.get("status", 1) == 1
             ):
-                monto_original = a.get("monto")
+                monto_original = alerta.get("monto")
                 break
 
-        # Modificar si existe
+        # 🛠️ Ejecutar la modificación (persistente)
         modificada = modificar_alerta(
             condiciones={"categoria": categoria, "periodo": periodo_normalizado},
             nuevos_valores={"monto": monto_float}
         )
 
+        # ✅ Confirmación al usuario
         if modificada and monto_original is not None:
             mensaje = construir_mensaje(
                 f"✅ *Alerta modificada correctamente*",
