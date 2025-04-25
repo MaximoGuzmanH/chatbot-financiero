@@ -11,6 +11,7 @@ RUTA_TRANSACCIONES = "/tmp/transacciones.json"
 REPO = "MaximoGuzmanH/chatbot-financiero"
 ARCHIVO_GITHUB = "transacciones.json"
 TOKEN = os.getenv("GITHUB_TOKEN")
+SINCRONIZADO = False  # Indica si ya se descargó el archivo desde GitHub
 
 # Constante global reutilizable
 MESES = [
@@ -51,14 +52,14 @@ def subir_a_github(ruta_local, repo, archivo_remoto, token):
         print(f"[OK] Archivo {archivo_remoto} actualizado en GitHub")
 
 def descargar_de_github():
+    global SINCRONIZADO
     url = f"https://raw.githubusercontent.com/{REPO}/main/{ARCHIVO_GITHUB}"
     try:
         response = requests.get(url)
         if response.status_code == 200:
-            if os.path.exists(RUTA_TRANSACCIONES):
-                os.remove(RUTA_TRANSACCIONES)
             with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
                 f.write(response.text)
+            SINCRONIZADO = True
             print("[INFO] transacciones.json sincronizado desde GitHub")
             return True
         else:
@@ -69,10 +70,11 @@ def descargar_de_github():
         return False
 
 def cargar_transacciones(filtrar_activos=True):
-    # 🔄 Sincronizar antes de consultar
-    if not descargar_de_github():
-        print("[ERROR] No se pudo sincronizar transacciones antes de consulta")
-        return []
+    global SINCRONIZADO
+    if not SINCRONIZADO:
+        if not descargar_de_github():
+            print("[ERROR] No se pudo sincronizar transacciones antes de consulta")
+            return []
 
     if not os.path.exists(RUTA_TRANSACCIONES):
         return []
@@ -85,9 +87,6 @@ def cargar_transacciones(filtrar_activos=True):
         return []
 
 def guardar_transaccion(transaccion):
-    # 🔄 Forzar sincronización antes de leer el archivo
-    descargar_de_github()
-
     try:
         transacciones = cargar_transacciones(filtrar_activos=False)
     except Exception as e:
