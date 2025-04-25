@@ -106,13 +106,15 @@ def cargar_transacciones(filtrar_activos=True, sincronizar=True):
         return []
 
 def guardar_transaccion(transaccion):
+    # 1️⃣ Leer las transacciones LOCALES ya sincronizadas (sin volver a descargar)
     try:
-        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=True)
-        print(f"[INFO] Se cargaron {len(transacciones)} transacciones previas.")
+        with open(RUTA_TRANSACCIONES, "r", encoding="utf-8") as f:
+            transacciones = json.load(f)
     except Exception as e:
-        print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
+        print(f"[ERROR] No se pudo cargar transacciones locales: {e}")
         transacciones = []
 
+    # 2️⃣ Procesar la nueva transacción
     ahora = datetime.now()
     fecha_str = transaccion.get("fecha") or ahora.strftime("%d/%m/%Y")
 
@@ -125,8 +127,7 @@ def guardar_transaccion(transaccion):
         else:
             dia, mes_num, año = map(int, fecha_str.split("/"))
             mes = MESES[mes_num - 1]
-    except Exception as e:
-        print(f"[WARN] No se pudo procesar la fecha '{fecha_str}': {e}")
+    except:
         dia = ahora.day
         mes = ahora.strftime("%B").lower()
         año = ahora.year
@@ -140,26 +141,18 @@ def guardar_transaccion(transaccion):
     })
 
     transacciones.append(transaccion)
-    print(f"[INFO] Transacción nueva agregada. Total ahora: {len(transacciones)}")
 
-    try:
-        with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
-            json.dump(transacciones, f, ensure_ascii=False, indent=2)
-        print("[OK] transacciones.json actualizado correctamente")
-    except Exception as e:
-        print(f"[ERROR] Fallo al guardar transacciones localmente: {e}")
-        return
+    # 3️⃣ Guardar en local
+    with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
+        json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
-    # ☁️ Subir al repositorio GitHub
-    try:
-        from github_sync import subir_log_a_github
-        subir_log_a_github(
-            ruta_archivo_local=RUTA_TRANSACCIONES,
-            ruta_destino_repo=ARCHIVO_GITHUB,
-            mensaje_commit="Ingreso registrado automáticamente"
-        )
-    except Exception as e:
-        print(f"[ERROR] Fallo al subir archivo a GitHub: {e}")
+    # 4️⃣ Subir al GitHub
+    from github_sync import subir_log_a_github
+    subir_log_a_github(
+        ruta_archivo_local=RUTA_TRANSACCIONES,
+        ruta_destino_repo=ARCHIVO_GITHUB,
+        mensaje_commit="Ingreso registrado automáticamente"
+    )
 
 def eliminar_transaccion_logicamente(condiciones):
     transacciones = cargar_transacciones(filtrar_activos=False)
