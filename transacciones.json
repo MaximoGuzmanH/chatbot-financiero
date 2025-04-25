@@ -13,14 +13,14 @@
   },
   {
     "tipo": "ingreso",
-    "monto": 1500.0,
+    "monto": 15.0,
     "categoria": "sueldo",
-    "fecha": "1 de abril",
-    "medio": "transferencia",
-    "dia": 1,
+    "fecha": "15 de abril",
+    "medio": "efectivo",
+    "dia": 15,
     "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-25T16:11:39.931655",
+    "timestamp": "2025-04-25T16:12:11.053045",
     "status": 1
   }
 ]
