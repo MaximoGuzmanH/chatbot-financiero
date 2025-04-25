@@ -803,8 +803,9 @@ class ActionConsultarInformacionFinanciera(Action):
         def normalizar_tipo(tipo_raw):
             mapa = {
                 "ingresos": "ingreso",
-                "egresos": "gasto",
                 "ingreso": "ingreso",
+                "egresos": "gasto",
+                "egreso": "gasto",
                 "gasto": "gasto"
             }
             return mapa.get(tipo_raw.lower(), tipo_raw.lower())
