@@ -534,5 +534,15 @@
     "año": 2025,
     "timestamp": "2025-04-25T03:11:44.606329",
     "status": 1
+  },
+  {
+    "tipo": "entrada_no_entendida",
+    "descripcion": "Si",
+    "timestamp": "2025-04-25T05:33:55.081441",
+    "fecha": "25/04/2025",
+    "dia": 25,
+    "mes": "abril",
+    "año": 2025,
+    "status": 1
   }
 ]
