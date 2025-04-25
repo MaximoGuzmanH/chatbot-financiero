@@ -18,5 +18,14 @@
     "timestamp": "2025-04-25T23:21:21.911651",
     "status": 0,
     "timestamp_modificacion": "2025-04-25T23:25:57.782648"
+  },
+  {
+    "categoria": "transporte",
+    "monto": 500.0,
+    "periodo": "mayo de 2025",
+    "mes": "mayo",
+    "año": 2025,
+    "timestamp": "2025-04-25T23:29:17.981629",
+    "status": 1
   }
 ]
