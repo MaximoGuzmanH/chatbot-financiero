@@ -594,21 +594,21 @@ class ActionAnalizarGastos(Action):
         total_gasto = sum(categorias_sumadas.values())
         top_categorias = sorted(categorias_sumadas.items(), key=lambda x: x[1], reverse=True)[:3]
 
-        # 🧾 Generar mensaje
+        # 🧾 Generar mensaje estructurado y formateado
         mensaje = []
 
-        titulo = "🧾 **Análisis de tus hábitos de consumo**"
+        titulo = f"📊 **Análisis de tus hábitos de consumo**"
         if mes and año:
             titulo += f" durante *{mes} de {año}*"
         mensaje.append(titulo)
 
         if sin_categoria:
-            mensaje.append(f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría. Esto podría afectar el análisis.")
+            mensaje.append(f"⚠️ *{len(sin_categoria)} gasto(s) sin categoría* podrían afectar el análisis.")
 
-        resumen = "📊 **Categorías con mayor gasto:**"
+        resumen = "**📌 Categorías con mayor gasto:**"
         for cat, monto in top_categorias:
             porcentaje = (monto / total_gasto) * 100 if total_gasto else 0
-            resumen += f"\n• {cat.title()}: {monto:.2f} soles ({porcentaje:.1f}%)"
+            resumen += f"\n• {cat.title()}: *{monto:.2f} soles* (**{porcentaje:.1f}%**)"
         mensaje.append(resumen)
 
         mensaje.append(f"💸 **Total gastado:** *{total_gasto:.2f} soles*")
