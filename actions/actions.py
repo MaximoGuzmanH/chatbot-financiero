@@ -1126,13 +1126,12 @@ class ActionModificarConfiguracion(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         import re
-        import json
         from datetime import datetime
+        import json
 
         categoria = get_entity(tracker, "categoria")
         monto = get_entity(tracker, "monto")
         periodo = get_entity(tracker, "periodo")
-        texto_usuario = tracker.latest_message.get("text", "").lower()
 
         if not categoria or not monto or not periodo:
             dispatcher.utter_message(
@@ -1142,19 +1141,15 @@ class ActionModificarConfiguracion(Action):
 
         try:
             monto_float = parse_monto(monto)
-        except Exception:
-            dispatcher.utter_message(
-                text="❌ El monto proporcionado no es válido. Intenta con un valor numérico."
-            )
+        except:
+            dispatcher.utter_message(text="❌ El monto proporcionado no es válido. Intenta con un valor numérico.")
             return []
 
         if monto_float <= 0:
-            dispatcher.utter_message(
-                text="⚠️ El monto debe ser *mayor a cero* para configurar una alerta."
-            )
+            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.")
             return []
 
-        # 📅 Normalizar periodo
+        # 📆 Normalizar periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo.lower())
         if not match:
             dispatcher.utter_message(
@@ -1166,49 +1161,39 @@ class ActionModificarConfiguracion(Action):
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # 🔍 Buscar si existe una alerta activa
+        # 🔍 Cargar alertas y buscar la existente
         alertas = cargar_alertas()
-        alerta_existente = next((
-            a for a in alertas
-            if a.get("categoria", "").lower() == categoria.lower()
-            and a.get("periodo", "").lower() == periodo_normalizado
-            and a.get("status", 1) == 1
-        ), None)
+        alerta_modificada = False
+        ahora = datetime.now().isoformat()
 
-        if alerta_existente:
-            # ✅ Hay una alerta activa: proponer modificación
-            dispatcher.utter_message(
-                text=construir_mensaje(
-                    f"✏️ Se encontró una alerta activa para *{categoria}* en *{periodo_normalizado}*.",
-                    f"¿Deseas actualizarla al nuevo monto de *{monto_float:.2f} soles*?"
-                )
+        for alerta in alertas:
+            if (
+                alerta.get("categoria", "").lower() == categoria.lower()
+                and alerta.get("periodo", "").lower() == periodo_normalizado
+                and alerta.get("status", 1) == 1
+            ):
+                alerta["monto"] = monto_float
+                alerta["timestamp_modificacion"] = ahora
+                alerta_modificada = True
+                break  # Solo una debe ser modificada
+
+        if alerta_modificada:
+            guardar_todas_las_alertas(alertas)
+            mensaje = construir_mensaje(
+                f"✅ *Alerta modificada correctamente*",
+                f"• Categoría: *{categoria}*",
+                f"• Nuevo monto: *{monto_float:.2f} soles*",
+                f"• Periodo: *{periodo_normalizado}*",
+                "👉 Puedes consultarla nuevamente o modificar otra si lo deseas."
             )
-            return [
-                SlotSet("categoria", categoria),
-                SlotSet("monto", monto_float),
-                SlotSet("periodo", periodo_normalizado),
-                SlotSet("mes", mes),
-                SlotSet("año", año),
-                SlotSet("alerta_original", json.dumps(alerta_existente)),
-                SlotSet("sugerencia_pendiente", "confirmar_modificacion_alerta")
-            ]
-
         else:
-            # ❌ No existe: sugerir creación
-            dispatcher.utter_message(
-                text=construir_mensaje(
-                    f"🔍 *No encontré una alerta activa* para *{categoria}* en *{periodo_normalizado}*.",
-                    "¿Deseas crear una nueva alerta con esa información?"
-                )
+            mensaje = construir_mensaje(
+                f"📭 *No se encontró una alerta activa* para *{categoria}* en *{periodo_normalizado}*.",
+                "👉 Puedes crearla si lo deseas indicando la categoría, el monto y el periodo."
             )
-            return [
-                SlotSet("categoria", categoria),
-                SlotSet("monto", monto_float),
-                SlotSet("periodo", periodo_normalizado),
-                SlotSet("mes", mes),
-                SlotSet("año", año),
-                SlotSet("sugerencia_pendiente", "action_crear_configuracion")
-            ]
+
+        dispatcher.utter_message(text=mensaje)
+        return []
 
 class ActionConfirmarModificacionAlerta(Action):
     def name(self) -> Text:
