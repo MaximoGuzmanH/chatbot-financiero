@@ -1116,7 +1116,7 @@ class ActionCrearConfiguracion(Action):
             print(f"[ERROR] Fallo en action_crear_configuracion: {e}")
             dispatcher.utter_message(text="❌ Ocurrió un error al crear la alerta. Por favor, intenta nuevamente.")
             return []
-            
+
 class ActionModificarConfiguracion(Action):
     def name(self) -> Text:
         return "action_modificar_configuracion"
@@ -1127,7 +1127,7 @@ class ActionModificarConfiguracion(Action):
 
         import re
         from datetime import datetime
-        from alertas_io import modificar_alerta, cargar_alertas
+        from alertas_io import cargar_alertas, modificar_alerta
         from utils import parse_monto, construir_mensaje
 
         categoria = get_entity(tracker, "categoria")
@@ -1147,9 +1147,10 @@ class ActionModificarConfiguracion(Action):
             return []
 
         if monto_float <= 0:
-            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.")
+            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.") 
             return []
 
+        # 📅 Normalizar periodo
         match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})", periodo.lower())
         if not match:
             dispatcher.utter_message(
@@ -1161,25 +1162,30 @@ class ActionModificarConfiguracion(Action):
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # Buscar el monto original antes de modificar
-        alertas = cargar_alertas(filtrar_activos=True)
+        # Buscar alerta original activa
+        alertas = cargar_alertas(filtrar_activos=False)
         monto_original = None
-        for alerta in alertas:
-            if alerta.get("categoria", "").lower() == categoria.lower() and alerta.get("periodo", "").lower() == periodo_normalizado:
-                monto_original = alerta.get("monto")
+        for a in alertas:
+            if (
+                a.get("categoria", "").lower() == categoria.lower() and
+                a.get("periodo", "").lower() == periodo_normalizado and
+                a.get("status", 1) == 1
+            ):
+                monto_original = a.get("monto")
                 break
 
+        # Modificar si existe
         modificada = modificar_alerta(
             condiciones={"categoria": categoria, "periodo": periodo_normalizado},
             nuevos_valores={"monto": monto_float}
         )
 
-        if modificada:
+        if modificada and monto_original is not None:
             mensaje = construir_mensaje(
                 f"✅ *Alerta modificada correctamente*",
                 f"• Categoría: *{categoria}*",
                 f"• Periodo: *{periodo_normalizado}*",
-                f"• Monto anterior: *{monto_original:.2f} soles*" if monto_original else "",
+                f"• Monto anterior: *{monto_original:.2f} soles*",
                 f"• Nuevo monto: *{monto_float:.2f} soles*",
                 "👉 Puedes consultarla nuevamente o modificar otra si lo deseas."
             )
