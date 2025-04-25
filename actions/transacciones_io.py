@@ -4,16 +4,25 @@ from datetime import datetime
 import requests
 import base64
 
-# Ruta absoluta al archivo transacciones.json
+# Ruta local al archivo transacciones.json dentro del contenedor
 RUTA_TRANSACCIONES = "/tmp/transacciones.json"
 
-   
 # GitHub API
 REPO = "MaximoGuzmanH/chatbot-financiero"
 ARCHIVO_GITHUB = "transacciones.json"
-TOKEN = os.getenv("GITHUB_TOKEN") 
+TOKEN = os.getenv("GITHUB_TOKEN")
+
+# Constante global reutilizable
+MESES = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+]
 
 def subir_a_github(ruta_local, repo, archivo_remoto, token):
+    if not token:
+        print("[WARN] TOKEN de GitHub no disponible. No se subirá el archivo.")
+        return
+
     with open(ruta_local, "r", encoding="utf-8") as f:
         contenido = f.read()
 
@@ -41,20 +50,47 @@ def subir_a_github(ruta_local, repo, archivo_remoto, token):
     else:
         print(f"[OK] Archivo {archivo_remoto} actualizado en GitHub")
 
+def descargar_de_github():
+    url = f"https://raw.githubusercontent.com/{REPO}/main/{ARCHIVO_GITHUB}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            if os.path.exists(RUTA_TRANSACCIONES):
+                os.remove(RUTA_TRANSACCIONES)
+            with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
+                f.write(response.text)
+            print("[INFO] transacciones.json sincronizado desde GitHub")
+            return True
+        else:
+            print(f"[WARN] No se pudo descargar el archivo desde GitHub ({response.status_code})")
+            return False
+    except Exception as e:
+        print(f"[ERROR] Al intentar sincronizar desde GitHub: {e}")
+        return False
+
 def cargar_transacciones(filtrar_activos=True):
+    # 🔄 Sincronizar antes de consultar
+    if not descargar_de_github():
+        print("[ERROR] No se pudo sincronizar transacciones antes de consulta")
+        return []
+
     if not os.path.exists(RUTA_TRANSACCIONES):
         return []
+
     try:
         with open(RUTA_TRANSACCIONES, "r", encoding="utf-8") as f:
             transacciones = json.load(f)
-            if filtrar_activos:
-                transacciones = [t for t in transacciones if t.get("status", 1) == 1]
-            return transacciones
+            return [t for t in transacciones if t.get("status", 1) == 1] if filtrar_activos else transacciones
     except json.JSONDecodeError:
         return []
 
 def guardar_transaccion(transaccion):
-    transacciones = cargar_transacciones(filtrar_activos=False)
+    try:
+        transacciones = cargar_transacciones(filtrar_activos=False)
+    except Exception as e:
+        print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
+        transacciones = []
+
     ahora = datetime.now()
 
     fecha_str = transaccion.get("fecha")
@@ -70,9 +106,7 @@ def guardar_transaccion(transaccion):
             año = ahora.year
         else:
             dia, mes_num, año = map(int, fecha_str.split("/"))
-            meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-                     "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
-            mes = meses[mes_num - 1]
+            mes = MESES[mes_num - 1]
     except Exception as e:
         print(f"[WARN] Fecha inválida '{fecha_str}': {e}")
         dia = ahora.day
@@ -90,15 +124,13 @@ def guardar_transaccion(transaccion):
     transacciones.append(transaccion)
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
-        
-    from github_sync import subir_log_a_github
 
+    from github_sync import subir_log_a_github
     resultado = subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
-        ruta_destino_repo="transacciones.json",
+        ruta_destino_repo=ARCHIVO_GITHUB,
         mensaje_commit="Actualización automática de transacciones desde Streamlit"
     )
-
     print(f"[DEBUG] Resultado de subida a GitHub: {resultado}")
 
 def eliminar_transaccion_logicamente(condiciones):
@@ -123,19 +155,6 @@ def eliminar_transaccion_logicamente(condiciones):
     else:
         print(f"[WARN] No encontrada: {condiciones}")
 
-def descargar_de_github():
-    url = f"https://raw.githubusercontent.com/{REPO}/main/{ARCHIVO_GITHUB}"
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
-                f.write(response.text)
-            print("[INFO] transacciones.json sincronizado desde GitHub")
-        else:
-            print(f"[WARN] No se pudo descargar el archivo desde GitHub ({response.status_code})")
-    except Exception as e:
-        print(f"[ERROR] Al intentar sincronizar desde GitHub: {e}")
-
-# 🔁 Cargar desde GitHub solo si no existe en el contenedor
+# 🔁 Cargar desde GitHub si no existe en el contenedor (primer arranque)
 if not os.path.exists(RUTA_TRANSACCIONES):
     descargar_de_github()
