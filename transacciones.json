@@ -97,14 +97,14 @@
   },
   {
     "tipo": "gasto",
-    "monto": 7.0,
+    "monto": 14.0,
     "categoria": "entretenimiento",
-    "fecha": "7 de marzo",
+    "fecha": "14 de marzo",
     "medio": "efectivo",
-    "dia": 7,
+    "dia": 14,
     "mes": "marzo",
     "año": 2025,
-    "timestamp": "2025-04-25T18:49:13.725224",
+    "timestamp": "2025-04-25T18:49:44.862941",
     "status": 1
   }
 ]
