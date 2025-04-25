@@ -775,7 +775,6 @@ class ActionConsultarInformacionFinanciera(Action):
 
         transacciones = cargar_transacciones(filtrar_activos=True)
         texto = tracker.latest_message.get("text", "").strip().lower()
-        tokens = texto.split()
 
         tipo = get_entity(tracker, "tipo") or tracker.get_slot("tipo")
         categoria = get_entity(tracker, "categoria") or tracker.get_slot("categoria")
@@ -801,92 +800,65 @@ class ActionConsultarInformacionFinanciera(Action):
                     return match.group(1), int(match.group(2)) if match.group(2) else hoy.year
             return None, None
 
-        # 🚨 Detectar ambigüedad
-        verbos_clave = [
-            "gasté", "gaste", "pagué", "ingresé", "recibí", "consulté", "usé",
-            "muestra", "consultar", "ver", "registré", "gané", "cuánto", "invertí"
-        ]
-        contiene_verbo = any(v in texto for v in verbos_clave)
-        if not contiene_verbo and len(tokens) <= 5:
-            mensaje = construir_mensaje(
-                f"❓ No logré entender tu intención con: “{texto}”. ¿Podrías reformularlo?",
-                "🧠 Estoy aquí para ayudarte con tus finanzas. Puedes decir cosas como:",
-                "- “¿Cuánto gasté en comida en abril?”",
-                "- “Muéstrame mis ingresos por sueldo en marzo.”"
-            )
-            dispatcher.utter_message(text=mensaje)
-            return [
-                SlotSet("sugerencia_pendiente", "action_ayuda_general"),
-                FollowupAction("action_entrada_no_entendida")
-            ]
-
-        # ⏳ Fecha específica
-        fecha = None
-        if fecha_raw:
-            try:
-                fecha_parseada = parse_fecha_relativa(fecha_raw)
-                fecha = fecha_parseada.strftime("%d/%m/%Y") if fecha_parseada else fecha_raw
-            except:
-                fecha = fecha_raw
-
-        # 📆 Periodo relativo o explícito
+        # ⏳ Periodo
         mes, año = None, None
         if periodo_raw:
             mes, año = interpretar_periodo(periodo_raw)
 
-        # 🔍 Filtrar transacciones
         resultados = []
         for t in transacciones:
             if t.get("status", 1) != 1:
                 continue
-            if tipo and t.get("tipo") != tipo:
+
+            # Normalizar tipo: ingresos → ingreso
+            tipo_json = t.get("tipo", "").lower()
+            tipo_normalizado = tipo.rstrip("s") if tipo else None
+            if tipo_normalizado and tipo_json != tipo_normalizado:
                 continue
+
             if medio and medio.lower() not in t.get("medio", "").lower():
                 continue
             if categoria and categoria.lower() not in t.get("categoria", "").lower():
                 continue
+
+            # Comparación robusta de mes y año
+            try:
+                año_json = int(str(t.get("año", 0)).replace(",", ""))
+            except:
+                año_json = 0
             if mes and año:
-                if t.get("mes", "").lower() != mes.lower() or int(t.get("año", 0)) != int(año):
+                if t.get("mes", "").lower() != mes.lower() or año_json != int(año):
                     continue
-            if fecha and fecha not in t.get("fecha", ""):
-                continue
+
             resultados.append(t)
+
+        # 🧪 Debug
+        print(f"[DEBUG] Resultados encontrados: {len(resultados)} | tipo={tipo}, mes={mes}, año={año}")
 
         total = sum(t["monto"] for t in resultados)
 
         if not resultados:
-            parametros = []
-            if tipo:
-                parametros.append(f"- Tipo: *{tipo}*")
-            if categoria:
-                parametros.append(f"- Categoría: *{categoria}*")
-            if medio:
-                parametros.append(f"- Medio: *{medio}*")
-            if fecha:
-                parametros.append(f"- Fecha: *{fecha}*")
-            if mes and año:
-                parametros.append(f"- Periodo: *{mes} de {año}*")
-
             mensaje = construir_mensaje(
                 f"📭 *No se encontraron registros financieros* con los criterios proporcionados.",
-                "🧾 **Parámetros usados:**",
-                *parametros
+                f"🧾 **Parámetros usados:**",
+                f"- Tipo: *{tipo}*" if tipo else "",
+                f"- Categoría: *{categoria}*" if categoria else "",
+                f"- Medio: *{medio}*" if medio else "",
+                f"- Periodo: *{mes} de {año}*" if mes and año else ""
             )
             dispatcher.utter_message(text=mensaje)
             return []
 
-        # 🧾 Construir respuesta
         partes = []
 
         if categoria and mes and año:
-            partes.append(f"📌 Tu *{tipo}* total en la categoría *{categoria}* durante *{mes} de {año}* es de *{total:.2f} soles*.")
+            partes.append(f"📌 Tu *{tipo}* total en *{categoria}* durante *{mes} de {año}* es de *{total:.2f} soles*.")
         elif tipo and mes and año:
             partes.append(f"📌 Tu *{tipo}* total durante *{mes} de {año}* es de *{total:.2f} soles*.")
         elif tipo:
             resumen_cat = defaultdict(float)
             for t in resultados:
                 resumen_cat[t.get("categoria", "Sin categoría")] += t["monto"]
-
             partes.append(f"📊 *Resumen de {tipo}s por categoría:*")
             for cat, monto in resumen_cat.items():
                 partes.append(f"- {cat}: {monto:.2f} soles")
