@@ -16,6 +16,20 @@ from transacciones_io import eliminar_transaccion_logicamente
 from alertas_io import guardar_alerta, eliminar_alerta_logicamente, cargar_alertas, guardar_todas_las_alertas
 import alertas_io
 
+def extraer_mes_y_anio(periodo: str):
+    import re
+    from datetime import datetime
+
+    if not periodo:
+        return None, None
+
+    match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo.lower())
+    if match:
+        mes = match.group(1).strip().lower()
+        año = int(match.group(2)) if match.group(2) else datetime.now().year
+        return mes, año
+    return None, None
+
 def construir_mensaje(*bloques: str) -> str:
     """Concatena bloques separados por doble salto, permitiendo saltos simples dentro de cada bloque."""
     return "\n\n".join(bloque.strip() for bloque in bloques if bloque)
@@ -336,9 +350,12 @@ class ActionVerHistorialCompleto(Action):
             from transacciones_io import cargar_transacciones
 
             transacciones = cargar_transacciones(filtrar_activos=True)
-            periodo = get_entity(tracker, "periodo")
 
-            # 🧠 Reconstruir periodo en todas las transacciones
+            # 🔍 Capturar entidades del usuario
+            periodo = get_entity(tracker, "periodo")
+            categoria = get_entity(tracker, "categoria")
+
+            # 🧠 Reconstruir periodo si no existe
             for t in transacciones:
                 if not t.get("periodo"):
                     mes = t.get("mes", "").strip().lower()
@@ -346,42 +363,54 @@ class ActionVerHistorialCompleto(Action):
                     if mes and año:
                         t["periodo"] = f"{mes} de {año}"
 
-            # 🎯 Filtrar solo ingresos/gastos
+            # 🎯 Filtrar por ingresos y gastos
             transacciones_filtradas = [
                 t for t in transacciones if t.get("tipo") in ["ingreso", "gasto"]
             ]
 
             # 📆 Filtrar por periodo si se indicó
             if periodo:
-                periodo = periodo.lower().strip()
+                mes_obj, año_obj = extraer_mes_y_anio(periodo)
+                if mes_obj and año_obj:
+                    transacciones_filtradas = [
+                        t for t in transacciones_filtradas
+                        if t.get("mes", "").lower() == mes_obj and t.get("año") == año_obj
+                    ]
+
+            # 🗂️ Filtrar por categoría si fue mencionada
+            if categoria:
                 transacciones_filtradas = [
                     t for t in transacciones_filtradas
-                    if periodo == t.get("periodo", "").lower()
+                    if categoria.lower() in t.get("categoria", "").lower()
                 ]
 
             if not transacciones_filtradas:
-                mensaje = (
-                    f"📭 *No se encontraron movimientos registrados*"
-                    + (f" para el periodo **{periodo}**." if periodo else ".")
-                )
+                mensaje = f"📭 *No se encontraron movimientos registrados*"
+                if categoria:
+                    mensaje += f" en la categoría *{categoria}*"
+                if periodo:
+                    mensaje += f" durante *{periodo}*"
+                mensaje += "."
                 dispatcher.utter_message(text=mensaje)
                 return []
 
-            # 🧾 Construcción del mensaje
+            # 📋 Construcción del mensaje de respuesta
             mensaje = []
             encabezado = "📋 **Historial de transacciones**"
+            if categoria:
+                encabezado += f" en *{categoria}*"
             if periodo:
-                encabezado += f" para *{periodo}*"
+                encabezado += f" durante *{periodo}*"
             mensaje.append(encabezado + ":\n")
 
             for t in transacciones_filtradas:
                 tipo = t.get("tipo", "transacción").capitalize()
                 monto = float(t.get("monto", 0))
-                categoria = t.get("categoria", "sin categoría").capitalize()
+                cat = t.get("categoria", "sin categoría").capitalize()
                 fecha = formatear_fecha(t.get("fecha", "")) if t.get("fecha") else ""
                 medio = t.get("medio", "")
 
-                linea = f"🔸 *{tipo}* de *{monto:.2f} soles* en *{categoria}*"
+                linea = f"🔸 *{tipo}* de *{monto:.2f} soles* en *{cat}*"
                 if fecha:
                     linea += f", el *{fecha}*"
                 if medio and medio.lower() != "n/a":
@@ -390,6 +419,7 @@ class ActionVerHistorialCompleto(Action):
 
             mensaje.append("\n📊 ¿Deseas *registrar algo nuevo* o *consultar tu resumen mensual*?")
             dispatcher.utter_message(text=construir_mensaje(*mensaje))
+
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
         except Exception as e:
