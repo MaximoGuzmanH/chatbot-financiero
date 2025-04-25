@@ -49,14 +49,14 @@
   },
   {
     "tipo": "gasto",
-    "monto": 100.0,
+    "monto": 15.0,
     "categoria": "comida",
-    "fecha": "5 de abril",
-    "medio": "tarjeta de débito",
-    "dia": 5,
+    "fecha": "25 de abril",
+    "medio": "efectivo",
+    "dia": 25,
     "mes": "abril",
     "año": 2025,
-    "timestamp": "2025-04-25T17:52:17.086606",
+    "timestamp": "2025-04-25T17:52:51.188118",
     "status": 1
   }
 ]
