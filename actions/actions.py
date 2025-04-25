@@ -1165,35 +1165,39 @@ class ActionModificarConfiguracion(Action):
         # 🔍 Cargar alertas
         alertas = cargar_alertas()
 
-        # Verificar si ya existe una alerta activa con mismo monto
-        alerta_igual = next((
-            a for a in alertas
-            if a.get("categoria", "").lower() == categoria.lower()
+        # 🚫 Verificar si ya existe una alerta activa con mismo monto
+        ya_existe_alerta = any(
+            a.get("categoria", "").lower() == categoria.lower()
             and a.get("periodo", "").lower() == periodo_normalizado
             and a.get("status", 1) == 1
-            and a.get("monto") == monto_float
-        ), None)
+            and float(a.get("monto", 0)) == monto_float
+            for a in alertas
+        )
 
-        if alerta_igual:
+        if ya_existe_alerta:
             dispatcher.utter_message(text=construir_mensaje(
                 f"ℹ️ Ya existe una alerta activa para *{categoria}* en *{periodo_normalizado}* con ese mismo monto.",
                 "👉 No fue necesario realizar una modificación."
             ))
             return []
 
-        # Buscar alerta activa previa para modificar
-        alerta_activa = next((
-            a for a in alertas
-            if a.get("categoria", "").lower() == categoria.lower()
-            and a.get("periodo", "").lower() == periodo_normalizado
-            and a.get("status", 1) == 1
-        ), None)
+        # 🔄 Buscar alerta activa y desactivarla
+        alerta_modificada = False
+        monto_original = None
 
-        if alerta_activa:
-            monto_original = alerta_activa.get("monto")
-            alerta_activa["status"] = 0
-            alerta_activa["timestamp_modificacion"] = ahora
+        for alerta in alertas:
+            if (
+                alerta.get("categoria", "").lower() == categoria.lower()
+                and alerta.get("periodo", "").lower() == periodo_normalizado
+                and alerta.get("status", 1) == 1
+            ):
+                alerta["status"] = 0
+                alerta["timestamp_modificacion"] = ahora
+                monto_original = alerta.get("monto")
+                alerta_modificada = True
+                break
 
+        if alerta_modificada:
             nueva_alerta = {
                 "categoria": categoria,
                 "monto": monto_float,
@@ -1203,7 +1207,6 @@ class ActionModificarConfiguracion(Action):
                 "status": 1,
                 "timestamp": ahora
             }
-
             alertas.append(nueva_alerta)
             guardar_todas_las_alertas(alertas)
 
@@ -1223,6 +1226,7 @@ class ActionModificarConfiguracion(Action):
 
         dispatcher.utter_message(text=mensaje)
         return []
+
 
 class ActionConfirmarModificacionAlerta(Action):
     def name(self) -> Text:
