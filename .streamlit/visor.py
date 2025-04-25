@@ -111,6 +111,8 @@ if estado_sel == "Activos":
     df_filtrado = df_filtrado[df_filtrado["status"] == 1]
 elif estado_sel == "Inactivos":
     df_filtrado = df_filtrado[df_filtrado["status"] == 0]
+elif estado_sel == "Todos":
+    df_filtrado = df_filtrado[df_filtrado["status"].isin([0, 1])]
 
 # ---------- TABLA RESULTANTE ----------
 st.markdown(f"### Resultados ({len(df_filtrado)} registros)")
