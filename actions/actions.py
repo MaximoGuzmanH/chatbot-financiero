@@ -800,28 +800,31 @@ class ActionConsultarInformacionFinanciera(Action):
                     return match.group(1), int(match.group(2)) if match.group(2) else hoy.year
             return None, None
 
-        # ⏳ Periodo
+        def normalizar_tipo(tipo_raw):
+            mapa = {
+                "ingresos": "ingreso",
+                "egresos": "gasto",
+                "ingreso": "ingreso",
+                "gasto": "gasto"
+            }
+            return mapa.get(tipo_raw.lower(), tipo_raw.lower())
+
         mes, año = None, None
         if periodo_raw:
             mes, año = interpretar_periodo(periodo_raw)
+
+        tipo_normalizado = normalizar_tipo(tipo) if tipo else None
 
         resultados = []
         for t in transacciones:
             if t.get("status", 1) != 1:
                 continue
-
-            # Normalizar tipo: ingresos → ingreso
-            tipo_json = t.get("tipo", "").lower()
-            tipo_normalizado = tipo.rstrip("s") if tipo else None
-            if tipo_normalizado and tipo_json != tipo_normalizado:
+            if tipo_normalizado and t.get("tipo") != tipo_normalizado:
                 continue
-
             if medio and medio.lower() not in t.get("medio", "").lower():
                 continue
             if categoria and categoria.lower() not in t.get("categoria", "").lower():
                 continue
-
-            # Comparación robusta de mes y año
             try:
                 año_json = int(str(t.get("año", 0)).replace(",", ""))
             except:
@@ -829,11 +832,9 @@ class ActionConsultarInformacionFinanciera(Action):
             if mes and año:
                 if t.get("mes", "").lower() != mes.lower() or año_json != int(año):
                     continue
-
             resultados.append(t)
 
-        # 🧪 Debug
-        print(f"[DEBUG] Resultados encontrados: {len(resultados)} | tipo={tipo}, mes={mes}, año={año}")
+        print(f"[DEBUG] Resultados encontrados: {len(resultados)} | tipo={tipo_normalizado}, mes={mes}, año={año}")
 
         total = sum(t["monto"] for t in resultados)
 
