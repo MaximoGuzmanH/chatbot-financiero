@@ -60,25 +60,25 @@ def descargar_de_github():
         if response.status_code == 200:
             nuevo_contenido = response.text
 
-            # Evita sobreescribir si el contenido remoto está vacío
+            # ❌ No sobrescribimos si el archivo remoto está vacío
             if not nuevo_contenido.strip():
                 print("[WARN] El archivo remoto está vacío. No se sobrescribirá localmente.")
                 return False
 
-            # 🧠 Validación extra: evitar borrar contenido local válido
+            # 🧼 Siempre eliminamos el archivo local antes de sobrescribir
             if os.path.exists(RUTA_TRANSACCIONES):
-                with open(RUTA_TRANSACCIONES, "r", encoding="utf-8") as f:
-                    actual = f.read()
-                if actual.strip() == nuevo_contenido.strip():
-                    print("[INFO] El archivo local ya está sincronizado con GitHub.")
-                    return True
+                try:
+                    os.remove(RUTA_TRANSACCIONES)
+                    print("[INFO] Archivo transacciones.json eliminado localmente antes de sincronizar.")
+                except Exception as e:
+                    print(f"[ERROR] No se pudo eliminar archivo local: {e}")
 
-            # 💾 Sólo ahora sobrescribimos
+            # 💾 Guardamos el nuevo contenido descargado
             with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
                 f.write(nuevo_contenido)
 
             SINCRONIZADO = True
-            print("[INFO] transacciones.json sincronizado desde GitHub")
+            print("[INFO] transacciones.json sincronizado correctamente desde GitHub")
             return True
 
         else:
