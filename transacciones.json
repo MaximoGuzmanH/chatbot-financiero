@@ -25,18 +25,6 @@
   },
   {
     "tipo": "ingreso",
-    "monto": 15.0,
-    "categoria": "sueldo",
-    "fecha": "de",
-    "medio": "efectivo",
-    "dia": 25,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-25T17:06:49.987009",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
     "monto": 50.0,
     "categoria": "sueldo",
     "fecha": "30 de marzo",
@@ -45,6 +33,18 @@
     "mes": "marzo",
     "año": 2025,
     "timestamp": "2025-04-25T17:08:33.021392",
+    "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 75.0,
+    "categoria": "sueldo",
+    "fecha": "15 de marzo",
+    "medio": "efectivo",
+    "dia": 15,
+    "mes": "marzo",
+    "año": 2025,
+    "timestamp": "2025-04-25T17:21:04.864548",
     "status": 1
   }
 ]
