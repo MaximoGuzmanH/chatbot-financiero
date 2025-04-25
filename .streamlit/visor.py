@@ -23,7 +23,8 @@ transacciones = cargar_datos_json(RUTA_TRANSACCIONES)
 df_transacciones = pd.DataFrame(transacciones)
 
 # Normalización para evitar errores
-campos = ["tipo", "monto", "categoria", "fecha", "medio", "mes", "año", "status"]
+campos = ["tipo", "monto", "categoria", "fecha", "medio", "mes", "año", "status", "timestamp_modificacion"]
+
 for campo in campos:
     if campo not in df_transacciones.columns:
         df_transacciones[campo] = None
@@ -72,7 +73,11 @@ else:
 # ---------- UNIÓN Y FILTRADO ----------
 df = pd.concat([df_transacciones, df_alertas], ignore_index=True)
 
-df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+# Validar existencia de columna 'timestamp' antes de convertir
+if "timestamp" in df.columns:
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+else:
+    df["timestamp"] = pd.NaT
 
 if df.empty:
     st.warning("⚠️ No se encontraron datos en transacciones.json ni alertas.json.")
