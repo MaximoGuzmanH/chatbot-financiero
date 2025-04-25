@@ -359,20 +359,12 @@ class ActionVerHistorialCompleto(Action):
             import re
             from datetime import datetime
 
-            def mes_a_numero(mes: str) -> int:
-                meses = {
-                    "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
-                    "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
-                    "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-                }
-                return meses.get(mes.strip().lower(), 0)
-
-            # 🧠 Siempre cargar desde el origen
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo_raw = get_entity(tracker, "periodo")
             categoria_raw = get_entity(tracker, "categoria")
+            medio_raw = get_entity(tracker, "medio")
 
-            # 📆 Extraer mes y año si se especificó
+            # 📆 Normalizar periodo a (mes, año)
             mes, año = None, None
             if periodo_raw:
                 match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
@@ -397,28 +389,41 @@ class ActionVerHistorialCompleto(Action):
                     if categoria_raw.lower() in t.get("categoria", "").lower()
                 ]
 
+            if medio_raw:
+                transacciones_filtradas = [
+                    t for t in transacciones_filtradas
+                    if medio_raw.lower() in t.get("medio", "").lower()
+                ]
+
             if not transacciones_filtradas:
                 mensaje = construir_mensaje(
                     f"📭 *No se encontraron transacciones registradas* con los criterios proporcionados.",
                     f"🧾 **Parámetros usados:**",
                     f"- Categoría: *{categoria_raw}*" if categoria_raw else "",
-                    f"- Periodo: *{periodo_raw}*" if periodo_raw else ""
+                    f"- Periodo: *{periodo_raw}*" if periodo_raw else "",
+                    f"- Medio: *{medio_raw}*" if medio_raw else ""
                 )
                 dispatcher.utter_message(text=mensaje)
                 return []
 
-            # 📅 Función para ordenar por fecha completa
+            # 📅 Ordenar por año, mes y día
+            meses_orden = {
+                "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
+                "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+            }
+
             def orden_fecha(t):
                 return (
                     int(t.get("año", 0)),
-                    mes_a_numero(t.get("mes", "")),
+                    meses_orden.get(t.get("mes", "").lower(), 0),
                     int(t.get("dia", 0))
                 )
 
-            # 🧾 Agrupar por tipo > año > mes, y ordenar previamente
-            transacciones_ordenadas = sorted(transacciones_filtradas, key=orden_fecha)
+            transacciones_filtradas.sort(key=orden_fecha)
+
+            # 🧾 Agrupar por tipo > año > mes
             agrupadas = {"ingreso": {}, "gasto": {}}
-            for t in transacciones_ordenadas:
+            for t in transacciones_filtradas:
                 tipo = t["tipo"]
                 año_t = int(t.get("año", 0))
                 mes_t = t.get("mes", "").capitalize()
@@ -447,7 +452,7 @@ class ActionVerHistorialCompleto(Action):
                     continue
                 mensaje.append(label)
                 for año_t in sorted(agrupadas[tipo].keys()):
-                    for mes_t in sorted(agrupadas[tipo][año_t].keys(), key=lambda m: mes_a_numero(m)):
+                    for mes_t in sorted(agrupadas[tipo][año_t].keys(), key=lambda m: meses_orden[m.lower()]):
                         mensaje.append(f"📅 *{mes_t} de {año_t}*:")
                         for t in sorted(agrupadas[tipo][año_t][mes_t], key=orden_fecha):
                             mensaje.append(formatear_linea(t))
@@ -460,7 +465,6 @@ class ActionVerHistorialCompleto(Action):
             print(f"[ERROR] Fallo en action_ver_historial_completo: {e}")
             dispatcher.utter_message(text="❌ Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente.")
             return []
-
 
 from collections import Counter, defaultdict
 
