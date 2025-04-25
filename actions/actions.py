@@ -1146,7 +1146,7 @@ class ActionModificarConfiguracion(Action):
             return []
 
         if monto_float <= 0:
-            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.")
+            dispatcher.utter_message(text="⚠️ El monto debe ser *mayor a cero*.") 
             return []
 
         # 📆 Normalizar periodo
@@ -1161,9 +1161,10 @@ class ActionModificarConfiguracion(Action):
         año = int(match.group(2))
         periodo_normalizado = f"{mes} de {año}"
 
-        # 🔍 Cargar alertas y buscar la existente
+        # 🔍 Buscar y desactivar alerta previa
         alertas = cargar_alertas()
         alerta_modificada = False
+        monto_original = None
         ahora = datetime.now().isoformat()
 
         for alerta in alertas:
@@ -1172,18 +1173,31 @@ class ActionModificarConfiguracion(Action):
                 and alerta.get("periodo", "").lower() == periodo_normalizado
                 and alerta.get("status", 1) == 1
             ):
-                alerta["monto"] = monto_float
+                alerta["status"] = 0
                 alerta["timestamp_modificacion"] = ahora
+                monto_original = alerta.get("monto")
                 alerta_modificada = True
-                break  # Solo una debe ser modificada
+                break
 
         if alerta_modificada:
+            nueva_alerta = {
+                "categoria": categoria,
+                "monto": monto_float,
+                "periodo": periodo_normalizado,
+                "mes": mes,
+                "año": año,
+                "status": 1,
+                "timestamp": ahora
+            }
+            alertas.append(nueva_alerta)
             guardar_todas_las_alertas(alertas)
+
             mensaje = construir_mensaje(
                 f"✅ *Alerta modificada correctamente*",
                 f"• Categoría: *{categoria}*",
-                f"• Nuevo monto: *{monto_float:.2f} soles*",
                 f"• Periodo: *{periodo_normalizado}*",
+                f"• Monto anterior: *{monto_original:.2f} soles*",
+                f"• Nuevo monto: *{monto_float:.2f} soles*",
                 "👉 Puedes consultarla nuevamente o modificar otra si lo deseas."
             )
         else:
