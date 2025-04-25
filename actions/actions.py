@@ -701,9 +701,13 @@ class ActionCompararMeses(Action):
                 for t in transacciones:
                     if t.get("tipo") != tipo:
                         continue
-                    if t.get("periodo", "").lower() == periodo1:
+                    mes_t = t.get("mes", "").lower()
+                    año_t = str(t.get("año", "")).replace(",", "")
+                    periodo_transaccion = f"{mes_t} de {año_t}"
+
+                    if periodo_transaccion == periodo1.lower():
                         total[periodo1] += float(t.get("monto", 0))
-                    elif t.get("periodo", "").lower() == periodo2:
+                    elif periodo_transaccion == periodo2.lower():
                         total[periodo2] += float(t.get("monto", 0))
 
                 v1, v2 = total.get(periodo1, 0), total.get(periodo2, 0)
@@ -726,7 +730,7 @@ class ActionCompararMeses(Action):
                     comparativa,
                     "👉 ¿Quieres *configurar un presupuesto* o *consultar tus ingresos recientes*?"
                 )
-                dispatcher.utter_message(text=mensaje)
+                dispatcher.utter_message(text=mensaje.replace("\n", "<br>"))
                 return [SlotSet("sugerencia_pendiente", "action_crear_configuracion")]
 
             elif "en qué mes" in texto:
@@ -753,7 +757,7 @@ class ActionCompararMeses(Action):
                     f"• *{mes_max}* con *{monto_max:.2f} soles*",
                     "👉 ¿Deseas *comparar otros periodos* o *revisar tu historial completo*?"
                 )
-                dispatcher.utter_message(text=mensaje)
+                dispatcher.utter_message(text=mensaje.replace("\n", "<br>"))
                 return [SlotSet("sugerencia_pendiente", "action_ver_historial_completo")]
 
             else:
