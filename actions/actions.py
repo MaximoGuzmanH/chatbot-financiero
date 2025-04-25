@@ -964,14 +964,13 @@ class ActionResetearCategoriaGastos(Action):
         import re
         import json
         from transacciones_io import (
-            cargar_transacciones, 
-            RUTA_TRANSACCIONES, 
-            MESES, 
-            subir_a_github, 
-            descargar_de_github, 
-            TOKEN, 
-            REPO, 
-            ARCHIVO_GITHUB
+            descargar_de_github,
+            cargar_transacciones,
+            RUTA_TRANSACCIONES,
+            REPO,
+            ARCHIVO_GITHUB,
+            TOKEN,
+            subir_a_github
         )
         from utils import get_entity, construir_mensaje
 
@@ -996,12 +995,11 @@ class ActionResetearCategoriaGastos(Action):
         año = int(match.group(2))
         ahora = datetime.now().isoformat()
 
-        # 📥 Forzar descarga del archivo original desde GitHub
+        # 📥 Sincronizar antes de consultar
         descargar_de_github()
 
-        # 🔄 Cargar transacciones completas (incluso eliminadas)
+        # 📄 Cargar transacciones completas (activas e inactivas)
         transacciones = cargar_transacciones(filtrar_activos=False)
-
         gastos_reseteados = []
 
         for t in transacciones:
@@ -1016,25 +1014,15 @@ class ActionResetearCategoriaGastos(Action):
                 t["timestamp_modificacion"] = ahora
                 gastos_reseteados.append(t)
 
-        # 📝 Registrar el reinicio como transacción
-        transacciones.append({
-            "tipo": "reinicio",
-            "categoria": categoria,
-            "mes": mes,
-            "año": año,
-            "motivo": "reseteo de gastos",
-            "timestamp": ahora,
-            "status": 1
-        })
-
-        # 💾 Guardar en /tmp y subir a GitHub
+        # 💾 Guardar cambios en /tmp
         with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
             json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
+        # ☁ Subir a GitHub
         if TOKEN:
             subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
 
-        # 📢 Construcción del mensaje
+        # 📢 Mensaje al usuario
         if gastos_reseteados:
             detalles = "\n".join([
                 f"• {g['categoria'].capitalize()} – {g['monto']:.2f} soles – {g.get('dia', '?')} de {g.get('mes', '?')} de {g.get('año', '?')}"
@@ -1042,14 +1030,14 @@ class ActionResetearCategoriaGastos(Action):
             ])
             mensaje = construir_mensaje(
                 f"🔄 *Se han reseteado {len(gastos_reseteados)} gastos* en la categoría *{categoria}* para *{mes} de {año}*.",
-                "📋 Detalles de los gastos reiniciados:",
+                "🧾 Detalles de los gastos reiniciados:",
                 detalles,
                 "📌 Ya no se considerarán en tus análisis financieros."
             )
         else:
             mensaje = construir_mensaje(
                 f"ℹ️ *No se encontraron gastos activos* en *{categoria}* para *{mes} de {año}*.",
-                "📌 Aun así, se ha registrado el reinicio como referencia."
+                "📌 No se realizó ninguna modificación."
             )
 
         dispatcher.utter_message(text=mensaje)
