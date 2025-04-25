@@ -73,14 +73,14 @@
   },
   {
     "tipo": "gasto",
-    "monto": 1.0,
-    "categoria": "comida",
-    "fecha": "3 de abril",
-    "medio": "tarjeta de débito",
-    "dia": 3,
-    "mes": "abril",
+    "monto": 13.0,
+    "categoria": "entretenimiento",
+    "fecha": "13 de marzo",
+    "medio": "efectivo",
+    "dia": 13,
+    "mes": "marzo",
     "año": 2025,
-    "timestamp": "2025-04-25T18:33:58.117431",
+    "timestamp": "2025-04-25T18:34:34.346754",
     "status": 1
   }
 ]
