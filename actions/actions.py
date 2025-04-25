@@ -162,9 +162,8 @@ class ActionRegistrarGasto(Action):
                 "medio": medio
             }
 
-            # ✅ Importar y sincronizar antes de guardar
-            from transacciones_io import descargar_de_github, guardar_transaccion
-            descargar_de_github()
+            # ✅ Guardar directamente (sin llamar descargar_de_github aquí)
+            from transacciones_io import guardar_transaccion
             guardar_transaccion(transaccion)
 
             mes_actual = transaccion.get("mes", "").lower()
