@@ -25,18 +25,6 @@
   },
   {
     "tipo": "ingreso",
-    "monto": 15.0,
-    "categoria": "sueldo",
-    "fecha": "de",
-    "medio": "efectivo",
-    "dia": 25,
-    "mes": "april",
-    "año": 2025,
-    "timestamp": "2025-04-25T17:06:49.987009",
-    "status": 1
-  },
-  {
-    "tipo": "ingreso",
     "monto": 50.0,
     "categoria": "sueldo",
     "fecha": "30 de marzo",
