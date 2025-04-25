@@ -1344,10 +1344,11 @@ class ActionEliminarConfiguracion(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         import re
+        from alertas_io import eliminar_alerta_logicamente, cargar_alertas
+        from utils import construir_mensaje
 
         categoria = get_entity(tracker, "categoria")
         periodo = get_entity(tracker, "periodo")
-        texto_usuario = tracker.latest_message.get("text", "").lower()
 
         if not categoria or not periodo:
             dispatcher.utter_message(
@@ -1358,7 +1359,7 @@ class ActionEliminarConfiguracion(Action):
         # 📆 Normalizar periodo
         periodo = periodo.lower().strip()
 
-        # 🔍 Buscar alerta activa
+        # Verificar si existe una alerta activa con esos criterios
         alertas = cargar_alertas()
         alerta = next((
             a for a in alertas
@@ -1373,21 +1374,20 @@ class ActionEliminarConfiguracion(Action):
             )
             return []
 
+        # 🗑️ Eliminar directamente (eliminación lógica)
+        eliminar_alerta_logicamente({
+            "categoria": categoria,
+            "periodo": periodo
+        })
+
         mensaje = construir_mensaje(
-            f"🔔 *Se encontró una alerta activa:*",
-            f"• Categoría: *{alerta['categoria']}*",
-            f"• Monto: *{alerta['monto']:.2f} soles*",
-            f"• Periodo: *{alerta['periodo']}*",
-            "⚠️ ¿Estás seguro de que deseas eliminar esta alerta?",
-            "✉️ *Responde con “sí” para confirmar* o *“no” para cancelar* la eliminación."
+            f"🗑️ *Alerta eliminada correctamente*",
+            f"• Categoría: *{categoria}*",
+            f"• Periodo: *{periodo}*",
+            "👉 Ya no recibirás notificaciones para esta configuración."
         )
         dispatcher.utter_message(text=mensaje)
-
-        return [
-            SlotSet("categoria", categoria),
-            SlotSet("periodo", periodo),
-            SlotSet("sugerencia_pendiente", "confirmar_eliminacion_alerta")
-        ]
+        return []
 
 class ActionConfirmarEliminacionAlerta(Action):
     def name(self) -> Text:
