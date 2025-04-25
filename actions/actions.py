@@ -349,7 +349,9 @@ class ActionVerHistorialCompleto(Action):
         try:
             from transacciones_io import cargar_transacciones
             import re
+            from datetime import datetime
 
+            # 🧠 Siempre cargar el archivo desde origen
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo_raw = get_entity(tracker, "periodo")
             categoria_raw = get_entity(tracker, "categoria")
@@ -408,18 +410,18 @@ class ActionVerHistorialCompleto(Action):
             agrupadas = {"ingreso": {}, "gasto": {}}
             for t in transacciones_filtradas:
                 tipo = t["tipo"]
-                año = int(t.get("año", 0))
-                mes = t.get("mes", "").capitalize()
-                agrupadas.setdefault(tipo, {}).setdefault(año, {}).setdefault(mes, []).append(t)
+                año_t = int(t.get("año", 0))
+                mes_t = t.get("mes", "").capitalize()
+                agrupadas.setdefault(tipo, {}).setdefault(año_t, {}).setdefault(mes_t, []).append(t)
 
             def formatear_linea(t):
                 monto = float(t.get("monto", 0))
                 categoria = t.get("categoria", "sin categoría").capitalize()
                 dia = t.get("dia")
-                mes = t.get("mes")
-                año = t.get("año")
+                mes_f = t.get("mes")
+                año_f = t.get("año")
                 medio = t.get("medio", "")
-                fecha_str = f"{dia} de {mes} de {año}" if dia and mes and año else ""
+                fecha_str = f"{dia} de {mes_f} de {año_f}" if dia and mes_f and año_f else ""
                 linea = f"🔸 *{t['tipo'].capitalize()}* de *{monto:.2f} soles* en *{categoria}*"
                 if fecha_str:
                     linea += f", el *{fecha_str}*"
@@ -434,10 +436,10 @@ class ActionVerHistorialCompleto(Action):
                 if not agrupadas[tipo]:
                     continue
                 mensaje.append(label)
-                for año in sorted(agrupadas[tipo].keys()):
-                    for mes in sorted(agrupadas[tipo][año].keys(), key=lambda m: meses_orden[m.lower()]):
-                        mensaje.append(f"📅 *{mes} de {año}*:")
-                        for t in agrupadas[tipo][año][mes]:
+                for año_t in sorted(agrupadas[tipo].keys()):
+                    for mes_t in sorted(agrupadas[tipo][año_t].keys(), key=lambda m: meses_orden[m.lower()]):
+                        mensaje.append(f"📅 *{mes_t} de {año_t}*:")
+                        for t in sorted(agrupadas[tipo][año_t][mes_t], key=orden_fecha):
                             mensaje.append(formatear_linea(t))
 
             mensaje.append("👉 ¿Deseas *consultar otro periodo* o *registrar algo nuevo*?")
@@ -448,7 +450,6 @@ class ActionVerHistorialCompleto(Action):
             print(f"[ERROR] Fallo en action_ver_historial_completo: {e}")
             dispatcher.utter_message(text="❌ Ocurrió un error al mostrar tu historial. Por favor, intenta nuevamente.")
             return []
-
 
 from collections import Counter, defaultdict
 
