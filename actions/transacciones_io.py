@@ -57,10 +57,24 @@ def descargar_de_github():
     try:
         response = requests.get(url)
         if response.status_code == 200:
+            contenido = response.text.strip()
+
+            # Validar que no esté vacío ni mal formado
+            try:
+                json.loads(contenido)  # Intentamos parsear
+            except json.JSONDecodeError:
+                print("[ERROR] El contenido descargado NO es un JSON válido. Se omite escritura.")
+                return False
+
+            if not contenido:
+                print("[ERROR] El archivo descargado está vacío. No se sobreescribirá el local.")
+                return False
+
             with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
-                f.write(response.text)
+                f.write(contenido)
+
             SINCRONIZADO = True
-            print("[INFO] transacciones.json sincronizado desde GitHub")
+            print("[INFO] transacciones.json sincronizado correctamente desde GitHub")
             return True
         else:
             print(f"[WARN] No se pudo descargar el archivo desde GitHub ({response.status_code})")
@@ -68,6 +82,7 @@ def descargar_de_github():
     except Exception as e:
         print(f"[ERROR] Al intentar sincronizar desde GitHub: {e}")
         return False
+
 
 def cargar_transacciones(filtrar_activos=True, sincronizar=True):
     if sincronizar:
@@ -87,12 +102,12 @@ def cargar_transacciones(filtrar_activos=True, sincronizar=True):
 
 def guardar_transaccion(transaccion):
     try:
-        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)
+        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=True)
+        print(f"[INFO] Se cargaron {len(transacciones)} transacciones previas.")
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
 
-    # 🧱 Normalización y agregado
     ahora = datetime.now()
     fecha_str = transaccion.get("fecha") or ahora.strftime("%d/%m/%Y")
 
@@ -105,7 +120,8 @@ def guardar_transaccion(transaccion):
         else:
             dia, mes_num, año = map(int, fecha_str.split("/"))
             mes = MESES[mes_num - 1]
-    except:
+    except Exception as e:
+        print(f"[WARN] No se pudo procesar la fecha '{fecha_str}': {e}")
         dia = ahora.day
         mes = ahora.strftime("%B").lower()
         año = ahora.year
@@ -119,18 +135,26 @@ def guardar_transaccion(transaccion):
     })
 
     transacciones.append(transaccion)
+    print(f"[INFO] Transacción nueva agregada. Total ahora: {len(transacciones)}")
 
-    # 💾 Guardar localmente en tmp
-    with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
-        json.dump(transacciones, f, ensure_ascii=False, indent=2)
+    try:
+        with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
+            json.dump(transacciones, f, ensure_ascii=False, indent=2)
+        print("[OK] transacciones.json actualizado correctamente")
+    except Exception as e:
+        print(f"[ERROR] Fallo al guardar transacciones localmente: {e}")
+        return
 
     # ☁️ Subir al repositorio GitHub
-    from github_sync import subir_log_a_github
-    subir_log_a_github(
-        ruta_archivo_local=RUTA_TRANSACCIONES,
-        ruta_destino_repo=ARCHIVO_GITHUB,
-        mensaje_commit="Ingreso registrado automáticamente"
-    )
+    try:
+        from github_sync import subir_log_a_github
+        subir_log_a_github(
+            ruta_archivo_local=RUTA_TRANSACCIONES,
+            ruta_destino_repo=ARCHIVO_GITHUB,
+            mensaje_commit="Ingreso registrado automáticamente"
+        )
+    except Exception as e:
+        print(f"[ERROR] Fallo al subir archivo a GitHub: {e}")
 
 def eliminar_transaccion_logicamente(condiciones):
     transacciones = cargar_transacciones(filtrar_activos=False)
