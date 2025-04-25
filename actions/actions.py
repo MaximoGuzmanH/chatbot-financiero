@@ -15,6 +15,29 @@ from dateparser import parse as parse_fecha_relativa
 from transacciones_io import eliminar_transaccion_logicamente
 from alertas_io import guardar_alerta, eliminar_alerta_logicamente, cargar_alertas, guardar_todas_las_alertas
 import alertas_io
+import calendar
+
+def interpretar_periodo(periodo_raw):
+    hoy = datetime.now()
+
+    if not periodo_raw:
+        return None, None
+
+    texto = periodo_raw.lower().strip()
+
+    if "este mes" in texto:
+        return hoy.strftime("%B"), hoy.year
+    elif "último mes" in texto or "mes pasado" in texto:
+        mes = hoy.month - 1 if hoy.month > 1 else 12
+        año = hoy.year if hoy.month > 1 else hoy.year - 1
+        nombre_mes = calendar.month_name[mes]
+        return nombre_mes, año
+    else:
+        match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", texto)
+        if match:
+            return match.group(1), int(match.group(2)) if match.group(2) else hoy.year
+
+    return None, None
 
 def extraer_mes_y_anio(periodo: str):
     import re
@@ -357,20 +380,40 @@ class ActionVerHistorialCompleto(Action):
         try:
             from transacciones_io import cargar_transacciones
             import re
+            import calendar
             from datetime import datetime
+            from rasa_sdk.events import SlotSet
+
+            def interpretar_periodo(periodo_raw):
+                hoy = datetime.now()
+
+                if not periodo_raw:
+                    return None, None
+
+                texto = periodo_raw.lower().strip()
+
+                if "este mes" in texto:
+                    return hoy.strftime("%B"), hoy.year
+                elif "último mes" in texto or "mes pasado" in texto:
+                    mes = hoy.month - 1 if hoy.month > 1 else 12
+                    año = hoy.year if hoy.month > 1 else hoy.year - 1
+                    nombre_mes = calendar.month_name[mes]
+                    return nombre_mes, año
+                else:
+                    match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", texto)
+                    if match:
+                        return match.group(1), int(match.group(2)) if match.group(2) else hoy.year
+
+                return None, None
 
             transacciones = cargar_transacciones(filtrar_activos=True)
+
             periodo_raw = get_entity(tracker, "periodo")
             categoria_raw = get_entity(tracker, "categoria")
             medio_raw = get_entity(tracker, "medio")
 
             # 📆 Normalizar periodo a (mes, año)
-            mes, año = None, None
-            if periodo_raw:
-                match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
-                if match:
-                    mes = match.group(1).strip()
-                    año = int(match.group(2)) if match.group(2) else datetime.now().year
+            mes, año = interpretar_periodo(periodo_raw)
 
             meses_orden = {
                 "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
