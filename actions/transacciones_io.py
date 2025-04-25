@@ -57,33 +57,34 @@ def descargar_de_github():
 
     try:
         response = requests.get(url)
-        if response.status_code == 200:
-            nuevo_contenido = response.text
 
-            # ❌ No sobrescribimos si el archivo remoto está vacío
-            if not nuevo_contenido.strip():
-                print("[WARN] El archivo remoto está vacío. No se sobrescribirá localmente.")
-                return False
-
-            # 🧼 Siempre eliminamos el archivo local antes de sobrescribir
-            if os.path.exists(RUTA_TRANSACCIONES):
-                try:
-                    os.remove(RUTA_TRANSACCIONES)
-                    print("[INFO] Archivo transacciones.json eliminado localmente antes de sincronizar.")
-                except Exception as e:
-                    print(f"[ERROR] No se pudo eliminar archivo local: {e}")
-
-            # 💾 Guardamos el nuevo contenido descargado
-            with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
-                f.write(nuevo_contenido)
-
-            SINCRONIZADO = True
-            print("[INFO] transacciones.json sincronizado correctamente desde GitHub")
-            return True
-
-        else:
+        if response.status_code != 200:
             print(f"[WARN] No se pudo descargar el archivo desde GitHub ({response.status_code})")
             return False
+
+        nuevo_contenido = response.text
+
+        # 🛑 Validación: archivo remoto vacío
+        if not nuevo_contenido.strip():
+            print("[WARN] El archivo remoto está vacío. No se sobrescribirá localmente.")
+            return False
+
+        # 🔄 Eliminar archivo local si existe
+        if os.path.exists(RUTA_TRANSACCIONES):
+            try:
+                os.remove(RUTA_TRANSACCIONES)
+                print("[INFO] Archivo transacciones.json eliminado antes de sincronizar.")
+            except Exception as e:
+                print(f"[ERROR] No se pudo eliminar archivo local: {e}")
+                return False
+
+        # 💾 Guardar el nuevo archivo sincronizado
+        with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
+            f.write(nuevo_contenido)
+
+        SINCRONIZADO = True
+        print("[INFO] transacciones.json sincronizado correctamente desde GitHub")
+        return True
 
     except Exception as e:
         print(f"[ERROR] Al intentar sincronizar desde GitHub: {e}")
@@ -114,14 +115,17 @@ def cargar_transacciones(filtrar_activos=True, sincronizar=True):
         return []
 
 def guardar_transaccion(transaccion):
-    # Paso 1: Cargar transacciones ya sincronizadas previamente (NO volver a sincronizar aquí)
+    # 🔄 Paso 1: sincronizar ANTES de leer
+    descargar_de_github()
+
+    # 📥 Paso 2: cargar lo que AHORA está en local (ya sincronizado)
     try:
-        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)
+        transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)  # 👈 Esto es CRUCIAL
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
 
-    # Paso 2: Procesar fecha y campos auxiliares
+    # 🧱 Paso 3: Normalizar campos
     ahora = datetime.now()
     fecha_str = transaccion.get("fecha") or ahora.strftime("%d/%m/%Y")
 
@@ -147,14 +151,14 @@ def guardar_transaccion(transaccion):
         "status": transaccion.get("status", 1)
     })
 
-    # Paso 3: Agregar la nueva transacción
+    # ➕ Paso 4: AGREGAR a la lista de transacciones
     transacciones.append(transaccion)
 
-    # Paso 4: Guardar en el archivo local
+    # 💾 Paso 5: guardar localmente
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
-    # Paso 5: Subir a GitHub
+    # ☁️ Paso 6: subir a GitHub
     from github_sync import subir_log_a_github
     subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
