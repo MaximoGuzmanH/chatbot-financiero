@@ -349,6 +349,7 @@ class ActionVerHistorialCompleto(Action):
         try:
             from transacciones_io import cargar_transacciones
             import re
+            from collections import defaultdict
 
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo_raw = get_entity(tracker, "periodo")
@@ -409,16 +410,14 @@ class ActionVerHistorialCompleto(Action):
             ingresos.sort(key=orden_fecha)
             gastos.sort(key=orden_fecha)
 
-            # 🧾 Construir mensaje
-            mensaje = []
-
-            encabezado = "**📋 Historial de transacciones**"
-            if periodo_raw:
-                encabezado += f" para *{periodo_raw.strip()}*"
-            mensaje.append(encabezado + ":")
+            def agrupar_por_mes(transacciones):
+                agrupadas = defaultdict(list)
+                for t in transacciones:
+                    clave = f"{t.get('mes', '').capitalize()} de {t.get('año')}"
+                    agrupadas[clave].append(t)
+                return agrupadas
 
             def formatear_linea(t):
-                tipo = t.get("tipo", "Transacción").capitalize()
                 monto = float(t.get("monto", 0))
                 categoria = t.get("categoria", "sin categoría").capitalize()
                 dia = t.get("dia")
@@ -426,24 +425,35 @@ class ActionVerHistorialCompleto(Action):
                 año = t.get("año")
                 medio = t.get("medio", "")
 
-                fecha_str = ""
-                if dia and mes and año:
-                    fecha_str = f"{dia} de {mes} de {año}"
-
-                linea = f"🔸 *{tipo}* de *{monto:.2f} soles* en *{categoria}*"
+                fecha_str = f"{dia} de {mes} de {año}" if dia and mes and año else ""
+                linea = f"🔸 {'Ingreso' if t['tipo'] == 'ingreso' else 'Gasto'} de *{monto:.2f} soles* en *{categoria}*"
                 if fecha_str:
                     linea += f", el *{fecha_str}*"
                 if medio and medio.lower() != "n/a":
                     linea += f", con *{medio}*"
                 return linea
 
+            mensaje = []
+            encabezado = "**📋 Historial de transacciones**"
+            if periodo_raw:
+                encabezado += f" para *{periodo_raw.strip()}*"
+            mensaje.append(encabezado + ":")
+
             if ingresos:
                 mensaje.append("💰 **Ingresos:**")
-                mensaje.extend([formatear_linea(t) for t in ingresos])
+                ingresos_por_mes = agrupar_por_mes(ingresos)
+                for mes_año in sorted(ingresos_por_mes.keys(), key=lambda x: orden_fecha(ingresos_por_mes[x][0])):
+                    mensaje.append(f"📆 *{mes_año}*:")
+                    for t in ingresos_por_mes[mes_año]:
+                        mensaje.append(formatear_linea(t))
 
             if gastos:
                 mensaje.append("🧾 **Egresos:**")
-                mensaje.extend([formatear_linea(t) for t in gastos])
+                gastos_por_mes = agrupar_por_mes(gastos)
+                for mes_año in sorted(gastos_por_mes.keys(), key=lambda x: orden_fecha(gastos_por_mes[x][0])):
+                    mensaje.append(f"📆 *{mes_año}*:")
+                    for t in gastos_por_mes[mes_año]:
+                        mensaje.append(formatear_linea(t))
 
             mensaje.append("👉 ¿Deseas *consultar otro periodo* o *registrar algo nuevo*?")
             dispatcher.utter_message(text=construir_mensaje(*mensaje))
