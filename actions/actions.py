@@ -50,6 +50,14 @@ def formatear_fecha(fecha: str) -> str:
         pass
     return fecha
 
+def mes_a_numero(mes: str) -> int:
+    meses = {
+        "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+        "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+        "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+    }
+    return meses.get(mes.strip().lower(), 0)
+
 def get_entity(tracker: Tracker, entity_name: str) -> Text:
     entity = next(tracker.get_latest_entity_values(entity_name), None)
     return entity if entity else ""
@@ -351,12 +359,20 @@ class ActionVerHistorialCompleto(Action):
             import re
             from datetime import datetime
 
-            # 🧠 Siempre cargar el archivo desde origen
+            def mes_a_numero(mes: str) -> int:
+                meses = {
+                    "enero": 1, "febrero": 2, "marzo": 3, "abril": 4,
+                    "mayo": 5, "junio": 6, "julio": 7, "agosto": 8,
+                    "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
+                }
+                return meses.get(mes.strip().lower(), 0)
+
+            # 🧠 Siempre cargar desde el origen
             transacciones = cargar_transacciones(filtrar_activos=True)
             periodo_raw = get_entity(tracker, "periodo")
             categoria_raw = get_entity(tracker, "categoria")
 
-            # 📆 Normalizar periodo a (mes, año)
+            # 📆 Extraer mes y año si se especificó
             mes, año = None, None
             if periodo_raw:
                 match = re.search(r"([a-záéíóúñ]+)(?:\s+de\s+)?(\d{4})?", periodo_raw.lower())
@@ -391,16 +407,11 @@ class ActionVerHistorialCompleto(Action):
                 dispatcher.utter_message(text=mensaje)
                 return []
 
-            # 📅 Ordenar por año, mes y día
-            meses_orden = {
-                "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
-                "julio": 7, "agosto": 8, "septiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12
-            }
-
+            # 📅 Función para ordenar por fecha
             def orden_fecha(t):
                 return (
                     int(t.get("año", 0)),
-                    meses_orden.get(t.get("mes", "").lower(), 0),
+                    mes_a_numero(t.get("mes", "")),
                     int(t.get("dia", 0))
                 )
 
@@ -437,7 +448,7 @@ class ActionVerHistorialCompleto(Action):
                     continue
                 mensaje.append(label)
                 for año_t in sorted(agrupadas[tipo].keys()):
-                    for mes_t in sorted(agrupadas[tipo][año_t].keys(), key=lambda m: meses_orden[m.lower()]):
+                    for mes_t in sorted(agrupadas[tipo][año_t].keys(), key=lambda m: mes_a_numero(m)):
                         mensaje.append(f"📅 *{mes_t} de {año_t}*:")
                         for t in sorted(agrupadas[tipo][año_t][mes_t], key=orden_fecha):
                             mensaje.append(formatear_linea(t))
