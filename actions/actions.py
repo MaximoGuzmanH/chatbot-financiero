@@ -963,15 +963,14 @@ class ActionResetearCategoriaGastos(Action):
         from datetime import datetime
         import re
         import json
-        import os
         from transacciones_io import (
-            cargar_transacciones,
-            RUTA_TRANSACCIONES,
-            MESES,
-            subir_a_github,
-            descargar_de_github,
-            TOKEN,
-            REPO,
+            cargar_transacciones, 
+            RUTA_TRANSACCIONES, 
+            MESES, 
+            subir_a_github, 
+            descargar_de_github, 
+            TOKEN, 
+            REPO, 
             ARCHIVO_GITHUB
         )
         from utils import get_entity, construir_mensaje
@@ -997,12 +996,14 @@ class ActionResetearCategoriaGastos(Action):
         año = int(match.group(2))
         ahora = datetime.now().isoformat()
 
-        # 📥 Descargar el archivo más reciente desde GitHub y cargar todo
+        # 📥 Forzar descarga del archivo original desde GitHub
         descargar_de_github()
+
+        # 🔄 Cargar transacciones completas (incluso eliminadas)
         transacciones = cargar_transacciones(filtrar_activos=False)
 
-        # 🔍 Identificar y resetear gastos activos de la categoría y mes especificado
         gastos_reseteados = []
+
         for t in transacciones:
             if (
                 t.get("tipo") == "gasto"
@@ -1015,7 +1016,7 @@ class ActionResetearCategoriaGastos(Action):
                 t["timestamp_modificacion"] = ahora
                 gastos_reseteados.append(t)
 
-        # 📝 Registrar el reinicio como evento
+        # 📝 Registrar el reinicio como transacción
         transacciones.append({
             "tipo": "reinicio",
             "categoria": categoria,
@@ -1026,23 +1027,17 @@ class ActionResetearCategoriaGastos(Action):
             "status": 1
         })
 
-        # 💾 Guardar cambios en /tmp y subir a GitHub
+        # 💾 Guardar en /tmp y subir a GitHub
         with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
             json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
         if TOKEN:
             subir_a_github(RUTA_TRANSACCIONES, REPO, ARCHIVO_GITHUB, TOKEN)
 
-        # 📢 Construir respuesta al usuario
+        # 📢 Construcción del mensaje
         if gastos_reseteados:
             detalles = "\n".join([
-                "• {} – {:.2f} soles – {}".format(
-                    g["categoria"].capitalize(),
-                    g["monto"],
-                    g.get("fecha", "{} de {} de {}".format(
-                        g.get("dia", "?"), g["mes"], g["año"]
-                    ))
-                )
+                f"• {g['categoria'].capitalize()} – {g['monto']:.2f} soles – {g.get('dia', '?')} de {g.get('mes', '?')} de {g.get('año', '?')}"
                 for g in gastos_reseteados
             ])
             mensaje = construir_mensaje(
