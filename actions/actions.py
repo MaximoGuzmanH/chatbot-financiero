@@ -287,11 +287,7 @@ class ActionRegistrarIngreso(Action):
                 "medio": medio
             }
 
-            from transacciones_io import descargar_de_github
-
-            # Antes de guardar, sincroniza desde GitHub
-            descargar_de_github()
-
+            # 👉 Ya no sincronizamos aquí (descargar_de_github), solo guardamos
             guardar_transaccion(transaccion)
             
             mensaje = construir_mensaje(
