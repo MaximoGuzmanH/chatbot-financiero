@@ -54,35 +54,40 @@ def subir_a_github(ruta_local, repo, archivo_remoto, token):
 def descargar_de_github():
     global SINCRONIZADO
     url = f"https://raw.githubusercontent.com/{REPO}/main/{ARCHIVO_GITHUB}"
+
     try:
         response = requests.get(url)
         if response.status_code == 200:
-            contenido = response.text.strip()
+            nuevo_contenido = response.text
 
-            # Validar que no esté vacío ni mal formado
-            try:
-                json.loads(contenido)  # Intentamos parsear
-            except json.JSONDecodeError:
-                print("[ERROR] El contenido descargado NO es un JSON válido. Se omite escritura.")
+            # Evita sobreescribir si el contenido remoto está vacío
+            if not nuevo_contenido.strip():
+                print("[WARN] El archivo remoto está vacío. No se sobrescribirá localmente.")
                 return False
 
-            if not contenido:
-                print("[ERROR] El archivo descargado está vacío. No se sobreescribirá el local.")
-                return False
+            # 🧠 Validación extra: evitar borrar contenido local válido
+            if os.path.exists(RUTA_TRANSACCIONES):
+                with open(RUTA_TRANSACCIONES, "r", encoding="utf-8") as f:
+                    actual = f.read()
+                if actual.strip() == nuevo_contenido.strip():
+                    print("[INFO] El archivo local ya está sincronizado con GitHub.")
+                    return True
 
+            # 💾 Sólo ahora sobrescribimos
             with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
-                f.write(contenido)
+                f.write(nuevo_contenido)
 
             SINCRONIZADO = True
-            print("[INFO] transacciones.json sincronizado correctamente desde GitHub")
+            print("[INFO] transacciones.json sincronizado desde GitHub")
             return True
+
         else:
             print(f"[WARN] No se pudo descargar el archivo desde GitHub ({response.status_code})")
             return False
+
     except Exception as e:
         print(f"[ERROR] Al intentar sincronizar desde GitHub: {e}")
         return False
-
 
 def cargar_transacciones(filtrar_activos=True, sincronizar=True):
     if sincronizar:
