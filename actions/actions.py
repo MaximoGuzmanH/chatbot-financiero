@@ -547,18 +547,21 @@ class ActionAnalizarGastos(Action):
             return None, None
 
         mes, año = interpretar_periodo(periodo_raw or texto_usuario)
+        if not año:
+            año = datetime.now().year  # Año por defecto
 
         # 🎯 Filtrar gastos válidos
         gastos = [t for t in transacciones if t.get("tipo") == "gasto" and t.get("monto") and t.get("categoria")]
 
-        if mes and año:
-            gastos = [
-                g for g in gastos
-                if g.get("mes", "").lower() == mes.lower() and int(str(g.get("año", 0)).replace(",", "")) == año
-            ]
+        # 📅 Filtrar por año siempre, y por mes si está presente
+        gastos = [
+            g for g in gastos
+            if int(str(g.get("año", 0)).replace(",", "")) == año and
+               (not mes or g.get("mes", "").lower() == mes.lower())
+        ]
 
         if not gastos:
-            periodo_str = f"{mes} de {año}" if mes and año else "el periodo indicado"
+            periodo_str = f"{mes} de {año}" if mes else f"{año}"
             dispatcher.utter_message(text=f"📭 *No se encontraron gastos registrados* para el periodo **{periodo_str}**.\n¿Deseas ingresar uno?")
             return []
 
@@ -573,16 +576,17 @@ class ActionAnalizarGastos(Action):
                 mensaje = construir_mensaje(
                     f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría." if sin_categoria else "",
                     f"🔍 No se encontraron gastos en la categoría *{categoria}*"
-                    + (f" durante *{mes} de {año}*" if mes and año else "") + "."
+                    + (f" durante *{mes} de {año}*" if mes else f" en *{año}*") + "."
                 )
             else:
+                porcentaje = (total_categoria / sum(float(g["monto"]) for g in gastos) * 100)
                 mensaje = construir_mensaje(
-                    f"⚠️ Se encontraron {len(sin_categoria)} gasto(s) sin categoría." if sin_categoria else "",
-                    f"📂 Has gastado un total de *{total_categoria:.2f} soles* en *{categoria}*"
-                    + (f" durante *{mes} de {año}*" if mes and año else "") + "."
+                    f"📊 En *{categoria}* gastaste un total de *{total_categoria:.2f} soles*",
+                    f"📈 Eso representa aproximadamente *{porcentaje:.1f}%* del total de tus gastos.",
+                    f"📅 Periodo analizado: *{mes} de {año}*" if mes else f"📅 Año: *{año}*"
                 )
 
-            dispatcher.utter_message(text=mensaje)
+            dispatcher.utter_message(text=mensaje.replace("\n", "<br>"))
             return [SlotSet("sugerencia_pendiente", "action_consultar_resumen_mensual")]
 
         # 📊 Agrupar por categoría
@@ -598,8 +602,7 @@ class ActionAnalizarGastos(Action):
         mensaje = []
 
         titulo = f"📊 **Análisis de tus hábitos de consumo**"
-        if mes and año:
-            titulo += f" durante *{mes} de {año}*"
+        titulo += f" durante *{mes} de {año}*" if mes else f" en el año *{año}*"
         mensaje.append(titulo)
 
         if sin_categoria:
