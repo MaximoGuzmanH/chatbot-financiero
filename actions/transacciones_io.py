@@ -114,20 +114,14 @@ def cargar_transacciones(filtrar_activos=True, sincronizar=True):
         return []
 
 def guardar_transaccion(transaccion):
-    # 🔄 Paso 1: sincronizar antes de cualquier lectura
-    descargar_de_github()  # Esto descarga desde GitHub y pisa el archivo local
-
-    # 📥 Paso 2: cargar lo que ahora está en local (ya sincronizado)
+    # Paso 1: Cargar transacciones ya sincronizadas previamente (NO volver a sincronizar aquí)
     try:
         transacciones = cargar_transacciones(filtrar_activos=False, sincronizar=False)
-        if not isinstance(transacciones, list):
-            print("[WARN] El contenido de transacciones no es una lista. Se inicializará una nueva lista vacía.")
-            transacciones = []
     except Exception as e:
         print(f"[ERROR] No se pudo cargar transacciones previas: {e}")
         transacciones = []
 
-    # 🧱 Paso 3: agregar los campos auxiliares (fecha, timestamp, etc.)
+    # Paso 2: Procesar fecha y campos auxiliares
     ahora = datetime.now()
     fecha_str = transaccion.get("fecha") or ahora.strftime("%d/%m/%Y")
 
@@ -140,8 +134,7 @@ def guardar_transaccion(transaccion):
         else:
             dia, mes_num, año = map(int, fecha_str.split("/"))
             mes = MESES[mes_num - 1]
-    except Exception as e:
-        print(f"[WARN] Fecha inválida '{fecha_str}': {e}")
+    except:
         dia = ahora.day
         mes = ahora.strftime("%B").lower()
         año = ahora.year
@@ -154,14 +147,14 @@ def guardar_transaccion(transaccion):
         "status": transaccion.get("status", 1)
     })
 
-    # ➕ Paso 4: agregar la nueva transacción a la lista sincronizada
+    # Paso 3: Agregar la nueva transacción
     transacciones.append(transaccion)
 
-    # 💾 Paso 5: guardar en el archivo local
+    # Paso 4: Guardar en el archivo local
     with open(RUTA_TRANSACCIONES, "w", encoding="utf-8") as f:
         json.dump(transacciones, f, ensure_ascii=False, indent=2)
 
-    # ☁️ Paso 6: subir la nueva versión a GitHub
+    # Paso 5: Subir a GitHub
     from github_sync import subir_log_a_github
     subir_log_a_github(
         ruta_archivo_local=RUTA_TRANSACCIONES,
