@@ -160,5 +160,17 @@
     "año": 2025,
     "timestamp": "2025-04-26T00:45:49.430407",
     "status": 1
+  },
+  {
+    "tipo": "ingreso",
+    "monto": 1500.0,
+    "categoria": "sueldo",
+    "fecha": "1 de abril",
+    "medio": "transferencia",
+    "dia": 1,
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-26T00:46:05.729367",
+    "status": 1
   }
 ]
