@@ -27,5 +27,14 @@
     "año": 2025,
     "timestamp": "2025-04-25T23:29:17.981629",
     "status": 1
+  },
+  {
+    "categoria": "entretenimiento",
+    "monto": 300.0,
+    "periodo": "abril de 2025",
+    "mes": "abril",
+    "año": 2025,
+    "timestamp": "2025-04-26T00:48:42.953126",
+    "status": 1
   }
 ]
